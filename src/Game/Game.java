@@ -27,6 +27,7 @@ public class Game extends BasicGame {
 	// online editor und anschliessend pull test
 	// neuer linux test mit neuem project setup
 	// keine umlaute!!!! sifu!!!!!
+	// so jetzt geh ma SN!
 	/*/
 	private static int				screenWidth		= 800;
 	private static int				screenHeight	= 600;
