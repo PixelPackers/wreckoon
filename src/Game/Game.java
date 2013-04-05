@@ -217,4 +217,6 @@ public class Game extends BasicGame {
 		game.setShowFPS(false);
 		game.start();
 	}
+	
+	// delete me please
 }
