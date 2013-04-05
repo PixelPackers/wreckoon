@@ -24,6 +24,7 @@ import org.newdawn.slick.SlickException;
 
 public class Game extends BasicGame {
 	// linux setup
+	// online editor und anschließend pull test
 	/*/
 	private static int				screenWidth		= 800;
 	private static int				screenHeight	= 600;
