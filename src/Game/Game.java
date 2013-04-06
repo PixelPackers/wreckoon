@@ -23,12 +23,7 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 
 public class Game extends BasicGame {
-	// linux setup
-	// online editor und anschliessend pull test
-	// neuer linux test mit neuem project setup
-	// keine umlaute!!!! sifu!!!!!
-	// so jetzt geh ma SN!
-	/*/
+	//*/
 	private static int				screenWidth		= 800;
 	private static int				screenHeight	= 600;
 	private static boolean			fullScreen		= false;
@@ -136,7 +131,7 @@ public class Game extends BasicGame {
 		
 		min_size = 0.1f;
 		max_size = 0.3f;
-		
+		/*
 		for (int i = 0; i < 10; ++i) {
 			for (int j = 0; j < 10; ++j) {
 				float size = (float) Math.random()*max_size + min_size;
@@ -153,30 +148,34 @@ public class Game extends BasicGame {
 				GameObject crate = new GameObject(bodyDef, fixtureDef, world, "images/crate.png");
 				crates.add(crate);
 			}
-		}
+		}//*/
 	}
 	
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
 		Input input = gc.getInput();
 		
-		if (input.isKeyPressed(Input.KEY_SPACE)) {
+		if (input.isKeyPressed(Input.KEY_SPACE) || input.isKeyPressed(Input.KEY_W) || input.isKeyPressed(Input.KEY_UP)) {
 			player.getBody().setLinearVelocity(new Vec2(player.getBody().getLinearVelocity().x, 20));
 		}
-		if (input.isKeyDown(Input.KEY_LEFT)) {
+		if (input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
 			// player.getBody().setLinearVelocity(new Vec2(-2, player.getBody().getLinearVelocity().y));
 			player.accelerate(true);
 		}
-		if (input.isKeyDown(Input.KEY_RIGHT)) {
+		if (input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D)) {
 			// player.getBody().setLinearVelocity(new Vec2(2, player.getBody().getLinearVelocity().y));
 			player.accelerate(false);
 		}
 		
 		if (input.isKeyDown(Input.KEY_E)) {
-			zoom += ZOOM_STEP;
+			if(zoom < 2){
+				zoom += ZOOM_STEP;
+			}
 		}
 		if (input.isKeyDown(Input.KEY_R)) {
-			zoom -= ZOOM_STEP;
+			if(zoom -ZOOM_STEP > ZOOM_STEP){
+				zoom -= ZOOM_STEP;
+			}
 		}
 		
 		// if (input.isKeyDown(Input.KEY_W)) {
