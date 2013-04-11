@@ -24,7 +24,7 @@ import org.newdawn.slick.SlickException;
 
 public class Game extends BasicGame {
 	
-	// Mo's Kommentar
+	// Sifu's Kommentar
 	
 	//*/
 	private static int				screenWidth		= 800;
