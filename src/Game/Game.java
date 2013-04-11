@@ -23,6 +23,9 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 
 public class Game extends BasicGame {
+	
+	// Mo's Kommentar
+	
 	//*/
 	private static int				screenWidth		= 800;
 	private static int				screenHeight	= 600;
