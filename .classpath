@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/home/chris/workspace/TheRaccooning/natives/linux"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="TheRaccooning/natives"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7">
@@ -10,10 +10,10 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/home/chris/workspace/TheRaccooning/natives/linux"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/home/chris/workspace/TheRaccooning/lib/jbox2d.jar"/>
-	<classpathentry kind="lib" path="/home/chris/workspace/TheRaccooning/lib/jinput.jar"/>
-	<classpathentry kind="lib" path="/home/chris/workspace/TheRaccooning/lib/lwjgl.jar"/>
-	<classpathentry kind="lib" path="/home/chris/workspace/TheRaccooning/lib/slf4j.jar"/>
-	<classpathentry kind="lib" path="/home/chris/workspace/TheRaccooning/lib/slick.jar"/>
+	<classpathentry kind="lib" path="lib/jbox2d.jar"/>
+	<classpathentry kind="lib" path="lib/jinput.jar"/>
+	<classpathentry kind="lib" path="lib/lwjgl.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j.jar"/>
+	<classpathentry kind="lib" path="lib/slick.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

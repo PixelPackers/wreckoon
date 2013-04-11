@@ -28,8 +28,8 @@ public class Game extends BasicGame {
 	private static int				screenHeight	= 600;
 	private static boolean			fullScreen		= false;
 	/*/
-	private static int				screenWidth		= 1366;
-	private static int				screenHeight	= 768;
+	private static int				screenWidth		= 1920;
+	private static int				screenHeight	= 1080;
 	private static boolean			fullScreen		= true;
 	//*/
 	
@@ -119,7 +119,7 @@ public class Game extends BasicGame {
 				fixtureDef.shape = c;
 				
 				
-				bodyDef.position.set(max_size * i, max_size * j);
+				bodyDef.position.set(max_size * i * 10, max_size * j * 10);
 				GameObject crate = new GameObject(bodyDef, fixtureDef, world, "images/player.png");
 				crates.add(crate);
 			}
@@ -131,7 +131,7 @@ public class Game extends BasicGame {
 		
 		min_size = 0.1f;
 		max_size = 0.3f;
-		/*
+		//*
 		for (int i = 0; i < 10; ++i) {
 			for (int j = 0; j < 10; ++j) {
 				float size = (float) Math.random()*max_size + min_size;
@@ -144,7 +144,7 @@ public class Game extends BasicGame {
 
 				
 				
-				bodyDef.position.set(max_size * i, max_size * j);
+				bodyDef.position.set(max_size * i * 10, max_size * j * 10);
 				GameObject crate = new GameObject(bodyDef, fixtureDef, world, "images/crate.png");
 				crates.add(crate);
 			}
@@ -167,6 +167,7 @@ public class Game extends BasicGame {
 			player.accelerate(false);
 		}
 		
+		// TODO Kamera Smoothness muss auch angepasst werden, je nach Zoom
 		if (input.isKeyDown(Input.KEY_E)) {
 			if(zoom < 2){
 				zoom += ZOOM_STEP;
