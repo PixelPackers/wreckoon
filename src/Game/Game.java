@@ -55,6 +55,9 @@ public class Game extends BasicGame {
 	
 	@Override
 	public void init(GameContainer gc) throws SlickException {
+		
+		// git, bitte funtionier
+		
 		// world = new World(gravity, doSleep);
 		world = new World(new Vec2(0f, -30f), false);
 		
