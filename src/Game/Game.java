@@ -3,13 +3,9 @@ package Game;
 // TODO delete
 import java.util.ArrayList;
 
-import org.jbox2d.*;
-
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
-import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
@@ -26,7 +22,7 @@ public class Game extends BasicGame {
 	
 	// Sifu's Kommentar
 	
-	//*/
+	/*/
 	private static int				screenWidth		= 800;
 	private static int				screenHeight	= 600;
 	private static boolean			fullScreen		= false;
@@ -42,9 +38,11 @@ public class Game extends BasicGame {
 	private ArrayList<GameObject>	crates			= new ArrayList<GameObject>();
 	private Player					player;
 	
-	private final float				WORLD_SCALE		= 100f;
-	private float					zoom			= 0.3f;
-	private final float				ZOOM_STEP		= 0.01f;
+	//private Image[][] worldImages = new Image[8][8];
+	private Image trashpile;
+	
+	private float					zoom			= 30f;
+	private final float				ZOOM_STEP		= 1f;
 	
 	private Camera					cam				= new Camera(0, screenHeight);
 	private static final float		CAM_SPEED		= 5f;
@@ -55,6 +53,14 @@ public class Game extends BasicGame {
 	
 	@Override
 	public void init(GameContainer gc) throws SlickException {
+		
+		/*for (int y = 0; y < worldImages.length; ++y) {
+			for (int x = 0; x < worldImages[0].length; ++x) {
+				//worldImages[y][x] = new Image("images/world_x" + x % 2 + "_y" + y % 2 + ".png");
+				worldImages[y][x] = new Image("images/test" + (x + 1) + " (" + (y + 1) + ").png");
+			}
+		}*/
+		trashpile = new Image("images/background.png");
 		
 		// git, bitte funtionier
 		
@@ -161,21 +167,25 @@ public class Game extends BasicGame {
 	public void update(GameContainer gc, int delta) throws SlickException {
 		Input input = gc.getInput();
 		
-		if (input.isKeyPressed(Input.KEY_SPACE) || input.isKeyPressed(Input.KEY_W) || input.isKeyPressed(Input.KEY_UP)) {
+		if (input.isKeyPressed(Input.KEY_SPACE) || input.isKeyPressed(Input.KEY_W) || input.isKeyPressed(Input.KEY_UP) || input.isButton1Pressed(0)) {
 			player.getBody().setLinearVelocity(new Vec2(player.getBody().getLinearVelocity().x, 20));
 		}
-		if (input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
+		if (input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A) || input.isControllerLeft(0)) {
 			// player.getBody().setLinearVelocity(new Vec2(-2, player.getBody().getLinearVelocity().y));
 			player.accelerate(true);
 		}
-		if (input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D)) {
+		if (input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D) || input.isControllerRight(0)) {
 			// player.getBody().setLinearVelocity(new Vec2(2, player.getBody().getLinearVelocity().y));
 			player.accelerate(false);
 		}
 		
+		if (input.isKeyPressed(Input.KEY_DOWN) || input.isKeyDown(Input.KEY_S) || input.isButton3Pressed(0)) {
+			player.getBody().setLinearVelocity(new Vec2(player.getBody().getLinearVelocity().x, -50));
+		}
+		
 		// TODO Kamera Smoothness muss auch angepasst werden, je nach Zoom
 		if (input.isKeyDown(Input.KEY_E)) {
-			if(zoom < 2){
+			if (zoom < 200){
 				zoom += ZOOM_STEP;
 			}
 		}
@@ -205,11 +215,31 @@ public class Game extends BasicGame {
 	
 	@Override
 	public void render(GameContainer gc, Graphics g) throws SlickException {
-		g.translate(cam.getX() * zoom * WORLD_SCALE + screenWidth / 2f, cam.getY() * zoom * WORLD_SCALE + screenHeight * 2f / 3f);
-		g.scale(zoom * WORLD_SCALE, zoom * WORLD_SCALE);
+		// FIXME clean this crap up
+		g.pushTransform();
+		g.translate(cam.getX() * 0.75f * zoom + screenWidth / 2f, cam.getY() * 0.75f * zoom + screenHeight * 2f / 3f);
+		g.scale(zoom, zoom);
+		trashpile.draw(-7, -29, 30f, 15f);
+		g.popTransform();
+		
+		g.pushTransform();
+		g.translate(cam.getX() * 0.875f * zoom + screenWidth / 2f, cam.getY() * 0.875f * zoom + screenHeight * 2f / 3f);
+		g.scale(zoom, zoom);
+		trashpile.draw(3, -18, 40f, 20f);
+		g.popTransform();
+		
+		g.translate(cam.getX() * zoom + screenWidth / 2f, cam.getY() * zoom + screenHeight * 2f / 3f);
+		g.scale(zoom, zoom);
+		
 		for (GameObject staticObj : staticObjects) {
 			staticObj.draw();
 		}
+		
+		/*for (int y = 0; y < worldImages.length; ++y) {
+			for (int x = 0; x < worldImages[0].length; ++x) {
+				worldImages[y][x].draw(x * 19, y * 10, 19, 10);
+			}
+		}*/
 		
 		for (GameObject crate : crates) {
 			crate.draw();
@@ -228,5 +258,4 @@ public class Game extends BasicGame {
 		game.start();
 	}
 	
-	// delete me please
 }
