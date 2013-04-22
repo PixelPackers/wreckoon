@@ -111,16 +111,16 @@ public class Game extends BasicGame {
 		
 		polyPolyShape = new PolygonShape();
 
-			Vec2[] points = new Vec2[8];
-			points[0] = new Vec2( 0f,	0f);
+			Vec2[] points = new Vec2[7];
+			points[0] = new Vec2(  0f,	0f);
 			points[1] = new Vec2( 22f,	0f);
-			points[2] = new Vec2( -6f,	12f);
+			points[2] = new Vec2( -6f, 12f);
 			points[3] = new Vec2( -8f,	8f);
 			points[4] = new Vec2( -8f,	7f);
 			points[5] = new Vec2( -7f,	4f);
 			points[6] = new Vec2( -5f,	2f);
-			points[7] = new Vec2( -2f,	0f);
-		polyPolyShape.set(points, 8);
+			//points[7] = new Vec2( -2f,	0f);
+		polyPolyShape.set(points, 7);
 		//*/
 		FixtureDef polyFixDef = new FixtureDef();
 		polyFixDef.shape = polyPolyShape;
@@ -229,6 +229,25 @@ public class Game extends BasicGame {
 		if (input.isKeyDown(Input.KEY_R)) {
 			if(zoom -ZOOM_STEP > ZOOM_STEP){
 				zoom -= ZOOM_STEP;
+			}
+		}
+		
+		if (input.isKeyPressed(Input.KEY_X)) {
+			if( !crates.isEmpty() ){
+//				GameObject o = crates.get(0);
+//				o.getBody().setLinearVelocity( new Vec2(0, 14 ) );
+//				world.destroyBody( o.getBody() );
+//				crates.remove(o);
+			}
+			for ( GameObject o : crates){
+				o.getBody().setLinearVelocity( new Vec2( o.getBody().m_linearVelocity.x, (float)(Math.random() * 14) )) ;
+			}
+		}
+		if (input.isKeyDown(Input.KEY_Y)) {
+			if( !crates.isEmpty() ){
+				GameObject o = crates.get(0);
+				world.destroyBody( o.getBody() );
+				crates.remove(o);
 			}
 		}
 		
