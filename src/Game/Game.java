@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
@@ -17,6 +18,7 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.geom.Polygon;
 
 public class Game extends BasicGame {
 	
@@ -37,6 +39,8 @@ public class Game extends BasicGame {
 	private ArrayList<GameObject>	staticObjects	= new ArrayList<GameObject>();
 	private ArrayList<GameObject>	crates			= new ArrayList<GameObject>();
 	private Player					player;
+	private PolygonShape 			polyPolyShape;
+	private BodyDef 				polyBodyDef;
 	
 	//private Image[][] worldImages = new Image[8][8];
 	private Image[] trashpile = new Image[5];
@@ -84,9 +88,9 @@ public class Game extends BasicGame {
 		
 		// walls
 		BodyDef wallBodyDef = new BodyDef();
-		wallBodyDef.position.set(0f, 0f);
+		wallBodyDef.position.set(17f, 0f);
 		PolygonShape wallShape = new PolygonShape();
-		wallShape.setAsBox(10f, 50f);
+		wallShape.setAsBox(1f, 10f);
 		FixtureDef wallFixtureDef = new FixtureDef();
 		wallFixtureDef.shape = wallShape;
 		GameObject wall = new GameObject(wallBodyDef, wallFixtureDef, world, "images/crate.png");
@@ -98,6 +102,35 @@ public class Game extends BasicGame {
 		// groundBox.setAsBox(1, 50);
 		// groundBody.createFixture(groundBox, 0);
 		// staticObjects.add(wall);
+		
+		// P O L Y G O N
+		polyBodyDef = new BodyDef();
+		polyBodyDef.position.set(-5f,4f);
+		
+		Body poly = new Body(polyBodyDef, world);
+		
+		polyPolyShape = new PolygonShape();
+
+			Vec2[] points = new Vec2[8];
+			points[0] = new Vec2( 0f,	0f);
+			points[1] = new Vec2( 22f,	0f);
+			points[2] = new Vec2( -6f,	12f);
+			points[3] = new Vec2( -8f,	8f);
+			points[4] = new Vec2( -8f,	7f);
+			points[5] = new Vec2( -7f,	4f);
+			points[6] = new Vec2( -5f,	2f);
+			points[7] = new Vec2( -2f,	0f);
+		polyPolyShape.set(points, 8);
+		//*/
+		FixtureDef polyFixDef = new FixtureDef();
+		polyFixDef.shape = polyPolyShape;
+		
+		world.createBody(polyBodyDef);
+		poly.createFixture(polyFixDef);
+		
+		
+		
+		
 		
 		// Dynamic Body
 		BodyDef bodyDef = new BodyDef();
@@ -289,6 +322,15 @@ public class Game extends BasicGame {
 		}
 		
 		player.draw();
+		
+		
+		// my poly		
+		Polygon p = new Polygon();
+		Vec2[] verts = polyPolyShape.getVertices();
+		for (Vec2 v : verts){
+			p.addPoint(polyBodyDef.position.x+ v.x, -(polyBodyDef.position.y +v.y));
+		}
+		g.draw(p);
 	}
 	
 	public static void main(String[] args) throws SlickException {
