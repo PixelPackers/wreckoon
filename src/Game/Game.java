@@ -13,6 +13,7 @@ import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
+import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
@@ -127,9 +128,6 @@ public class Game extends BasicGame {
 		
 		world.createBody(polyBodyDef);
 		poly.createFixture(polyFixDef);
-		
-		
-		
 		
 		
 		// Dynamic Body
@@ -271,7 +269,21 @@ public class Game extends BasicGame {
 			GameObject crate = new GameObject(bodyDef, fixtureDef, world, "images/player.png");
 			crates.add(crate);
 			world.createBody(bodyDef);
-			
+		}
+		
+
+		if (input.isKeyDown(Input.KEY_V)) {
+			if( !crates.isEmpty() ){
+				GameObject o = crates.get(10);
+				o.getBody().setTransform(new Vec2(
+						 player.getBody().getPosition().x + 2,
+						 player.getBody().getPosition().y + 1
+						) // vec2 end
+						, 0
+				); // transform end
+				// gravity für objekt deaktivieren?
+
+			}
 		}
 		
 		// if (input.isKeyDown(Input.KEY_W)) {
@@ -294,6 +306,10 @@ public class Game extends BasicGame {
 	
 	@Override
 	public void render(GameContainer gc, Graphics g) throws SlickException {
+
+		g.setColor(Color.white);
+		g.drawString("Count: " + world.getBodyCount(), 0, 0);
+		
 		// FIXME clean this crap up. create method: drawBackground().
 		//*
 		g.pushTransform();
@@ -373,8 +389,6 @@ public class Game extends BasicGame {
 			p.addPoint(polyBodyDef.position.x+ v.x, -(polyBodyDef.position.y +v.y));
 		}
 		g.draw(p);
-		// TODO print body count
-		g.drawString("Count: " + world.getBodyCount(), 0, 0);
 	}
 	
 	public static void main(String[] args) throws SlickException {
