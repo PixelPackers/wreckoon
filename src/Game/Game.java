@@ -240,8 +240,9 @@ public class Game extends BasicGame {
 //				crates.remove(o);
 			}
 			for ( GameObject o : crates){
-				o.getBody().setLinearVelocity( new Vec2( o.getBody().m_linearVelocity.x, (float)(Math.random() * 14) )) ;
+				o.getBody().setLinearVelocity( new Vec2( o.getBody().m_linearVelocity.x, (float)(Math.random() * 8) )) ;
 			}
+			world.setGravity( new Vec2(0f,-1f));
 		}
 		if (input.isKeyDown(Input.KEY_Y)) {
 			if( !crates.isEmpty() ){
@@ -249,6 +250,28 @@ public class Game extends BasicGame {
 				world.destroyBody( o.getBody() );
 				crates.remove(o);
 			}
+
+			world.setGravity( new Vec2(0f,-30f));
+		}
+		if (input.isKeyDown(Input.KEY_C)) {
+			float max_size = 0.5f;
+			float min_size=0.05f;
+			float size = (float) Math.random()* max_size + min_size;
+
+			CircleShape c = new CircleShape();
+			c.m_radius = size;
+			FixtureDef fixtureDef = new FixtureDef();
+			fixtureDef.shape = c;
+			fixtureDef.density = 1f;
+			fixtureDef.friction = 0.5f;
+			
+			BodyDef bodyDef = new BodyDef();
+			bodyDef.type = BodyType.DYNAMIC;
+			bodyDef.position.set(player.getBody().getPosition().x, player.getBody().getPosition().y + size*2);
+			GameObject crate = new GameObject(bodyDef, fixtureDef, world, "images/player.png");
+			crates.add(crate);
+			world.createBody(bodyDef);
+			
 		}
 		
 		// if (input.isKeyDown(Input.KEY_W)) {
@@ -350,6 +373,8 @@ public class Game extends BasicGame {
 			p.addPoint(polyBodyDef.position.x+ v.x, -(polyBodyDef.position.y +v.y));
 		}
 		g.draw(p);
+		// TODO print body count
+		g.drawString("Count: " + world.getBodyCount(), 0, 0);
 	}
 	
 	public static void main(String[] args) throws SlickException {
