@@ -39,7 +39,7 @@ public class Game extends BasicGame {
 	private Player					player;
 	
 	//private Image[][] worldImages = new Image[8][8];
-	private Image trashpile;
+	private Image[] trashpile = new Image[5];
 	
 	private float					zoom			= 30f;
 	private final float				ZOOM_STEP		= 1f;
@@ -60,7 +60,11 @@ public class Game extends BasicGame {
 				worldImages[y][x] = new Image("images/test" + (x + 1) + " (" + (y + 1) + ").png");
 			}
 		}*/
-		trashpile = new Image("images/background.png");
+		trashpile[0] = new Image("images/background1.png");
+		trashpile[1] = new Image("images/background2.png");
+		trashpile[2] = new Image("images/background3.png");
+		trashpile[3] = new Image("images/background4.png");
+		trashpile[4] = new Image("images/background5.png");
 		
 		// git, bitte funtionier
 		
@@ -167,19 +171,19 @@ public class Game extends BasicGame {
 	public void update(GameContainer gc, int delta) throws SlickException {
 		Input input = gc.getInput();
 		
-		if (input.isKeyPressed(Input.KEY_SPACE) || input.isKeyPressed(Input.KEY_W) || input.isKeyPressed(Input.KEY_UP) || input.isButton1Pressed(0)) {
+		if (input.isKeyPressed(Input.KEY_SPACE) || input.isKeyPressed(Input.KEY_W) || input.isKeyPressed(Input.KEY_UP) ) {
 			player.getBody().setLinearVelocity(new Vec2(player.getBody().getLinearVelocity().x, 20));
 		}
-		if (input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A) || input.isControllerLeft(0)) {
+		if (input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A) ) {
 			// player.getBody().setLinearVelocity(new Vec2(-2, player.getBody().getLinearVelocity().y));
 			player.accelerate(true);
 		}
-		if (input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D) || input.isControllerRight(0)) {
+		if (input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D) ) {
 			// player.getBody().setLinearVelocity(new Vec2(2, player.getBody().getLinearVelocity().y));
 			player.accelerate(false);
 		}
 		
-		if (input.isKeyPressed(Input.KEY_DOWN) || input.isKeyDown(Input.KEY_S) || input.isButton3Pressed(0)) {
+		if (input.isKeyPressed(Input.KEY_DOWN) || input.isKeyDown(Input.KEY_S) ) {
 			player.getBody().setLinearVelocity(new Vec2(player.getBody().getLinearVelocity().x, -50));
 		}
 		
@@ -215,19 +219,58 @@ public class Game extends BasicGame {
 	
 	@Override
 	public void render(GameContainer gc, Graphics g) throws SlickException {
-		// FIXME clean this crap up
+		// FIXME clean this crap up. create method: drawBackground().
+		//*
 		g.pushTransform();
-		g.translate(cam.getX() * 0.75f * zoom + screenWidth / 2f, cam.getY() * 0.75f * zoom + screenHeight * 2f / 3f);
-		g.scale(zoom, zoom);
-		trashpile.draw(-7, -29, 30f, 15f);
+			g.translate(cam.getX() * 0.475f * zoom + screenWidth / 2f, cam.getY() * 0.475f * zoom + screenHeight * 2f / 3f);
+			g.scale(zoom, zoom);
+			trashpile[2].draw(13, -18, 40f, 20f);
+		g.popTransform();
+	
+	
+		g.pushTransform();
+			g.translate(cam.getX() * 0.575f * zoom + screenWidth / 2f, cam.getY() * 0.575f * zoom + screenHeight * 2f / 3f);
+			g.scale(zoom, zoom);
+			trashpile[4].draw(6, -18, 40f, 20f);
 		g.popTransform();
 		
 		g.pushTransform();
-		g.translate(cam.getX() * 0.875f * zoom + screenWidth / 2f, cam.getY() * 0.875f * zoom + screenHeight * 2f / 3f);
-		g.scale(zoom, zoom);
-		trashpile.draw(3, -18, 40f, 20f);
+			g.translate(cam.getX() * 0.675f * zoom + screenWidth / 2f, cam.getY() * 0.675f * zoom + screenHeight * 2f / 3f);
+			g.scale(zoom, zoom);
+			trashpile[3].draw(23, -18, 40f, 20f);
+		g.popTransform();
+	
+		g.pushTransform();
+			g.translate(cam.getX() * 0.75f * zoom + screenWidth / 2f, cam.getY() * 0.75f * zoom + screenHeight * 2f / 3f);
+			g.scale(zoom, zoom);
+			trashpile[0].draw(-7, -29, 30f, 15f);
+		g.popTransform();
+
+		g.pushTransform();
+			g.translate(cam.getX() * 0.875f * zoom + screenWidth / 2f, cam.getY() * 0.875f * zoom + screenHeight * 2f / 3f);
+			g.scale(zoom, zoom);
+			trashpile[1].draw(15, -18, 40f, 20f);
 		g.popTransform();
 		
+
+
+		/*/
+		for(int i=0; i<trashpile.length; ++i){
+			g.pushTransform();
+				if (i%2 == 0){
+					g.translate(cam.getX() * 0.75f * zoom + screenWidth / 2f, cam.getY() * 0.75f * zoom + screenHeight * 2f / 3f);
+					g.scale(zoom, zoom);
+					trashpile[i].draw(-7 + (10*i), -29, 30f, 15f);
+				}
+				else {
+					g.translate(cam.getX() * 0.875f * zoom + screenWidth / 2f, cam.getY() * 0.875f * zoom + screenHeight * 2f / 3f);
+					g.scale(zoom, zoom);
+					trashpile[i].draw(3 + (15*i), -18, 40f, 20f);
+				}					
+			g.popTransform();
+		}
+		//*/
+				
 		g.translate(cam.getX() * zoom + screenWidth / 2f, cam.getY() * zoom + screenHeight * 2f / 3f);
 		g.scale(zoom, zoom);
 		
