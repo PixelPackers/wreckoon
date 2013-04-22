@@ -25,7 +25,7 @@ public class Game extends BasicGame {
 	
 	// Sifu's Kommentar
 	
-	/*/
+//	/*/
 	private static int				screenWidth		= 800;
 	private static int				screenHeight	= 600;
 	private static boolean			fullScreen		= false;
@@ -120,7 +120,7 @@ public class Game extends BasicGame {
 			points[4] = new Vec2( -8f,	7f);
 			points[5] = new Vec2( -7f,	4f);
 			points[6] = new Vec2( -5f,	2f);
-			//points[7] = new Vec2( -2f,	0f);
+//			points[7] = new Vec2( -2.5f,2f);
 		polyPolyShape.set(points, 7);
 		//*/
 		FixtureDef polyFixDef = new FixtureDef();
@@ -156,8 +156,8 @@ public class Game extends BasicGame {
 		float min_size = 0.1f;
 		float max_size = 0.3f;
 		
-		for (int i = 0; i < 10; ++i) {
-			for (int j = 0; j < 10; ++j) {
+		for (int i = 0; i < 5; ++i) {
+			for (int j = 0; j < 5; ++j) {
 				float size = (float) Math.random()*max_size + min_size;
 				
 
@@ -179,8 +179,8 @@ public class Game extends BasicGame {
 		min_size = 0.1f;
 		max_size = 0.3f;
 		//*
-		for (int i = 0; i < 10; ++i) {
-			for (int j = 0; j < 10; ++j) {
+		for (int i = 0; i < 5; ++i) {
+			for (int j = 0; j < 5; ++j) {
 				float size = (float) Math.random()*max_size + min_size;
 				
 
@@ -238,7 +238,15 @@ public class Game extends BasicGame {
 //				crates.remove(o);
 			}
 			for ( GameObject o : crates){
-				o.getBody().setLinearVelocity( new Vec2( o.getBody().m_linearVelocity.x, (float)(Math.random() * 8) )) ;
+				
+				float oX 	= o.getBody().getPosition().x;
+				float pX	= player.getBody().getPosition().x;
+				float distance = Math.abs(oX - pX);
+				float space = 5f;
+				
+				if(distance < space){
+					o.getBody().setLinearVelocity( new Vec2( o.getBody().m_linearVelocity.x, (space-distance)*1.5f ) ) ;
+				}
 			}
 			world.setGravity( new Vec2(0f,-1f));
 		}
@@ -265,8 +273,8 @@ public class Game extends BasicGame {
 			
 			BodyDef bodyDef = new BodyDef();
 			bodyDef.type = BodyType.DYNAMIC;
-			bodyDef.position.set(player.getBody().getPosition().x, player.getBody().getPosition().y + size*2);
 			GameObject crate = new GameObject(bodyDef, fixtureDef, world, "images/player.png");
+			bodyDef.position.set(player.getBody().getPosition().x, player.getBody().getPosition().y + size*2);
 			crates.add(crate);
 			world.createBody(bodyDef);
 		}
@@ -281,7 +289,7 @@ public class Game extends BasicGame {
 						) // vec2 end
 						, 0
 				); // transform end
-				// gravity für objekt deaktivieren?
+				// gravity fï¿½r objekt deaktivieren?
 
 			}
 		}
@@ -307,9 +315,7 @@ public class Game extends BasicGame {
 	@Override
 	public void render(GameContainer gc, Graphics g) throws SlickException {
 
-		g.setColor(Color.white);
-		g.drawString("Count: " + world.getBodyCount(), 0, 0);
-		
+		g.pushTransform();
 		// FIXME clean this crap up. create method: drawBackground().
 		//*
 		g.pushTransform();
@@ -389,6 +395,13 @@ public class Game extends BasicGame {
 			p.addPoint(polyBodyDef.position.x+ v.x, -(polyBodyDef.position.y +v.y));
 		}
 		g.draw(p);
+		
+		
+		// GUI
+		g.popTransform();
+		g.setColor(Color.white);
+		g.drawString("Count: " + world.getBodyCount(), 0, 0);
+		
 	}
 	
 	public static void main(String[] args) throws SlickException {
