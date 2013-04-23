@@ -1,6 +1,10 @@
 package Game;
 
 // TODO delete
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.jbox2d.collision.shapes.CircleShape;
@@ -9,6 +13,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 import org.newdawn.slick.AppGameContainer;
@@ -20,6 +25,8 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Polygon;
+
+import com.google.gson.Gson;
 
 public class Game extends BasicGame {
 	
@@ -39,6 +46,7 @@ public class Game extends BasicGame {
 	
 	private ArrayList<GameObject>	staticObjects	= new ArrayList<GameObject>();
 	private ArrayList<GameObject>	crates			= new ArrayList<GameObject>();
+	private ArrayList<Body>	jsonObjects		= new ArrayList<Body>();
 	private Player					player;
 	private PolygonShape 			polyPolyShape;
 	private BodyDef 				polyBodyDef;
@@ -128,7 +136,40 @@ public class Game extends BasicGame {
 		
 		world.createBody(polyBodyDef);
 		poly.createFixture(polyFixDef);
+			
+		// JSON Loader
+		String test = "";
+		try {
+			test = readFile("etc/test.json");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
+		JSONObject testObj = new Gson().fromJson(test, JSONObject.class);
+		
+		for (int i = 0; i < testObj.rigidBodies.size(); ++i) {
+			BodyDef jsonBodyDef = new BodyDef();
+			jsonBodyDef.type = BodyType.DYNAMIC;
+			jsonBodyDef.position.set(4f * i, 25f);
+			Body jsonBody;
+			jsonBody = world.createBody(jsonBodyDef);
+			
+			for (int j = 0; j < testObj.rigidBodies.get(i).polygons.size(); ++j) {
+				FixtureDef jsonFixtureDef = new FixtureDef();
+				PolygonShape jsonShape = new PolygonShape();
+				Vec2[] jsonPoints = new Vec2[7];
+				for (int k = 0; k < testObj.rigidBodies.get(i).polygons.get(j).size(); ++k) {
+					jsonPoints[k] = testObj.rigidBodies.get(i).polygons.get(j).get(k);
+				}
+				jsonShape.set(jsonPoints, testObj.rigidBodies.get(i).polygons.get(j).size());
+				jsonFixtureDef.shape = jsonShape;
+				jsonFixtureDef.density = 0.5f;
+				jsonBody.createFixture(jsonFixtureDef);
+			}
+			jsonObjects.add(jsonBody);
+			
+		}
 		
 		// Dynamic Body
 		BodyDef bodyDef = new BodyDef();
@@ -152,7 +193,7 @@ public class Game extends BasicGame {
 		fixtureDef.density = 1f;
 		fixtureDef.friction = 0.5f;
 		
-		// Crate
+		/*/ Crate
 		float min_size = 0.1f;
 		float max_size = 0.3f;
 		
@@ -198,6 +239,21 @@ public class Game extends BasicGame {
 		}//*/
 	}
 	
+	private String readFile( String file ) throws IOException {
+	    BufferedReader reader = new BufferedReader( new FileReader (file));
+	    String         line = null;
+	    StringBuilder  stringBuilder = new StringBuilder();
+	    String         ls = System.getProperty("line.separator");
+
+	    while( ( line = reader.readLine() ) != null ) {
+	        stringBuilder.append( line );
+	        stringBuilder.append( ls );
+	    }
+
+	    reader.close();
+	    return stringBuilder.toString();
+	}
+	
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
 		Input input = gc.getInput();
@@ -239,8 +295,8 @@ public class Game extends BasicGame {
 			}
 			for ( GameObject o : crates){
 				
-				float oX 	= o.getBody().getPosition().x;
-				float pX	= player.getBody().getPosition().x;
+				float oX = o.getBody().getPosition().x;
+				float pX = player.getBody().getPosition().x;
 				float distance = Math.abs(oX - pX);
 				float space = 5f;
 				
@@ -273,8 +329,8 @@ public class Game extends BasicGame {
 			
 			BodyDef bodyDef = new BodyDef();
 			bodyDef.type = BodyType.DYNAMIC;
+			bodyDef.position.set(player.getBody().getPosition().x, player.getBody().getPosition().y - size*2);
 			GameObject crate = new GameObject(bodyDef, fixtureDef, world, "images/player.png");
-			bodyDef.position.set(player.getBody().getPosition().x, player.getBody().getPosition().y + size*2);
 			crates.add(crate);
 			world.createBody(bodyDef);
 		}
@@ -373,6 +429,20 @@ public class Game extends BasicGame {
 		
 		for (GameObject staticObj : staticObjects) {
 			staticObj.draw();
+		}
+		
+		int i = 0;
+		for (Body b : jsonObjects) {
+			++i;
+			Fixture f = b.getFixtureList();
+				Polygon p = new Polygon();
+				PolygonShape ps = (PolygonShape) f.getShape();
+				Vec2[] verts = ps.getVertices();
+				for (Vec2 v : verts){
+					p.addPoint(b.getPosition().x+ v.x, -(b.getPosition().y +v.y));
+				}
+				g.draw(p);
+			if (i >= 2) break;
 		}
 		
 		/*for (int y = 0; y < worldImages.length; ++y) {
