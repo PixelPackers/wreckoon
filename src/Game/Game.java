@@ -96,15 +96,36 @@ public class Game extends BasicGame {
 		staticObjects.add(ground);
 		
 		// walls
-		BodyDef wallBodyDef = new BodyDef();
-		wallBodyDef.position.set(17f, 0f);
-		PolygonShape wallShape = new PolygonShape();
-		wallShape.setAsBox(1f, 10f);
-		FixtureDef wallFixtureDef = new FixtureDef();
-		wallFixtureDef.shape = wallShape;
-		GameObject wall = new GameObject(wallBodyDef, wallFixtureDef, world, "images/crate.png");
-		staticObjects.add(wall);
-		
+		{
+			BodyDef wallBodyDef = new BodyDef();
+			wallBodyDef.position.set(17f, 0f);
+			PolygonShape wallShape = new PolygonShape();
+			wallShape.setAsBox(1f, 10f);
+			FixtureDef wallFixtureDef = new FixtureDef();
+			wallFixtureDef.shape = wallShape;
+			GameObject wall = new GameObject(wallBodyDef, wallFixtureDef, world, "images/crate.png");
+			staticObjects.add(wall);
+		}
+		{
+			BodyDef wallBodyDef = new BodyDef();
+			wallBodyDef.position.set(-45f, 20f);
+			PolygonShape wallShape = new PolygonShape();
+			wallShape.setAsBox(1f, 20f);
+			FixtureDef wallFixtureDef = new FixtureDef();
+			wallFixtureDef.shape = wallShape;
+			GameObject wall = new GameObject(wallBodyDef, wallFixtureDef, world, "images/crate.png");
+			staticObjects.add(wall);
+		}
+		{
+			BodyDef wallBodyDef = new BodyDef();
+			wallBodyDef.position.set(45f, 20f);
+			PolygonShape wallShape = new PolygonShape();
+			wallShape.setAsBox(1f, 20f);
+			FixtureDef wallFixtureDef = new FixtureDef();
+			wallFixtureDef.shape = wallShape;
+			GameObject wall = new GameObject(wallBodyDef, wallFixtureDef, world, "images/crate.png");
+			staticObjects.add(wall);
+		}
 		// groundBodyDef.position.set(10, 0);
 		// wall = new GameObject(groundBodyDef, groundFixtureDef, world, "images/crate.png");
 		// wallShape = new PolygonShape();
@@ -140,7 +161,7 @@ public class Game extends BasicGame {
 		// JSON Loader
 		String test = "";
 		try {
-			test = readFile("etc/test.json");
+			test = readFile("etc/test2");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -431,18 +452,16 @@ public class Game extends BasicGame {
 			staticObj.draw();
 		}
 		
-		int i = 0;
+		
 		for (Body b : jsonObjects) {
-			++i;
 			Fixture f = b.getFixtureList();
 				Polygon p = new Polygon();
 				PolygonShape ps = (PolygonShape) f.getShape();
 				Vec2[] verts = ps.getVertices();
-				for (Vec2 v : verts){
-					p.addPoint(b.getPosition().x+ v.x, -(b.getPosition().y +v.y));
+				for (int i = 0; i < ps.getVertexCount(); ++i){
+					p.addPoint(b.getPosition().x+ verts[i].x, -(b.getPosition().y +verts[i].y));
 				}
 				g.draw(p);
-			if (i >= 2) break;
 		}
 		
 		/*for (int y = 0; y < worldImages.length; ++y) {
@@ -464,7 +483,7 @@ public class Game extends BasicGame {
 		for (Vec2 v : verts){
 			p.addPoint(polyBodyDef.position.x+ v.x, -(polyBodyDef.position.y +v.y));
 		}
-		g.draw(p);
+		g.fill(p);
 		
 		
 		// GUI
