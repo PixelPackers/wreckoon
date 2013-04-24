@@ -59,6 +59,10 @@ public class Game extends BasicGame {
 	
 	private Camera					cam				= new Camera(0, screenHeight);
 	private static final float		CAM_SPEED		= 5f;
+
+	float deleteMeRotation = 0;
+	float deleteMeX = 0;
+	float deleteMeY = 0;
 	
 	public Game() {
 		super("The Raccooning");
@@ -98,7 +102,7 @@ public class Game extends BasicGame {
 		// walls
 		{
 			BodyDef wallBodyDef = new BodyDef();
-			wallBodyDef.position.set(17f, 0f);
+			wallBodyDef.position.set(22f, 0f);
 			PolygonShape wallShape = new PolygonShape();
 			wallShape.setAsBox(1f, 10f);
 			FixtureDef wallFixtureDef = new FixtureDef();
@@ -161,7 +165,7 @@ public class Game extends BasicGame {
 		// JSON Loader
 		String test = "";
 		try {
-			test = readFile("etc/test2");
+			test = readFile("etc/world");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -172,16 +176,16 @@ public class Game extends BasicGame {
 		for (int i = 0; i < testObj.rigidBodies.size(); ++i) {
 			BodyDef jsonBodyDef = new BodyDef();
 			jsonBodyDef.type = BodyType.DYNAMIC;
-			jsonBodyDef.position.set(4f * i, 25f);
+			jsonBodyDef.position.set(18f * i, 25f);
 			Body jsonBody;
 			jsonBody = world.createBody(jsonBodyDef);
 			
 			for (int j = 0; j < testObj.rigidBodies.get(i).polygons.size(); ++j) {
 				FixtureDef jsonFixtureDef = new FixtureDef();
 				PolygonShape jsonShape = new PolygonShape();
-				Vec2[] jsonPoints = new Vec2[7];
+				Vec2[] jsonPoints = new Vec2[100];
 				for (int k = 0; k < testObj.rigidBodies.get(i).polygons.get(j).size(); ++k) {
-					jsonPoints[k] = testObj.rigidBodies.get(i).polygons.get(j).get(k);
+					jsonPoints[k] = testObj.rigidBodies.get(i).polygons.get(j).get(k).mul(1);
 				}
 				jsonShape.set(jsonPoints, testObj.rigidBodies.get(i).polygons.get(j).size());
 				jsonFixtureDef.shape = jsonShape;
@@ -283,12 +287,22 @@ public class Game extends BasicGame {
 			player.getBody().setLinearVelocity(new Vec2(player.getBody().getLinearVelocity().x, 20));
 		}
 		if (input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A) ) {
-			// player.getBody().setLinearVelocity(new Vec2(-2, player.getBody().getLinearVelocity().y));
-			player.accelerate(true);
+			
+			if(input.isKeyDown(Input.KEY_LSHIFT) || input.isKeyDown(Input.KEY_RSHIFT)){
+				deleteMeX -=10;
+			} else {
+				// player.getBody().setLinearVelocity(new Vec2(-2, player.getBody().getLinearVelocity().y));
+				player.accelerate(true);
+			}
 		}
 		if (input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D) ) {
-			// player.getBody().setLinearVelocity(new Vec2(2, player.getBody().getLinearVelocity().y));
-			player.accelerate(false);
+
+			if(input.isKeyDown(Input.KEY_LSHIFT) || input.isKeyDown(Input.KEY_RSHIFT)){
+				deleteMeX +=10;
+			} else {
+				// player.getBody().setLinearVelocity(new Vec2(2, player.getBody().getLinearVelocity().y));
+				player.accelerate(false);
+			}
 		}
 		
 		if (input.isKeyPressed(Input.KEY_DOWN) || input.isKeyDown(Input.KEY_S) ) {
@@ -351,9 +365,11 @@ public class Game extends BasicGame {
 			BodyDef bodyDef = new BodyDef();
 			bodyDef.type = BodyType.DYNAMIC;
 			bodyDef.position.set(player.getBody().getPosition().x, player.getBody().getPosition().y - size*2);
-			GameObject crate = new GameObject(bodyDef, fixtureDef, world, "images/player.png");
-			crates.add(crate);
-			world.createBody(bodyDef);
+			for(int i =0; i< 4; ++i){
+				GameObject crate = new GameObject(bodyDef, fixtureDef, world, "images/player.png");
+				crates.add(crate);
+				world.createBody(bodyDef);
+			}
 		}
 		
 
@@ -369,6 +385,13 @@ public class Game extends BasicGame {
 				// gravity f�r objekt deaktivieren?
 
 			}
+		}
+		if (input.isKeyDown(Input.KEY_J)) {
+			deleteMeRotation -= 10;
+		}
+
+		if (input.isKeyDown(Input.KEY_K)) {
+			deleteMeRotation+=10;
 		}
 		
 		// if (input.isKeyDown(Input.KEY_W)) {
@@ -386,14 +409,90 @@ public class Game extends BasicGame {
 		cam.follow(player.getBody().getPosition().x, player.getBody().getPosition().y, 10);
 		
 		// world.step(timeStep, velocityIterations, positionIterations);
-		world.step(delta / 1000f, 6, 2);
+		world.step(delta / 1000f, 18, 6);
 	}
 	
 	@Override
 	public void render(GameContainer gc, Graphics g) throws SlickException {
 
 		g.pushTransform();
-		// FIXME clean this crap up. create method: drawBackground().
+		drawBackground(g);
+		
+				
+		g.translate(cam.getX() * zoom + screenWidth / 2f, cam.getY() * zoom + screenHeight * 2f / 3f);
+		g.scale(zoom, zoom);
+		
+		for (GameObject staticObj : staticObjects) {
+			staticObj.draw();
+		}
+		
+		for (Body b : jsonObjects) {
+			Fixture f = b.getFixtureList();
+//			System.out.println(f.m_shape);
+			while (f != null) {
+				Polygon p = new Polygon();
+				PolygonShape ps = (PolygonShape) f.getShape();
+				
+				Vec2[] verts = ps.getVertices();
+				for (int i = 0; i < ps.getVertexCount(); ++i){
+					Vec2 worldPoint = b.getWorldPoint(verts[i]);
+					p.addPoint(worldPoint.x, -worldPoint.y);
+					//p.addPoint(b.getPosition().x+ verts[i].x, -(b.getPosition().y +verts[i].y));
+				}
+				g.pushTransform();
+//				g.rotate(b.getPosition().x, b.getPosition().y, (float)Math.toDegrees(b.getAngle() ));
+				// FIXME uber crap
+				g.rotate(b.getPosition().x, b.getPosition().y, deleteMeRotation );
+					g.draw(p);
+
+				g.popTransform();
+				f = f.getNext();
+			}
+		}
+		
+		/*for (int y = 0; y < worldImages.length; ++y) {
+			for (int x = 0; x < worldImages[0].length; ++x) {
+				worldImages[y][x].draw(x * 19, y * 10, 19, 10);
+			}
+		}*/
+		
+		for (GameObject crate : crates) {
+			crate.draw();
+		}
+		
+		player.draw();
+		
+		
+		// my poly		
+		Polygon p = new Polygon();
+		Vec2[] verts = polyPolyShape.getVertices();
+		for (Vec2 v : verts){
+			p.addPoint(polyBodyDef.position.x+ v.x, -(polyBodyDef.position.y +v.y));
+		}
+		g.draw(p);
+		
+		
+		// GUI
+		g.popTransform();
+		g.drawString("10px", 0, 50);
+		g.drawRect(50, 50, 10, 1);
+		g.drawRect(50, 55, 10*zoom, 1);
+		g.setColor(Color.white);
+		g.drawString("Count: " + world.getBodyCount(), 0, 0);
+		
+	}
+	
+	public static void main(String[] args) throws SlickException {
+		AppGameContainer game = new AppGameContainer(new Game());
+		game.setDisplayMode(screenWidth, screenHeight, fullScreen);
+		game.setMultiSample(16);
+		game.setTargetFrameRate(60);
+		game.setVSync(true);
+		game.setShowFPS(false);
+		game.start();
+	}
+	public void drawBackground(Graphics g){
+		// FIXME clean this crap up. 
 		//*
 		g.pushTransform();
 			g.translate(cam.getX() * 0.475f * zoom + screenWidth / 2f, cam.getY() * 0.475f * zoom + screenHeight * 2f / 3f);
@@ -426,8 +525,7 @@ public class Game extends BasicGame {
 			trashpile[1].draw(15, -18, 40f, 20f);
 		g.popTransform();
 		
-
-
+		
 		/*/
 		for(int i=0; i<trashpile.length; ++i){
 			g.pushTransform();
@@ -444,63 +542,5 @@ public class Game extends BasicGame {
 			g.popTransform();
 		}
 		//*/
-				
-		g.translate(cam.getX() * zoom + screenWidth / 2f, cam.getY() * zoom + screenHeight * 2f / 3f);
-		g.scale(zoom, zoom);
-		
-		for (GameObject staticObj : staticObjects) {
-			staticObj.draw();
-		}
-		
-		
-		for (Body b : jsonObjects) {
-			Fixture f = b.getFixtureList();
-				Polygon p = new Polygon();
-				PolygonShape ps = (PolygonShape) f.getShape();
-				Vec2[] verts = ps.getVertices();
-				for (int i = 0; i < ps.getVertexCount(); ++i){
-					p.addPoint(b.getPosition().x+ verts[i].x, -(b.getPosition().y +verts[i].y));
-				}
-				g.draw(p);
-		}
-		
-		/*for (int y = 0; y < worldImages.length; ++y) {
-			for (int x = 0; x < worldImages[0].length; ++x) {
-				worldImages[y][x].draw(x * 19, y * 10, 19, 10);
-			}
-		}*/
-		
-		for (GameObject crate : crates) {
-			crate.draw();
-		}
-		
-		player.draw();
-		
-		
-		// my poly		
-		Polygon p = new Polygon();
-		Vec2[] verts = polyPolyShape.getVertices();
-		for (Vec2 v : verts){
-			p.addPoint(polyBodyDef.position.x+ v.x, -(polyBodyDef.position.y +v.y));
-		}
-		g.fill(p);
-		
-		
-		// GUI
-		g.popTransform();
-		g.setColor(Color.white);
-		g.drawString("Count: " + world.getBodyCount(), 0, 0);
-		
 	}
-	
-	public static void main(String[] args) throws SlickException {
-		AppGameContainer game = new AppGameContainer(new Game());
-		game.setDisplayMode(screenWidth, screenHeight, fullScreen);
-		game.setMultiSample(16);
-		game.setTargetFrameRate(60);
-		game.setVSync(true);
-		game.setShowFPS(false);
-		game.start();
-	}
-	
 }
