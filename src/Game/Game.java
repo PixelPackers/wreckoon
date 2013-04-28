@@ -58,11 +58,6 @@ public class Game extends BasicGame {
 	private final float				ZOOM_STEP		= 1f;
 	
 	private Camera					cam				= new Camera(0, screenHeight);
-	private static final float		CAM_SPEED		= 5f;
-
-	float deleteMeRotation = 0;
-	float deleteMeX = 0;
-	float deleteMeY = 0;
 	
 	public Game() {
 		super("The Raccooning");
@@ -175,7 +170,7 @@ public class Game extends BasicGame {
 		
 		for (int i = 0; i < testObj.rigidBodies.size(); ++i) {
 			BodyDef jsonBodyDef = new BodyDef();
-			jsonBodyDef.type = BodyType.DYNAMIC;
+			jsonBodyDef.type = BodyType.STATIC;
 			jsonBodyDef.position.set(18f * i, 25f);
 			Body jsonBody;
 			jsonBody = world.createBody(jsonBodyDef);
@@ -183,6 +178,7 @@ public class Game extends BasicGame {
 			for (int j = 0; j < testObj.rigidBodies.get(i).polygons.size(); ++j) {
 				FixtureDef jsonFixtureDef = new FixtureDef();
 				PolygonShape jsonShape = new PolygonShape();
+				// FIXME [100] wtf?
 				Vec2[] jsonPoints = new Vec2[100];
 				for (int k = 0; k < testObj.rigidBodies.get(i).polygons.get(j).size(); ++k) {
 					jsonPoints[k] = testObj.rigidBodies.get(i).polygons.get(j).get(k).mul(1);
@@ -202,7 +198,7 @@ public class Game extends BasicGame {
 		bodyDef.position.set(4f, 4f);
 		CircleShape playerShape = new CircleShape();
 		playerShape.m_radius = 1f;
-		// TODO get the fucking polygon shape to work!
+
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.shape = playerShape;
 		fixtureDef.density = 11f;
@@ -219,6 +215,7 @@ public class Game extends BasicGame {
 		fixtureDef.friction = 0.5f;
 		
 		/*/ Crate
+		 // wenn ma das in eine eigene methode schmeisst, fehlt fixtureDef und noch iwas...
 		float min_size = 0.1f;
 		float max_size = 0.3f;
 		
@@ -287,22 +284,13 @@ public class Game extends BasicGame {
 			player.getBody().setLinearVelocity(new Vec2(player.getBody().getLinearVelocity().x, 20));
 		}
 		if (input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A) ) {
-			
-			if(input.isKeyDown(Input.KEY_LSHIFT) || input.isKeyDown(Input.KEY_RSHIFT)){
-				deleteMeX -=10;
-			} else {
-				// player.getBody().setLinearVelocity(new Vec2(-2, player.getBody().getLinearVelocity().y));
-				player.accelerate(true);
-			}
+			// player.getBody().setLinearVelocity(new Vec2(-2, player.getBody().getLinearVelocity().y));
+			player.accelerate(true);
 		}
 		if (input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D) ) {
 
-			if(input.isKeyDown(Input.KEY_LSHIFT) || input.isKeyDown(Input.KEY_RSHIFT)){
-				deleteMeX +=10;
-			} else {
-				// player.getBody().setLinearVelocity(new Vec2(2, player.getBody().getLinearVelocity().y));
-				player.accelerate(false);
-			}
+			// player.getBody().setLinearVelocity(new Vec2(2, player.getBody().getLinearVelocity().y));
+			player.accelerate(false);
 		}
 		
 		if (input.isKeyPressed(Input.KEY_DOWN) || input.isKeyDown(Input.KEY_S) ) {
@@ -386,26 +374,7 @@ public class Game extends BasicGame {
 
 			}
 		}
-		if (input.isKeyDown(Input.KEY_J)) {
-			deleteMeRotation -= 10;
-		}
-
-		if (input.isKeyDown(Input.KEY_K)) {
-			deleteMeRotation+=10;
-		}
 		
-		// if (input.isKeyDown(Input.KEY_W)) {
-		// cam.move(0, CAM_SPEED);
-		// }
-		// if (input.isKeyDown(Input.KEY_A)) {
-		// cam.move(CAM_SPEED, 0);
-		// }
-		// if (input.isKeyDown(Input.KEY_S)) {
-		// cam.move(0, -CAM_SPEED);
-		// }
-		// if (input.isKeyDown(Input.KEY_D)) {
-		// cam.move(-CAM_SPEED, 0);
-		// }
 		cam.follow(player.getBody().getPosition().x, player.getBody().getPosition().y, 10);
 		
 		// world.step(timeStep, velocityIterations, positionIterations);
@@ -440,28 +409,18 @@ public class Game extends BasicGame {
 					//p.addPoint(b.getPosition().x+ verts[i].x, -(b.getPosition().y +verts[i].y));
 				}
 				g.pushTransform();
-//				g.rotate(b.getPosition().x, b.getPosition().y, (float)Math.toDegrees(b.getAngle() ));
-				// FIXME uber crap
-				g.rotate(b.getPosition().x, b.getPosition().y, deleteMeRotation );
-					g.draw(p);
+				g.draw(p);
 
 				g.popTransform();
 				f = f.getNext();
 			}
 		}
-		
-		/*for (int y = 0; y < worldImages.length; ++y) {
-			for (int x = 0; x < worldImages[0].length; ++x) {
-				worldImages[y][x].draw(x * 19, y * 10, 19, 10);
-			}
-		}*/
-		
+				
 		for (GameObject crate : crates) {
 			crate.draw();
 		}
 		
 		player.draw();
-		
 		
 		// my poly		
 		Polygon p = new Polygon();
@@ -474,6 +433,8 @@ public class Game extends BasicGame {
 		
 		// GUI
 		g.popTransform();
+		
+		// scale pixel size : box2d:size
 		g.drawString("10px", 0, 50);
 		g.drawRect(50, 50, 10, 1);
 		g.drawRect(50, 55, 10*zoom, 1);
