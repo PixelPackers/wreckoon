@@ -48,8 +48,7 @@ public class Game extends BasicGame {
 	private ArrayList<GameObject>	crates			= new ArrayList<GameObject>();
 	private ArrayList<Body>	jsonObjects		= new ArrayList<Body>();
 	private Player					player;
-	private PolygonShape 			polyPolyShape;
-	private BodyDef 				polyBodyDef;
+	private GameObjectPolygon polygon;
 	
 	//private Image[][] worldImages = new Image[8][8];
 	private Image[] trashpile = new Image[5];
@@ -78,51 +77,33 @@ public class Game extends BasicGame {
 		trashpile[3] = new Image("images/background4.png");
 		trashpile[4] = new Image("images/background5.png");
 		
-		// git, bitte funtionier
 		
 		// world = new World(gravity, doSleep);
 		world = new World(new Vec2(0f, -30f), false);
 		
-		BodyDef groundBodyDef = new BodyDef();
-		groundBodyDef.position.set(0f, -9f);
+		// ground
 		PolygonShape groundBox = new PolygonShape();
 		groundBox.setAsBox(50f, 10f);
-		// groundBody.createFixture(groundBox, 0);
-		FixtureDef groundFixtureDef = new FixtureDef();
-		groundFixtureDef.shape = groundBox;
-		
-		GameObject ground = new GameObject(groundBodyDef, groundFixtureDef, world, "images/crate.png");
+		GameObject ground = new GameObject(world, 0f, -9f, groundBox, "images/crate.png", false);
 		staticObjects.add(ground);
 		
 		// walls
 		{
-			BodyDef wallBodyDef = new BodyDef();
-			wallBodyDef.position.set(22f, 0f);
 			PolygonShape wallShape = new PolygonShape();
 			wallShape.setAsBox(1f, 10f);
-			FixtureDef wallFixtureDef = new FixtureDef();
-			wallFixtureDef.shape = wallShape;
-			GameObject wall = new GameObject(wallBodyDef, wallFixtureDef, world, "images/crate.png");
+			GameObject wall = new GameObject(world, 22f, 0f, wallShape, "images/crate.png", false);
 			staticObjects.add(wall);
 		}
 		{
-			BodyDef wallBodyDef = new BodyDef();
-			wallBodyDef.position.set(-45f, 20f);
 			PolygonShape wallShape = new PolygonShape();
 			wallShape.setAsBox(1f, 20f);
-			FixtureDef wallFixtureDef = new FixtureDef();
-			wallFixtureDef.shape = wallShape;
-			GameObject wall = new GameObject(wallBodyDef, wallFixtureDef, world, "images/crate.png");
+			GameObject wall = new GameObject(world, -45f, 20f, wallShape, "images/crate.png", false);
 			staticObjects.add(wall);
 		}
 		{
-			BodyDef wallBodyDef = new BodyDef();
-			wallBodyDef.position.set(45f, 20f);
 			PolygonShape wallShape = new PolygonShape();
 			wallShape.setAsBox(1f, 20f);
-			FixtureDef wallFixtureDef = new FixtureDef();
-			wallFixtureDef.shape = wallShape;
-			GameObject wall = new GameObject(wallBodyDef, wallFixtureDef, world, "images/crate.png");
+			GameObject wall = new GameObject(world, 45f, 20f, wallShape, "images/crate.png", false);
 			staticObjects.add(wall);
 		}
 		// groundBodyDef.position.set(10, 0);
@@ -133,30 +114,12 @@ public class Game extends BasicGame {
 		// staticObjects.add(wall);
 		
 		// P O L Y G O N
-		polyBodyDef = new BodyDef();
-		polyBodyDef.position.set(-5f,4f);
+		Vec2[] points = new Vec2[3];
+		points[0] = new Vec2(  0f,	0f);
+		points[1] = new Vec2( 12f,	0f);
+		points[2] = new Vec2( -2f, 2f);
+		polygon = new GameObjectPolygon(world, -5f, 34f, points);
 		
-		Body poly = new Body(polyBodyDef, world);
-		
-		polyPolyShape = new PolygonShape();
-
-			Vec2[] points = new Vec2[7];
-			points[0] = new Vec2(  0f,	0f);
-			points[1] = new Vec2( 22f,	0f);
-			points[2] = new Vec2( -6f, 12f);
-			points[3] = new Vec2( -8f,	8f);
-			points[4] = new Vec2( -8f,	7f);
-			points[5] = new Vec2( -7f,	4f);
-			points[6] = new Vec2( -5f,	2f);
-//			points[7] = new Vec2( -2.5f,2f);
-		polyPolyShape.set(points, 7);
-		//*/
-		FixtureDef polyFixDef = new FixtureDef();
-		polyFixDef.shape = polyPolyShape;
-		
-		world.createBody(polyBodyDef);
-		poly.createFixture(polyFixDef);
-			
 		// JSON Loader
 		String test = "";
 		try {
@@ -205,7 +168,7 @@ public class Game extends BasicGame {
 		fixtureDef.friction = 0.3f;
 		
 		// Player
-		player = new Player(bodyDef, fixtureDef, world, "images/player.png");
+		player = new Player(world,4f,4f,playerShape, "images/player.png");
 		
 		PolygonShape dynamicBox = new PolygonShape();
 		dynamicBox.setAsBox(0.15f, 0.15f);
@@ -354,7 +317,7 @@ public class Game extends BasicGame {
 			bodyDef.type = BodyType.DYNAMIC;
 			bodyDef.position.set(player.getBody().getPosition().x, player.getBody().getPosition().y - size*2);
 			for(int i =0; i< 4; ++i){
-				GameObject crate = new GameObject(bodyDef, fixtureDef, world, "images/player.png");
+				GameObject crate = new GameObject(world, player.getBody().getPosition().x, player.getBody().getPosition().y - size*2, c, "images/player.png", true);
 				crates.add(crate);
 				world.createBody(bodyDef);
 			}
@@ -421,15 +384,7 @@ public class Game extends BasicGame {
 		}
 		
 		player.draw();
-		
-		// my poly		
-		Polygon p = new Polygon();
-		Vec2[] verts = polyPolyShape.getVertices();
-		for (Vec2 v : verts){
-			p.addPoint(polyBodyDef.position.x+ v.x, -(polyBodyDef.position.y +v.y));
-		}
-		g.draw(p);
-		
+		polygon.draw(g);
 		
 		// GUI
 		g.popTransform();

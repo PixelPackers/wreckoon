@@ -1,5 +1,6 @@
 package Game;
 
+import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.FixtureDef;
@@ -15,8 +16,8 @@ public class Player extends GameObject {
 	
 	private boolean		isRunning				= false;
 	
-	public Player(BodyDef bodyDef, FixtureDef fixtureDef, World world, String imgPath) throws SlickException {
-		super(bodyDef, fixtureDef, world, imgPath);
+	public Player(World world, float posX, float posY, Shape shape, String imgPath) throws SlickException {
+		super(world, posX, posY, shape, imgPath, true);
 	}
 	
 	public void accelerate(boolean left) {
