@@ -29,97 +29,91 @@ import org.newdawn.slick.geom.Polygon;
 import com.google.gson.Gson;
 
 public class Game extends BasicGame {
-	
+
 	// Sifu's Kommentar
+
+//	 /*/
+	private static int screenWidth = 1600;
+	private static int screenHeight = 900;
+	private static boolean fullScreen = false;
 	
-//	/*/
-	private static int				screenWidth		= 800;
-	private static int				screenHeight	= 600;
-	private static boolean			fullScreen		= false;
+
 	/*/
-	private static int				screenWidth		= 1920;
-	private static int				screenHeight	= 1080;
-	private static boolean			fullScreen		= true;
-	//*/
+	 private static int screenWidth = 1920;
+	 private static int screenHeight = 1080;
+	 private static boolean fullScreen = true;
+	 //*/
+
+	private boolean debugView = true;
 	
-	private World					world;
-	
-	private ArrayList<GameObject>	staticObjects	= new ArrayList<GameObject>();
-	private ArrayList<GameObject>	crates			= new ArrayList<GameObject>();
-	private ArrayList<Body>	jsonObjects		= new ArrayList<Body>();
-	private Player					player;
+	private World world;
+
+	private ArrayList<GameObject> staticObjects = new ArrayList<GameObject>();
+	private ArrayList<GameObject> balls = new ArrayList<GameObject>();
+	private ArrayList<Body> jsonObjects = new ArrayList<Body>();
+	private Player player;
 	private GameObjectPolygon polygon;
-	
-	//private Image[][] worldImages = new Image[8][8];
+
+	// private Image[][] worldImages = new Image[8][8];
 	private Image[] trashpile = new Image[5];
-	
-	private float					zoom			= 30f;
-	private final float				ZOOM_STEP		= 1f;
-	
-	private Camera					cam				= new Camera(0, screenHeight);
-	
+
+	private float zoom = 30f;
+	private final float ZOOM_STEP = 1f;
+
+	private Camera cam = new Camera(0, screenHeight);
+
 	public Game() {
 		super("The Raccooning");
 	}
-	
+
 	@Override
 	public void init(GameContainer gc) throws SlickException {
+
+		/*
+		 * for (int y = 0; y < worldImages.length; ++y) { for (int x = 0; x <
+		 * worldImages[0].length; ++x) { //worldImages[y][x] = new
+		 * Image("images/world_x" + x % 2 + "_y" + y % 2 + ".png");
+		 * worldImages[y][x] = new Image("images/test" + (x + 1) + " (" + (y +
+		 * 1) + ").png"); } }
+		 */			
 		
-		/*for (int y = 0; y < worldImages.length; ++y) {
-			for (int x = 0; x < worldImages[0].length; ++x) {
-				//worldImages[y][x] = new Image("images/world_x" + x % 2 + "_y" + y % 2 + ".png");
-				worldImages[y][x] = new Image("images/test" + (x + 1) + " (" + (y + 1) + ").png");
-			}
-		}*/
-		trashpile[0] = new Image("images/background1.png");
-		trashpile[1] = new Image("images/background2.png");
-		trashpile[2] = new Image("images/background3.png");
-		trashpile[3] = new Image("images/background4.png");
-		trashpile[4] = new Image("images/background5.png");
-		
-		
+		for (int i = 0; i <= 4; ++i) {
+			trashpile[i] = new Image("images/background" + (i + 1) + ".png");
+		}
+
 		// world = new World(gravity, doSleep);
 		world = new World(new Vec2(0f, -30f), false);
+
+		
+
+		float testWidth = 1.6f; 
+		float testHeight = 1.6f;
+		float space = 20f;
+		int max = 222;
+		for(int i=0; i<max; ++i){
+			for(int j=0; j<max; ++j){
+				if(j==i)
+				staticObjects.add(new GameObjectBox(world,  space + i*testWidth,  j*testHeight, testWidth, testHeight, 1f, 1f, "images/crate.png", BodyType.STATIC));
+			}
+			
+		}
+		
 		
 		// ground
-		PolygonShape groundBox = new PolygonShape();
-		groundBox.setAsBox(50f, 10f);
-		GameObject ground = new GameObject(world, 0f, -9f, groundBox, "images/crate.png", false);
-		staticObjects.add(ground);
-		
+		staticObjects.add(new GameObjectBox(world, 0f, -9f, 50f, 10f, 1f, 1f, "images/crate.png", BodyType.STATIC));
+
 		// walls
-		{
-			PolygonShape wallShape = new PolygonShape();
-			wallShape.setAsBox(1f, 10f);
-			GameObject wall = new GameObject(world, 22f, 0f, wallShape, "images/crate.png", false);
-			staticObjects.add(wall);
-		}
-		{
-			PolygonShape wallShape = new PolygonShape();
-			wallShape.setAsBox(1f, 20f);
-			GameObject wall = new GameObject(world, -45f, 20f, wallShape, "images/crate.png", false);
-			staticObjects.add(wall);
-		}
-		{
-			PolygonShape wallShape = new PolygonShape();
-			wallShape.setAsBox(1f, 20f);
-			GameObject wall = new GameObject(world, 45f, 20f, wallShape, "images/crate.png", false);
-			staticObjects.add(wall);
-		}
-		// groundBodyDef.position.set(10, 0);
-		// wall = new GameObject(groundBodyDef, groundFixtureDef, world, "images/crate.png");
-		// wallShape = new PolygonShape();
-		// groundBox.setAsBox(1, 50);
-		// groundBody.createFixture(groundBox, 0);
-		// staticObjects.add(wall);
-		
+		staticObjects.add(new GameObjectBox(world,  22f,  0f, 1f, 10f, 1f, 1f, "images/crate.png", BodyType.STATIC));
+		staticObjects.add(new GameObjectBox(world, -45f, 20f, 1f, 20f, 1f, 1f, "images/crate.png", BodyType.STATIC));
+		staticObjects.add(new GameObjectBox(world,  45f, 20f, 1f, 20f, 1f, 1f, "images/crate.png", BodyType.STATIC));
+
 		// P O L Y G O N
 		Vec2[] points = new Vec2[3];
-		points[0] = new Vec2(  0f,	0f);
-		points[1] = new Vec2( 12f,	0f);
-		points[2] = new Vec2( -2f, 2f);
-		polygon = new GameObjectPolygon(world, -5f, 34f, points);
-		
+		points[0] = new Vec2(0f, 0f);
+		points[1] = new Vec2(12f, 0f);
+		points[2] = new Vec2(-2f, 2f);
+		//polygon = new GameObjectPolygon(world, -5f, 34f, points, 1f, 0.5f, null, BodyType.DYNAMIC);
+
 		// JSON Loader
 		String test = "";
 		try {
@@ -128,16 +122,16 @@ public class Game extends BasicGame {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		JSONObject testObj = new Gson().fromJson(test, JSONObject.class);
-		
+
 		for (int i = 0; i < testObj.rigidBodies.size(); ++i) {
 			BodyDef jsonBodyDef = new BodyDef();
 			jsonBodyDef.type = BodyType.STATIC;
 			jsonBodyDef.position.set(18f * i, 25f);
 			Body jsonBody;
 			jsonBody = world.createBody(jsonBodyDef);
-			
+
 			for (int j = 0; j < testObj.rigidBodies.get(i).polygons.size(); ++j) {
 				FixtureDef jsonFixtureDef = new FixtureDef();
 				PolygonShape jsonShape = new PolygonShape();
@@ -152,159 +146,99 @@ public class Game extends BasicGame {
 				jsonBody.createFixture(jsonFixtureDef);
 			}
 			jsonObjects.add(jsonBody);
-			
-		}
-		
-		// Dynamic Body
-		BodyDef bodyDef = new BodyDef();
-		bodyDef.type = BodyType.DYNAMIC;
-		bodyDef.position.set(4f, 4f);
-		CircleShape playerShape = new CircleShape();
-		playerShape.m_radius = 1f;
 
-		FixtureDef fixtureDef = new FixtureDef();
-		fixtureDef.shape = playerShape;
-		fixtureDef.density = 11f;
-		fixtureDef.friction = 0.3f;
-		
-		// Player
-		player = new Player(world,4f,4f,playerShape, "images/player.png");
-		
-		PolygonShape dynamicBox = new PolygonShape();
-		dynamicBox.setAsBox(0.15f, 0.15f);
-		fixtureDef.shape = dynamicBox;
-
-		fixtureDef.density = 1f;
-		fixtureDef.friction = 0.5f;
-		
-		/*/ Crate
-		 // wenn ma das in eine eigene methode schmeisst, fehlt fixtureDef und noch iwas...
-		float min_size = 0.1f;
-		float max_size = 0.3f;
-		
-		for (int i = 0; i < 5; ++i) {
-			for (int j = 0; j < 5; ++j) {
-				float size = (float) Math.random()*max_size + min_size;
-				
-
-				CircleShape c = new CircleShape();
-				c.m_radius = size;
-				fixtureDef.shape = c;
-				
-				
-				bodyDef.position.set(max_size * i * 10, max_size * j * 10);
-				GameObject crate = new GameObject(bodyDef, fixtureDef, world, "images/player.png");
-				crates.add(crate);
-			}
 		}
 
-
-		fixtureDef.density = 2f;
-		fixtureDef.friction = 0.8f;
-		
-		min_size = 0.1f;
-		max_size = 0.3f;
-		//*
-		for (int i = 0; i < 5; ++i) {
-			for (int j = 0; j < 5; ++j) {
-				float size = (float) Math.random()*max_size + min_size;
-				
-
-				PolygonShape p = new PolygonShape();
-				p.setAsBox(size, size);
-				fixtureDef.shape = dynamicBox;
-				fixtureDef.shape = p;
-
-				
-				
-				bodyDef.position.set(max_size * i * 10, max_size * j * 10);
-				GameObject crate = new GameObject(bodyDef, fixtureDef, world, "images/crate.png");
-				crates.add(crate);
-			}
-		}//*/
+		player = new Player(world, 4f, 4f, 1f, 11f, 0.3f, "images/player.png");
 	}
-	
-	private String readFile( String file ) throws IOException {
-	    BufferedReader reader = new BufferedReader( new FileReader (file));
-	    String         line = null;
-	    StringBuilder  stringBuilder = new StringBuilder();
-	    String         ls = System.getProperty("line.separator");
 
-	    while( ( line = reader.readLine() ) != null ) {
-	        stringBuilder.append( line );
-	        stringBuilder.append( ls );
-	    }
+	private String readFile(String file) throws IOException {
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		String line = null;
+		StringBuilder stringBuilder = new StringBuilder();
+		String ls = System.getProperty("line.separator");
 
-	    reader.close();
-	    return stringBuilder.toString();
+		while ((line = reader.readLine()) != null) {
+			stringBuilder.append(line);
+			stringBuilder.append(ls);
+		}
+
+		reader.close();
+		return stringBuilder.toString();
 	}
-	
+
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
 		Input input = gc.getInput();
-		
-		if (input.isKeyPressed(Input.KEY_SPACE) || input.isKeyPressed(Input.KEY_W) || input.isKeyPressed(Input.KEY_UP) ) {
+
+		if (input.isKeyPressed(Input.KEY_SPACE) || input.isKeyPressed(Input.KEY_W) || input.isKeyPressed(Input.KEY_UP)) {
 			player.getBody().setLinearVelocity(new Vec2(player.getBody().getLinearVelocity().x, 20));
 		}
-		if (input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A) ) {
-			// player.getBody().setLinearVelocity(new Vec2(-2, player.getBody().getLinearVelocity().y));
+		if (input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
+			// player.getBody().setLinearVelocity(new Vec2(-2,
+			// player.getBody().getLinearVelocity().y));
 			player.accelerate(true);
 		}
-		if (input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D) ) {
+		if (input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D)) {
 
-			// player.getBody().setLinearVelocity(new Vec2(2, player.getBody().getLinearVelocity().y));
+			// player.getBody().setLinearVelocity(new Vec2(2,
+			// player.getBody().getLinearVelocity().y));
 			player.accelerate(false);
 		}
-		
-		if (input.isKeyPressed(Input.KEY_DOWN) || input.isKeyDown(Input.KEY_S) ) {
+
+		if (input.isKeyPressed(Input.KEY_DOWN) || input.isKeyDown(Input.KEY_S)) {
 			player.getBody().setLinearVelocity(new Vec2(player.getBody().getLinearVelocity().x, -50));
 		}
-		
+
 		// TODO Kamera Smoothness muss auch angepasst werden, je nach Zoom
 		if (input.isKeyDown(Input.KEY_E)) {
-			if (zoom < 200){
+			if (zoom < 200) {
 				zoom += ZOOM_STEP;
 			}
 		}
 		if (input.isKeyDown(Input.KEY_R)) {
-			if(zoom -ZOOM_STEP > ZOOM_STEP){
+			if (zoom - ZOOM_STEP > ZOOM_STEP) {
 				zoom -= ZOOM_STEP;
 			}
 		}
-		
+
 		if (input.isKeyPressed(Input.KEY_X)) {
-			if( !crates.isEmpty() ){
-//				GameObject o = crates.get(0);
-//				o.getBody().setLinearVelocity( new Vec2(0, 14 ) );
-//				world.destroyBody( o.getBody() );
-//				crates.remove(o);
+			if (!balls.isEmpty()) {
+				// GameObject o = crates.get(0);
+				// o.getBody().setLinearVelocity( new Vec2(0, 14 ) );
+				// world.destroyBody( o.getBody() );
+				// crates.remove(o);
 			}
-			for ( GameObject o : crates){
-				
+			for (GameObject o : balls) {
+
 				float oX = o.getBody().getPosition().x;
 				float pX = player.getBody().getPosition().x;
 				float distance = Math.abs(oX - pX);
 				float space = 5f;
-				
-				if(distance < space){
-					o.getBody().setLinearVelocity( new Vec2( o.getBody().m_linearVelocity.x, (space-distance)*1.5f ) ) ;
+
+				if (distance < space) {
+					o.getBody().setLinearVelocity(new Vec2(o.getBody().m_linearVelocity.x, (space - distance) * 1.5f));
 				}
 			}
-			world.setGravity( new Vec2(0f,-1f));
+			world.setGravity(new Vec2(0f, -1f));
 		}
 		if (input.isKeyDown(Input.KEY_Y)) {
-			if( !crates.isEmpty() ){
-				GameObject o = crates.get(0);
-				world.destroyBody( o.getBody() );
-				crates.remove(o);
+			for(int i=0; i < 10; ++i){
+				if (!balls.isEmpty()) {
+					GameObject o = balls.get(0);
+					world.destroyBody(o.getBody());
+					balls.remove(o);
+				} else {
+					break;
+				}
 			}
 
-			world.setGravity( new Vec2(0f,-30f));
+			world.setGravity(new Vec2(0f, -30f));
 		}
 		if (input.isKeyDown(Input.KEY_C)) {
 			float max_size = 0.5f;
-			float min_size=0.05f;
-			float size = (float) Math.random()* max_size + min_size;
+			float min_size = 0.05f;
+			float size = (float) Math.random() * max_size + min_size;
 
 			CircleShape c = new CircleShape();
 			c.m_radius = size;
@@ -312,92 +246,95 @@ public class Game extends BasicGame {
 			fixtureDef.shape = c;
 			fixtureDef.density = 1f;
 			fixtureDef.friction = 0.5f;
-			
-			BodyDef bodyDef = new BodyDef();
-			bodyDef.type = BodyType.DYNAMIC;
-			bodyDef.position.set(player.getBody().getPosition().x, player.getBody().getPosition().y - size*2);
-			for(int i =0; i< 4; ++i){
-				GameObject crate = new GameObject(world, player.getBody().getPosition().x, player.getBody().getPosition().y - size*2, c, "images/player.png", true);
-				crates.add(crate);
-				world.createBody(bodyDef);
+
+			for (int i = 0; i < 4; ++i) {
+				GameObjectCircle ball = new GameObjectCircle(world, player.getBody().getPosition().x, player.getBody().getPosition().y - size
+						* 2, size, 1f, 0.5f, "images/player.png", BodyType.DYNAMIC);
+				balls.add(ball);
 			}
 		}
-		
 
 		if (input.isKeyDown(Input.KEY_V)) {
-			if( !crates.isEmpty() ){
-				GameObject o = crates.get(10);
-				o.getBody().setTransform(new Vec2(
-						 player.getBody().getPosition().x + 2,
-						 player.getBody().getPosition().y + 1
-						) // vec2 end
-						, 0
-				); // transform end
-				// gravity f�r objekt deaktivieren?
+			if (!balls.isEmpty()) {
+				GameObject o = balls.get(10);
+				o.getBody().setTransform(new Vec2(player.getBody().getPosition().x + 2, player.getBody().getPosition().y + 1) // vec2
+																																// end
+						, 0); // transform end
+								// gravity f�r objekt deaktivieren?
 
 			}
 		}
 		
+		if (input.isKeyPressed(Input.KEY_ENTER)) {
+			debugView = !debugView;			
+		}
+			
+
 		cam.follow(player.getBody().getPosition().x, player.getBody().getPosition().y, 10);
-		
+
 		// world.step(timeStep, velocityIterations, positionIterations);
 		world.step(delta / 1000f, 18, 6);
 	}
-	
+
 	@Override
 	public void render(GameContainer gc, Graphics g) throws SlickException {
-
+		
 		g.pushTransform();
 		drawBackground(g);
-		
-				
+
 		g.translate(cam.getX() * zoom + screenWidth / 2f, cam.getY() * zoom + screenHeight * 2f / 3f);
 		g.scale(zoom, zoom);
-		
+
 		for (GameObject staticObj : staticObjects) {
-			staticObj.draw();
+			staticObj.draw(g, debugView);
 		}
-		
-		for (Body b : jsonObjects) {
-			Fixture f = b.getFixtureList();
-//			System.out.println(f.m_shape);
-			while (f != null) {
-				Polygon p = new Polygon();
-				PolygonShape ps = (PolygonShape) f.getShape();
-				
-				Vec2[] verts = ps.getVertices();
-				for (int i = 0; i < ps.getVertexCount(); ++i){
-					Vec2 worldPoint = b.getWorldPoint(verts[i]);
-					p.addPoint(worldPoint.x, -worldPoint.y);
-					//p.addPoint(b.getPosition().x+ verts[i].x, -(b.getPosition().y +verts[i].y));
+
+		for (Body body : jsonObjects) {
+			Fixture fixture = body.getFixtureList();
+			// System.out.println(f.m_shape);
+			while (fixture != null) {
+				Polygon polygon = new Polygon();
+				PolygonShape polygonShape = (PolygonShape) fixture.getShape();
+
+				Vec2[] verts = polygonShape.getVertices();
+				for (int i = 0; i < polygonShape.getVertexCount(); ++i) {
+					Vec2 worldPoint = body.getWorldPoint(verts[i]);
+					polygon.addPoint(worldPoint.x, -worldPoint.y);
+					// p.addPoint(b.getPosition().x+ verts[i].x,
+					// -(b.getPosition().y +verts[i].y));
 				}
 				g.pushTransform();
-				g.draw(p);
+				g.draw(polygon);
 
 				g.popTransform();
-				f = f.getNext();
+				fixture = fixture.getNext();
 			}
 		}
-				
-		for (GameObject crate : crates) {
-			crate.draw();
+
+		for (GameObject ball : balls) {
+			ball.draw(g, debugView);
 		}
-		
-		player.draw();
-		polygon.draw(g);
-		
+
+		player.draw(g, debugView);
+		//polygon.draw(g);
+
 		// GUI
 		g.popTransform();
-		
+
 		// scale pixel size : box2d:size
 		g.drawString("10px", 0, 50);
 		g.drawRect(50, 50, 10, 1);
-		g.drawRect(50, 55, 10*zoom, 1);
+		g.drawRect(50, 55, 10 * zoom, 1);
 		g.setColor(Color.white);
 		g.drawString("Count: " + world.getBodyCount(), 0, 0);
 		
+		if(!balls.isEmpty()){
+			float f = balls.get(0).getBody().getPosition().y;
+			g.drawString("y: "+f, 200, 10);
+		}
+
 	}
-	
+
 	public static void main(String[] args) throws SlickException {
 		AppGameContainer game = new AppGameContainer(new Game());
 		game.setDisplayMode(screenWidth, screenHeight, fullScreen);
@@ -407,56 +344,38 @@ public class Game extends BasicGame {
 		game.setShowFPS(false);
 		game.start();
 	}
-	public void drawBackground(Graphics g){
-		// FIXME clean this crap up. 
-		//*
+
+	public void drawBackground(Graphics g) {
+		// FIXME clean this crap up.
+		// *
 		g.pushTransform();
-			g.translate(cam.getX() * 0.475f * zoom + screenWidth / 2f, cam.getY() * 0.475f * zoom + screenHeight * 2f / 3f);
-			g.scale(zoom, zoom);
-			trashpile[2].draw(13, -18, 40f, 20f);
-		g.popTransform();
-	
-	
-		g.pushTransform();
-			g.translate(cam.getX() * 0.575f * zoom + screenWidth / 2f, cam.getY() * 0.575f * zoom + screenHeight * 2f / 3f);
-			g.scale(zoom, zoom);
-			trashpile[4].draw(6, -18, 40f, 20f);
-		g.popTransform();
-		
-		g.pushTransform();
-			g.translate(cam.getX() * 0.675f * zoom + screenWidth / 2f, cam.getY() * 0.675f * zoom + screenHeight * 2f / 3f);
-			g.scale(zoom, zoom);
-			trashpile[3].draw(23, -18, 40f, 20f);
-		g.popTransform();
-	
-		g.pushTransform();
-			g.translate(cam.getX() * 0.75f * zoom + screenWidth / 2f, cam.getY() * 0.75f * zoom + screenHeight * 2f / 3f);
-			g.scale(zoom, zoom);
-			trashpile[0].draw(-7, -29, 30f, 15f);
+		g.translate(cam.getX() * 0.475f * zoom + screenWidth / 2f, cam.getY() * 0.475f * zoom + screenHeight * 2f / 3f);
+		g.scale(zoom, zoom);
+		trashpile[2].draw(13, -18, 40f, 20f);
 		g.popTransform();
 
 		g.pushTransform();
-			g.translate(cam.getX() * 0.875f * zoom + screenWidth / 2f, cam.getY() * 0.875f * zoom + screenHeight * 2f / 3f);
-			g.scale(zoom, zoom);
-			trashpile[1].draw(15, -18, 40f, 20f);
+		g.translate(cam.getX() * 0.575f * zoom + screenWidth / 2f, cam.getY() * 0.575f * zoom + screenHeight * 2f / 3f);
+		g.scale(zoom, zoom);
+		trashpile[4].draw(6, -18, 40f, 20f);
 		g.popTransform();
-		
-		
-		/*/
-		for(int i=0; i<trashpile.length; ++i){
-			g.pushTransform();
-				if (i%2 == 0){
-					g.translate(cam.getX() * 0.75f * zoom + screenWidth / 2f, cam.getY() * 0.75f * zoom + screenHeight * 2f / 3f);
-					g.scale(zoom, zoom);
-					trashpile[i].draw(-7 + (10*i), -29, 30f, 15f);
-				}
-				else {
-					g.translate(cam.getX() * 0.875f * zoom + screenWidth / 2f, cam.getY() * 0.875f * zoom + screenHeight * 2f / 3f);
-					g.scale(zoom, zoom);
-					trashpile[i].draw(3 + (15*i), -18, 40f, 20f);
-				}					
-			g.popTransform();
-		}
-		//*/
+
+		g.pushTransform();
+		g.translate(cam.getX() * 0.675f * zoom + screenWidth / 2f, cam.getY() * 0.675f * zoom + screenHeight * 2f / 3f);
+		g.scale(zoom, zoom);
+		trashpile[3].draw(23, -18, 40f, 20f);
+		g.popTransform();
+
+		g.pushTransform();
+		g.translate(cam.getX() * 0.75f * zoom + screenWidth / 2f, cam.getY() * 0.75f * zoom + screenHeight * 2f / 3f);
+		g.scale(zoom, zoom);
+		trashpile[0].draw(-7, -29, 30f, 15f);
+		g.popTransform();
+
+		g.pushTransform();
+		g.translate(cam.getX() * 0.875f * zoom + screenWidth / 2f, cam.getY() * 0.875f * zoom + screenHeight * 2f / 3f);
+		g.scale(zoom, zoom);
+		trashpile[1].draw(15, -18, 40f, 20f);
+		g.popTransform();
 	}
 }

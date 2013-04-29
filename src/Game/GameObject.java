@@ -9,71 +9,54 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
+import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
-public class GameObject {
+public abstract class GameObject {
 
-	private Body body;
-	private BodyDef bodyDef;
-	private PolygonShape polygonShape;
-	private FixtureDef fixtureDef;
+	protected Body body;
+	protected BodyDef bodyDef;
+	protected FixtureDef fixtureDef;
 
-	private Image	img;
-	private float	width, height;
-	
-	/*
-	public GameObject(BodyDef bd, FixtureDef fd, World world, String imgPath) throws SlickException {
-		this.body = world.createBody(bd);
-		this.body.createFixture(fd);
+	protected Image img;
+	protected float width, height;
+
+	public GameObject(World world, float posX, float posY, float density, float friction, String imgPath, BodyType bodyType)
+			throws SlickException {
+		bodyDef = new BodyDef();
+		bodyDef.type = bodyType;
+		bodyDef.position.set(posX, posY);
+		body = new Body(bodyDef, world);
+
+		fixtureDef = new FixtureDef();
+		fixtureDef.density = density;
+		fixtureDef.friction = friction;
+
 		this.img = new Image(imgPath);
-		AABB aabb = this.body.getFixtureList().m_aabb;
-		width = aabb.lowerBound.x - aabb.upperBound.x;
-		height = aabb.lowerBound.y - aabb.upperBound.y;
 	}
-	//*/
-	
-	public void draw() {
-		Vec2 position = this.body.getPosition();
-		float angle = this.body.getAngle();
-		img.setRotation(-(float) Math.toDegrees(angle));
-		img.draw(position.x - this.width / 2, -position.y - this.height / 2, this.width, this.height);
+
+	protected void getReadyToRumble(World world) {
+		
+		// XXX was is der unterschied zwischen den naechsten 2 zeilen?
+		// body = new Body(bodyDef, world);
+		body = world.createBody(bodyDef);
+		body.createFixture(fixtureDef);
 	}
-	
+
+	public void draw(Graphics g, boolean debugView){
+		if(debugView || this.img == null)
+			drawOutline(g);
+		else 
+			drawImage();
+		
+	}
+
+	public abstract void drawImage();
+	public abstract void drawOutline(Graphics g);
+
 	public Body getBody() {
 		return body;
 	}
-	
 
-
-//*
-
-	public GameObject(World world, float posX, float posY, Shape shape, String imgPath, boolean isDynamic) throws SlickException {
-		
-		bodyDef 		= new BodyDef();
-		if(isDynamic){
-			bodyDef.type = BodyType.DYNAMIC;
-		} else {
-			bodyDef.type = BodyType.STATIC;
-		}
-		bodyDef.position.set(posX, posY);
-	
-		body			= new Body(bodyDef, world);
-		
-		fixtureDef 		= new FixtureDef();
-		fixtureDef.shape = shape;
-		fixtureDef.density = 0.11f;
-		fixtureDef.friction = 0.1f;
-		
-		body = world.createBody( bodyDef );
-		body.createFixture( fixtureDef );
-		
-		
-		this.img = new Image(imgPath);
-		AABB aabb = this.body.getFixtureList().m_aabb;
-		width = aabb.lowerBound.x - aabb.upperBound.x;
-		height = aabb.lowerBound.y - aabb.upperBound.y;
-	}
-
-//*/
 }
