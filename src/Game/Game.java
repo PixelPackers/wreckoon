@@ -33,8 +33,8 @@ public class Game extends BasicGame {
 	// Sifu's Kommentar
 
 //	 /*/
-	private static int screenWidth = 1600;
-	private static int screenHeight = 900;
+	private static int screenWidth = 800;
+	private static int screenHeight = 600;
 	private static boolean fullScreen = false;
 	
 
@@ -89,7 +89,7 @@ public class Game extends BasicGame {
 		float testWidth = 1.6f; 
 		float testHeight = 1.6f;
 		float space = 20f;
-		int max = 222;
+		int max = 5;
 		for(int i=0; i<max; ++i){
 			for(int j=0; j<max; ++j){
 				if(j==i)
@@ -115,40 +115,17 @@ public class Game extends BasicGame {
 		//polygon = new GameObjectPolygon(world, -5f, 34f, points, 1f, 0.5f, null, BodyType.DYNAMIC);
 
 		// JSON Loader
-		String test = "";
+		String jsonFileAsString = "";
 		try {
-			test = readFile("etc/world");
+			jsonFileAsString = readFile("etc/world");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		JSONObject testObj = new Gson().fromJson(test, JSONObject.class);
-
-		for (int i = 0; i < testObj.rigidBodies.size(); ++i) {
-			BodyDef jsonBodyDef = new BodyDef();
-			jsonBodyDef.type = BodyType.STATIC;
-			jsonBodyDef.position.set(18f * i, 25f);
-			Body jsonBody;
-			jsonBody = world.createBody(jsonBodyDef);
-
-			for (int j = 0; j < testObj.rigidBodies.get(i).polygons.size(); ++j) {
-				FixtureDef jsonFixtureDef = new FixtureDef();
-				PolygonShape jsonShape = new PolygonShape();
-				// FIXME [100] wtf?
-				Vec2[] jsonPoints = new Vec2[100];
-				for (int k = 0; k < testObj.rigidBodies.get(i).polygons.get(j).size(); ++k) {
-					jsonPoints[k] = testObj.rigidBodies.get(i).polygons.get(j).get(k).mul(1);
-				}
-				jsonShape.set(jsonPoints, testObj.rigidBodies.get(i).polygons.get(j).size());
-				jsonFixtureDef.shape = jsonShape;
-				jsonFixtureDef.density = 0.5f;
-				jsonBody.createFixture(jsonFixtureDef);
-			}
-			jsonObjects.add(jsonBody);
-
-		}
-
+		JSONObject jsonObject = new Gson().fromJson(jsonFileAsString, JSONObject.class);
+		jsonObject.createShapes(world, jsonObjects);
+		
 		player = new Player(world, 4f, 4f, 1f, 11f, 0.3f, "images/player.png");
 	}
 
