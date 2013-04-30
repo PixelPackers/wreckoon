@@ -44,7 +44,7 @@ public class Game extends BasicGame {
 
 	private ArrayList<GameObject> 	staticObjects 	= new ArrayList<GameObject>();
 	private ArrayList<GameObject> 	balls 			= new ArrayList<GameObject>();
-	private ArrayList<Body> 		jsonObjects 	= new ArrayList<Body>();
+//	private ArrayList<Body> 		jsonObjects 	= new ArrayList<Body>();
 	private Player player;
 	private GameObjectPolygon polygon;
 
@@ -106,37 +106,37 @@ public class Game extends BasicGame {
 		points[1] = new Vec2(6f, 0f);
 		points[2] = new Vec2(-2f, 2f);
 		// FIXME warum geht das nicht mit dynamic...
-		polygon = new GameObjectPolygon(world, -5f, 34f, points, 0.9f, 0.5f, 0.5f, "images/player.png", BodyType.STATIC, false);
+		polygon = new GameObjectPolygon(world, -5f, 34f, points, 0.9f, 0.5f, 0.5f, "images/player.png", BodyType.DYNAMIC, false);
 
-		// JSON Loader
-		String jsonFileAsString = "";
-		try {
-			jsonFileAsString = readFile("etc/world");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		JSONObject jsonObject = new Gson().fromJson(jsonFileAsString, JSONObject.class);
-		jsonObject.createShapes(world, jsonObjects);
-		
+//		// JSON Loader
+//		String jsonFileAsString = "";
+//		try {
+//			jsonFileAsString = readFile("etc/world");
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//
+//		JSONObject jsonObject = new Gson().fromJson(jsonFileAsString, JSONObject.class);
+//		jsonObject.createShapes(world, jsonObjects);
+//		
 		player = new Player(world, 4f, 4f, 1f, 2f, 11f, 0.3f, 0f, "images/player.png");
 	}
 
-	private String readFile(String file) throws IOException {
-		BufferedReader reader = new BufferedReader(new FileReader(file));
-		String line = null;
-		StringBuilder stringBuilder = new StringBuilder();
-		String ls = System.getProperty("line.separator");
-
-		while ((line = reader.readLine()) != null) {
-			stringBuilder.append(line);
-			stringBuilder.append(ls);
-		}
-
-		reader.close();
-		return stringBuilder.toString();
-	}
+//	private String readFile(String file) throws IOException {
+//		BufferedReader reader = new BufferedReader(new FileReader(file));
+//		String line = null;
+//		StringBuilder stringBuilder = new StringBuilder();
+//		String ls = System.getProperty("line.separator");
+//
+//		while ((line = reader.readLine()) != null) {
+//			stringBuilder.append(line);
+//			stringBuilder.append(ls);
+//		}
+//
+//		reader.close();
+//		return stringBuilder.toString();
+//	}
 
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
@@ -162,27 +162,27 @@ public class Game extends BasicGame {
 			staticObj.draw(g, debugView);
 		}
 
-		for (Body body : jsonObjects) {
-			Fixture fixture = body.getFixtureList();
-			// System.out.println(f.m_shape);
-			while (fixture != null) {
-				Polygon polygon = new Polygon();
-				PolygonShape polygonShape = (PolygonShape) fixture.getShape();
-
-				Vec2[] verts = polygonShape.getVertices();
-				for (int i = 0; i < polygonShape.getVertexCount(); ++i) {
-					Vec2 worldPoint = body.getWorldPoint(verts[i]);
-					polygon.addPoint(worldPoint.x, -worldPoint.y);
-					// p.addPoint(b.getPosition().x+ verts[i].x,
-					// -(b.getPosition().y +verts[i].y));
-				}
-				g.pushTransform();
-				g.draw(polygon);
-
-				g.popTransform();
-				fixture = fixture.getNext();
-			}
-		}
+//		for (Body body : jsonObjects) {
+//			Fixture fixture = body.getFixtureList();
+//			// System.out.println(f.m_shape);
+//			while (fixture != null) {
+//				Polygon polygon = new Polygon();
+//				PolygonShape polygonShape = (PolygonShape) fixture.getShape();
+//
+//				Vec2[] verts = polygonShape.getVertices();
+//				for (int i = 0; i < polygonShape.getVertexCount(); ++i) {
+//					Vec2 worldPoint = body.getWorldPoint(verts[i]);
+//					polygon.addPoint(worldPoint.x, -worldPoint.y);
+//					// p.addPoint(b.getPosition().x+ verts[i].x,
+//					// -(b.getPosition().y +verts[i].y));
+//				}
+//				g.pushTransform();
+//				g.draw(polygon);
+//
+//				g.popTransform();
+//				fixture = fixture.getNext();
+//			}
+//		}
 
 		for (GameObject ball : balls) {
 			ball.draw(g, debugView);
@@ -201,10 +201,8 @@ public class Game extends BasicGame {
 		g.setColor(Color.white);
 		g.drawString("Count: " + world.getBodyCount(), 0, 0);
 		
-		if(!balls.isEmpty()){
-			float f = balls.get(0).getBody().getPosition().y;
-			g.drawString("y: "+f, 200, 10);
-		}
+		g.drawString("PlayerSpeed: " + player.getCurrentVelocity().toString(), 200, 10);
+		
 
 	}
 
@@ -217,6 +215,13 @@ public class Game extends BasicGame {
 		game.setShowFPS(false);
 		game.start();
 	}
+	
+	
+	
+	
+	
+	
+	
 
 	public void drawBackground(Graphics g) {
 		// FIXME clean this crap up.
@@ -256,22 +261,17 @@ public class Game extends BasicGame {
 		Input input = gc.getInput();
 
 		if (input.isKeyPressed(Input.KEY_SPACE) || input.isKeyPressed(Input.KEY_W) || input.isKeyPressed(Input.KEY_UP)) {
-			player.getBody().setLinearVelocity(new Vec2(player.getBody().getLinearVelocity().x, 20));
+			player.jump();
 		}
 		if (input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
-			// player.getBody().setLinearVelocity(new Vec2(-2,
-			// player.getBody().getLinearVelocity().y));
 			player.accelerate(true);
 		}
 		if (input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D)) {
-
-			// player.getBody().setLinearVelocity(new Vec2(2,
-			// player.getBody().getLinearVelocity().y));
 			player.accelerate(false);
 		}
 
 		if (input.isKeyPressed(Input.KEY_DOWN) || input.isKeyDown(Input.KEY_S)) {
-			player.getBody().setLinearVelocity(new Vec2(player.getBody().getLinearVelocity().x, -50));
+			player.groundPound();
 		}
 
 		// TODO Kamera Smoothness muss auch angepasst werden, je nach Zoom
@@ -353,12 +353,15 @@ public class Game extends BasicGame {
 			debugView = !debugView;			
 		}
 		
+		
+		// TODO crappy, weils keine keyUp() methode gibt. die reihenfolge muss auch so erhalten bleiben, sonsts is immer false
+		if(!input.isKeyPressed(input.KEY_LSHIFT) && !input.isKeyDown(input.KEY_RSHIFT)){
+			player.setRunning(false);
+		}
 		if (input.isKeyDown(input.KEY_LSHIFT) || input.isKeyDown(input.KEY_RSHIFT)){
 			player.setRunning(true);
 		}
 
-		if(!input.isKeyPressed(input.KEY_LSHIFT) && !input.isKeyDown(input.KEY_RSHIFT)){
-			player.setRunning(false);
-		}
+		
 	}
 }
