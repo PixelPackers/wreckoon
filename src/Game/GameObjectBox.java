@@ -7,14 +7,16 @@ import org.newdawn.slick.SlickException;
 
 public class GameObjectBox extends GameObjectPolygon {
 
-	public GameObjectBox(World world, float posX, float posY, float width, float height, float density, float friction, String imgPath, BodyType bodyType)
+	private float width, height;
+
+	public GameObjectBox(World world, float posX, float posY, float width, float height, float density, float friction, float restitution, String imgPath, BodyType bodyType, boolean fixedRotation)
 			throws SlickException {
 		super(world, posX, posY, new Vec2[]{
 				new Vec2(-width * 0.5f,  height * 0.5f),
 				new Vec2(-width * 0.5f, -height * 0.5f),
 				new Vec2( width * 0.5f, -height * 0.5f),
 				new Vec2( width * 0.5f,  height * 0.5f)},
-				density, friction, imgPath, bodyType);
+				density, friction, restitution, imgPath, bodyType, fixedRotation);
 		this.width = width;
 		this.height = height;
 	}

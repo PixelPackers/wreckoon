@@ -3,9 +3,7 @@ package Game;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyType;
-import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
@@ -15,36 +13,41 @@ public class GameObjectPolygon extends GameObject {
 	
 	protected PolygonShape polygonShape;
 
-	public GameObjectPolygon(World world, float posX, float posY, Vec2[] verts, float density, float friction, String imgPath,
-			BodyType bodyType) throws SlickException {
-		super(world, posX, posY, density, friction, imgPath, bodyType);
+	public GameObjectPolygon(World world, float posX, float posY, Vec2[] verts, float density, float friction, float restitution, String imgPath,
+			BodyType bodyType, boolean fixedRotation) throws SlickException {
+		super(world, posX, posY, density, friction, restitution, imgPath, bodyType, fixedRotation);
 
-		polygonShape = new PolygonShape();
-		polygonShape.set(verts, verts.length);
-		fixtureDef.shape = polygonShape;
+		this.polygonShape = new PolygonShape();
+		this.polygonShape.set(verts, verts.length);
+		this.fixtureDef.shape = polygonShape;
 		
 //		AABB aabb = this.body.getFixtureList().m_aabb;
-//		width = aabb.lowerBound.x - aabb.upperBound.x;
-//		height = aabb.lowerBound.y - aabb.upperBound.y;
+//		this.width = aabb.lowerBound.x - aabb.upperBound.x;
+//		this.height = aabb.lowerBound.y - aabb.upperBound.y;
+//		this.width  = 1f;
+//		this.height = 1f;
 
 		super.getReadyToRumble(world);
 	}
 
 	public void drawImage() {
-
+		Vec2 position = this.body.getPosition();
+		float angle = this.body.getAngle();
+		img.setRotation(-(float) Math.toDegrees(angle));
+		img.draw(position.x, -position.y, 10, 10);
 	}
 
 	@Override
 	public void drawOutline(Graphics g) {
 
-		Polygon polygon = new Polygon();
-		Vec2[] verts = polygonShape.getVertices();
-		for (int i=0; i< polygonShape.m_vertexCount; ++i) {
+		Polygon polygonToDraw = new Polygon();
+		Vec2[] verts = this.polygonShape.getVertices();
+		for (int i=0; i< this.polygonShape.m_vertexCount; ++i) {
 			Vec2 vert = verts[i];
-			Vec2 worldPoint = body.getWorldPoint(vert);
-			polygon.addPoint(worldPoint.x, -worldPoint.y);
+			Vec2 worldPoint = this.body.getWorldPoint(vert);
+			polygonToDraw.addPoint(worldPoint.x, -worldPoint.y);
 		}
-		g.draw(polygon);
+		g.draw(polygonToDraw);
 		
 	}
 	
