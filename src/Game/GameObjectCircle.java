@@ -11,9 +11,9 @@ public class GameObjectCircle extends GameObject {
 	
 	private float radius;
 
-	public GameObjectCircle(World world, float posX, float posY, float radius, float density, float friction, float restitution, String imgPath, BodyType bodyType, boolean fixedRotation)
+	public GameObjectCircle(World world, float posX, float posY, float radius, float density, float friction, float restitution, String imgPath, BodyType bodyType)
 			throws SlickException {
-		super(world, posX, posY, density, friction, restitution, imgPath, bodyType, fixedRotation);
+		super(world, posX, posY, density, friction, restitution, imgPath, bodyType);
 
 		CircleShape circleShape = new CircleShape();
 		circleShape.m_radius = radius;

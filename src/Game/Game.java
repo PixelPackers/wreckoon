@@ -14,6 +14,7 @@ import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
+import org.lwjgl.input.Mouse;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Color;
@@ -85,18 +86,18 @@ public class Game extends BasicGame {
 		for(int i=0; i<max; ++i){
 			for(int j=0; j<max; ++j){
 				if(j==i)
-				staticObjects.add(new GameObjectBox(world,  space + i*testWidth,  j*testHeight, testWidth, testHeight, 0.5f,0.5f, 0f, "images/crate.png", BodyType.STATIC, false));
+				staticObjects.add(new GameObjectBox(world,  space + i*testWidth,  j*testHeight, testWidth, testHeight, 0.5f,0.5f, 0f, "images/crate.png", BodyType.STATIC));
 			}
 		}
 		
 		
 		// ground
-		staticObjects.add(new GameObjectBox(world, 0f, -9f, 50f, 10f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC, false));
+		staticObjects.add(new GameObjectBox(world, 0f, -9f, 50f, 10f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC));
 
 		// walls
-		staticObjects.add(new GameObjectBox(world,  22f,  0f, 1f, 10f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC, false));
-		staticObjects.add(new GameObjectBox(world, -45f, 20f, 1f, 20f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC, false));
-		staticObjects.add(new GameObjectBox(world,  45f, 20f, 1f, 20f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC, false));
+		staticObjects.add(new GameObjectBox(world,  22f,  0f, 1f, 10f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC));
+		staticObjects.add(new GameObjectBox(world, -45f, 20f, 1f, 20f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC));
+		staticObjects.add(new GameObjectBox(world,  45f, 20f, 1f, 20f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC));
 
 		// P O L Y G O N
 		Vec2[] points = new Vec2[3];
@@ -104,7 +105,7 @@ public class Game extends BasicGame {
 		points[1] = new Vec2(6f, 0f);
 		points[2] = new Vec2(-2f, 2f);
 		// FIXME warum geht das nicht mit dynamic...
-		polygon = new GameObjectPolygon(world, -5f, 34f, points, 0.9f, 0.5f, 0.5f, "images/player.png", BodyType.DYNAMIC, false);
+		polygon = new GameObjectPolygon(world, -5f, 34f, points, 0.9f, 0.5f, 0.5f, "images/player.png", BodyType.DYNAMIC);
 
 //		// JSON Loader
 //		String jsonFileAsString = "";
@@ -334,7 +335,7 @@ public class Game extends BasicGame {
 
 			for (int i = 0; i < 4; ++i) {
 				GameObjectCircle ball = new GameObjectCircle(world, player.getBody().getPosition().x, player.getBody().getPosition().y - size
-						* 2, size, 1f, 0.5f, 0f, "images/player.png", BodyType.DYNAMIC, false);
+						* 2, size, 1f, 0.5f, 0f, "images/player.png", BodyType.DYNAMIC);
 				balls.add(ball);
 			}
 		}

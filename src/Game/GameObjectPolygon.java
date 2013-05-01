@@ -14,8 +14,8 @@ public class GameObjectPolygon extends GameObject {
 	protected PolygonShape polygonShape;
 
 	public GameObjectPolygon(World world, float posX, float posY, Vec2[] verts, float density, float friction, float restitution, String imgPath,
-			BodyType bodyType, boolean fixedRotation) throws SlickException {
-		super(world, posX, posY, density, friction, restitution, imgPath, bodyType, fixedRotation);
+			BodyType bodyType) throws SlickException {
+		super(world, posX, posY, density, friction, restitution, imgPath, bodyType);
 
 		this.polygonShape = new PolygonShape();
 		this.polygonShape.set(verts, verts.length);

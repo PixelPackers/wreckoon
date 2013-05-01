@@ -17,15 +17,12 @@ public abstract class GameObject {
 
 	protected Image 		img;
 
-	public GameObject(World world, float posX, float posY, float density, float friction, float restitution, String imgPath, BodyType bodyType, boolean fixedRotation)
+	public GameObject(World world, float posX, float posY, float density, float friction, float restitution, String imgPath, BodyType bodyType)
 			throws SlickException {
 		this.bodyDef = new BodyDef();
 		this.bodyDef.type = bodyType;
 		this.bodyDef.position.set(posX, posY);
-		this.bodyDef.fixedRotation = fixedRotation;
-		// FIXME das gleiche wie in getReadyToRumble() erster aufruf
-		this.body = new Body(bodyDef, world);
-
+		
 		this.fixtureDef = new FixtureDef();
 		this.fixtureDef.density = density;
 		this.fixtureDef.friction = friction;
@@ -36,9 +33,6 @@ public abstract class GameObject {
 	}
 
 	protected void getReadyToRumble(World world) {
-		
-		// XXX was is der unterschied zwischen den naechsten 2 zeilen?
-		// body = new Body(bodyDef, world);
 		this.body = world.createBody(bodyDef);
 		this.body.createFixture(fixtureDef);
 	}
