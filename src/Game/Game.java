@@ -79,8 +79,8 @@ public class Game extends BasicGame {
 
 		
 
-		float testWidth = 1.6f; 
-		float testHeight = 1.6f;
+		float testWidth = 3f; 
+		float testHeight = 3f;
 		float space = 20f;
 		int max = 5;
 		for(int i=0; i<max; ++i){
@@ -96,15 +96,14 @@ public class Game extends BasicGame {
 
 		// walls
 		staticObjects.add(new GameObjectBox(world,  22f,  0f, 1f, 10f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC));
-		staticObjects.add(new GameObjectBox(world, -45f, 20f, 1f, 20f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC));
-		staticObjects.add(new GameObjectBox(world,  45f, 20f, 1f, 20f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC));
+		staticObjects.add(new GameObjectBox(world, -25f, 0f, 1f, 20f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC));
+		staticObjects.add(new GameObjectBox(world,  25f, 0f, 1f, 20f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC));
 
 		// P O L Y G O N
 		Vec2[] points = new Vec2[3];
 		points[0] = new Vec2(0f, 0f);
 		points[1] = new Vec2(6f, 0f);
 		points[2] = new Vec2(-2f, 2f);
-		// FIXME warum geht das nicht mit dynamic...
 		polygon = new GameObjectPolygon(world, -5f, 34f, points, 0.9f, 0.5f, 0.5f, "images/player.png", BodyType.DYNAMIC);
 
 //		// JSON Loader

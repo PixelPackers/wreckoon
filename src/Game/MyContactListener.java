@@ -5,10 +5,10 @@ import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.contacts.Contact;
+import org.newdawn.slick.Color;
 
 public class MyContactListener implements ContactListener{
 
-//	private static int collisionCounter = 0;
 	private Player player;
 	
 	public MyContactListener(Player player) {
@@ -16,26 +16,29 @@ public class MyContactListener implements ContactListener{
 	}
 	
 	@Override
-	public void beginContact(Contact contact) {
+	public void beginContact(Contact contact) {	
 		
-		int i=0;
-		for( Fixture sensorFixture : player.getSensorList() ){
+		for( MySensor sensor : player.getSensorList() ){
 			
-			if (contact.getFixtureA() == sensorFixture||
-				contact.getFixtureB() == sensorFixture
+			if (contact.getFixtureA() == sensor.getFixture()||
+				contact.getFixtureB() == sensor.getFixture()
 			){
-				System.out.println("sensor" + i + " hit");
+				sensor.increaseCollidingCounter();
 			}
-
-			++i;
 		}
-//		System.out.println(++collisionCounter);
 		
 	}
-	@Override	public void endContact(Contact contact) {
-		
-		// TODO iswalljumpalbe wieder weg
-		// is on solid ground weg
+	
+	@Override	
+	public void endContact(Contact contact) {
+			
+		for( MySensor sensor : player.getSensorList() ){	
+			if (contact.getFixtureA() == sensor.getFixture()||
+				contact.getFixtureB() == sensor.getFixture()
+			){
+				sensor.decreaseCollidingCounter();
+			}
+		}
 		
 	}
 	@Override	public void postSolve(Contact contact, ContactImpulse contactImpulse) {}

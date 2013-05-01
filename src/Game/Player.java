@@ -29,11 +29,14 @@ public class Player {
 	private final float ACC_WALKING = 0.5f;
 	private final float ACC_RUNNING = 0.75f;
 	
+	private static int groundPoundCounter = 0;
+	
 	private float jumpPower = 20f;
 	private float groundPoundPower = -50f;
 
 	private boolean isRunning = false;
 	private boolean isGroundPounding = false;
+	private boolean jumping = false;
 	
 	private float	maxPlayerRotation = 10f;
 	private World world;
@@ -45,13 +48,13 @@ public class Player {
 	private Body 		body;
 	private BodyDef 	bodyDef = new BodyDef();
 	private FixtureDef 	fixtureDef = new FixtureDef();
-	private Fixture 	sensorTopLeft;
-	private Fixture 	sensorTopRight;
-	private Fixture 	sensorBottomLeft;
-	private Fixture 	sensorBottomRight;
+	private MySensor 	sensorTopLeft;
+	private MySensor 	sensorTopRight;
+	private MySensor	sensorBottomLeft;
+	private MySensor 	sensorBottomRight;
+	private MySensor	sensorGroundCollision;
 
-	private ArrayList<PolygonShape> sensorPolygonShapeList 	= new ArrayList<PolygonShape>();
-	private ArrayList<Fixture> sensorFixtureList			= new ArrayList<Fixture>();
+	private ArrayList<MySensor> sensorList			= new ArrayList<MySensor>();
 	
 	private Image 		img;
 	
@@ -125,13 +128,12 @@ public class Player {
 
 				PolygonShape sensorPolygonShape = new PolygonShape();
 				sensorPolygonShape.set(vertsSensor, vertsSensor.length);
-				sensorPolygonShapeList.add(sensorPolygonShape);
 				
 				FixtureDef 	fixtureDefSensor = new FixtureDef();
 				fixtureDefSensor.shape = sensorPolygonShape;
 				fixtureDefSensor.isSensor=true;
 		
-				sensorFixtureList.add(this.body.createFixture(fixtureDefSensor));
+				sensorList.add(new MySensor(this.body.createFixture(fixtureDefSensor), sensorPolygonShape ) );
 				
 			}
 		}
@@ -140,23 +142,27 @@ public class Player {
 		float groundCollisionSensorHeight=0.2f;
 		
 		Vec2[] vertsGroundSensor = new Vec2[]{
-			new Vec2(-this.width * 0.5f, -this.height * 0.5f - groundCollisionSensorHeight),
-			new Vec2(-this.width * 0.5f, -this.height * 0.5f + groundCollisionSensorHeight),
-			new Vec2( this.width * 0.5f, -this.height * 0.5f + groundCollisionSensorHeight),
-			new Vec2( this.width * 0.5f, -this.height * 0.5f - groundCollisionSensorHeight)
+			new Vec2(-this.width * 0.25f, -this.height * 0.5f - groundCollisionSensorHeight),
+			new Vec2(-this.width * 0.25f, -this.height * 0.5f + groundCollisionSensorHeight),
+			new Vec2( this.width * 0.25f, -this.height * 0.5f + groundCollisionSensorHeight),
+			new Vec2( this.width * 0.25f, -this.height * 0.5f - groundCollisionSensorHeight)
 		};
 
 		PolygonShape sensorPolygonShape = new PolygonShape();
 		sensorPolygonShape.set(vertsGroundSensor, vertsGroundSensor.length);
-		sensorPolygonShapeList.add(sensorPolygonShape);
 		
 		FixtureDef 	fixtureDefSensor = new FixtureDef();
 		fixtureDefSensor.shape = sensorPolygonShape;
 		fixtureDefSensor.isSensor=true;
-
-		sensorFixtureList.add(this.body.createFixture(fixtureDefSensor));
-	
 		
+		this.sensorGroundCollision = new MySensor( this.body.createFixture(fixtureDefSensor), sensorPolygonShape );
+		sensorList.add(sensorGroundCollision);
+		
+
+		sensorBottomLeft 	= sensorList.get(0);
+		sensorTopLeft		= sensorList.get(1);
+		sensorBottomRight 	= sensorList.get(2);
+		sensorTopRight 		= sensorList.get(3);
 	}
 
 	public void draw(Graphics g, boolean debugView){
@@ -199,23 +205,9 @@ public class Player {
 		g.draw(polygonToDraw);
 		
 		// draw sensors
-		for(PolygonShape polygonShape : sensorPolygonShapeList){
-			polygonToDraw 		= new Polygon();
-			Vec2[] sensorVerts 	= polygonShape.getVertices();
-			
-			for (int i=0; i< polygonShape.m_vertexCount; ++i) {
-				
-				Vec2 sensorVert 		= sensorVerts[i];
-				Vec2 sensorWorldPoint	= this.body.getWorldPoint(sensorVert);
-				polygonToDraw.addPoint(sensorWorldPoint.x, -sensorWorldPoint.y);
-				
-			}
-			
-			g.setColor(Color.green);
-			g.draw(polygonToDraw);
-			g.setColor(Color.white);
+		for (MySensor mySensor : sensorList){
+			mySensor.draw(g, this.body);
 		}
-
 		
 	}
 	
@@ -227,16 +219,50 @@ public class Player {
 //			this.body.m_angularVelocity = -(this.body.m_angularVelocity * 0.75f);
 //		}
 		
-		float currentRotation = (float) (Math.toDegrees( this.body.getAngle()) );
-		if( currentRotation < -this.maxPlayerRotation){
-			this.body.setTransform(this.body.getPosition(), (float)Math.toRadians(-this.maxPlayerRotation));
-		}
-		if( currentRotation > this.maxPlayerRotation){
-			this.body.setTransform(this.body.getPosition(), (float)Math.toRadians(this.maxPlayerRotation));
+		// if player wouldnt use fixedRotation, this would only allow an specific angle
+//		float currentRotation = (float) (Math.toDegrees( this.body.getAngle()) );
+//		if( currentRotation < -this.maxPlayerRotation){
+//			this.body.setTransform(this.body.getPosition(), (float)Math.toRadians(-this.maxPlayerRotation));
+//		}
+//		if( currentRotation > this.maxPlayerRotation){
+//			this.body.setTransform(this.body.getPosition(), (float)Math.toRadians(this.maxPlayerRotation));
+//		}
+		
+//		if(this.leftWallColliding() && !this.isJumping() ){
+		if(this.leftWallColliding() ){
+			if(this.body.getLinearVelocity().y >= 0){
+				System.out.println("> 0");
+			} else {
+				this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, 0f));	
+			}
+
 		}
 		
+		if(this.rightWallColliding() && !this.isJumping() ){
+//		if(this.rightWallColliding() ){
+			this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, 0f));
+
+		}
+		
+		++groundPoundCounter;
+		if(this.groundPoundCounter > 10 && isGroundPounding){
+			this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, groundPoundPower));
+
+		}
+//		if(getSensorGroundCollision().isColliding() && this.body.getLinearVelocity().y < 0f){
+		if(getSensorGroundCollision().isColliding()){
+			isGroundPounding = false;
+			jumping = false;
+			System.out.println("250: " + getSensorGroundCollision().isColliding());
+		}
+
 	}
 	
+
+	private boolean isJumping() {
+		
+		return this.jumping;
+	}
 
 	public void accelerate(boolean left) {
 		
@@ -263,22 +289,38 @@ public class Player {
 	}
 
 	public void jump(){
-		if(!isGroundPounding){
-			this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, this.jumpPower));
+		this.jumping = true;
+		
+		if(!isGroundPounding && (sensorGroundCollision.isColliding() || leftWallColliding() || rightWallColliding() ) ){
+			
+			float jumpSpeedX = this.body.getLinearVelocity().x;
+			
+			if(leftWallColliding()){
+				jumpSpeedX = this.jumpPower;
+			} else if(rightWallColliding()){
+				jumpSpeedX = -this.jumpPower;
+			}
+			
+			this.body.setLinearVelocity(new Vec2(jumpSpeedX, this.jumpPower));
+			System.out.println("jump");
 		}
 	}
 	public void groundPound(){
-		isGroundPounding = true;
-		
-		// TODO in game.update() eine variable hochzählen
-		// dann ab bestimmten wert ausführen und anschließend wieder auf 0 setzten
-		
-		//		this.getBody().setLinearVelocity(new Vec2(0,0));
-		this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, groundPoundPower));
-
-		isGroundPounding = false;
+		if(!isGroundPounding){
+			isGroundPounding = true;
+			
+			this.groundPoundCounter = 0;
+			this.getBody().setLinearVelocity(new Vec2(0f,0f));
+		}
 	}
 	
+	public boolean leftWallColliding(){
+		return sensorBottomLeft.isColliding() && sensorTopLeft.isColliding();
+	}
+
+	public boolean rightWallColliding(){
+		return sensorBottomRight.isColliding() && sensorTopRight.isColliding();
+	}
 	
 	
 	public boolean isRunning() {
@@ -297,8 +339,29 @@ public class Player {
 		return body;
 	}
 	
-	public ArrayList<Fixture> getSensorList(){
-		return this.sensorFixtureList;
+	public ArrayList<MySensor> getSensorList(){
+		return this.sensorList;
 	}
 
+	public MySensor getSensorTopLeft() {
+		return sensorTopLeft;
+	}
+
+	public MySensor getSensorTopRight() {
+		return sensorTopRight;
+	}
+
+	public MySensor getSensorBottomLeft() {
+		return sensorBottomLeft;
+	}
+
+	public MySensor getSensorBottomRight() {
+		return sensorBottomRight;
+	}
+	public MySensor getSensorGroundCollision() {
+		return sensorGroundCollision;
+	}
+
+	
+	
 }
