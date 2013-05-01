@@ -1,20 +1,12 @@
 package Game;
 
-// TODO delete
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import org.jbox2d.collision.shapes.CircleShape;
-import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyType;
-import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
-import org.lwjgl.input.Mouse;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Color;
@@ -23,9 +15,6 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.geom.Polygon;
-
-import com.google.gson.Gson;
 
 public class Game extends BasicGame {
 
@@ -104,7 +93,7 @@ public class Game extends BasicGame {
 		points[0] = new Vec2(0f, 0f);
 		points[1] = new Vec2(6f, 0f);
 		points[2] = new Vec2(-2f, 2f);
-		polygon = new GameObjectPolygon(world, -5f, 0f, points, 0.9f, 0.5f, 0.7f, "images/player.png", BodyType.STATIC);
+		polygon = new GameObjectPolygon(world, -5f, 0f, points, 0.9f, 0.5f, 0.3f, "images/player.png", BodyType.DYNAMIC);
 
 		staticObjects.add( new GameObjectCircle(world, 2f, -4f, 1.5f, 0.9f, 0.5f, 0.7f, "images/player.png", BodyType.STATIC) );
 //		// JSON Loader

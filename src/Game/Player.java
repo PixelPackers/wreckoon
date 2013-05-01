@@ -7,10 +7,8 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
-import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
-import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
@@ -29,7 +27,7 @@ public class Player {
 	private final float ACC_WALKING = 0.5f;
 	private final float ACC_RUNNING = 0.75f;
 	
-	private static int groundPoundCounter = 0;
+	private int groundPoundCounter = 0;
 	
 	private float jumpPower = 20f;
 	private float groundPoundPower = -50f;
@@ -228,22 +226,13 @@ public class Player {
 //			this.body.setTransform(this.body.getPosition(), (float)Math.toRadians(this.maxPlayerRotation));
 //		}
 		
-//		if(this.leftWallColliding() && !this.isJumping() ){
-		if(this.leftWallColliding() ){
+		
+		if( this.leftWallColliding() || this.rightWallColliding() ){
 			if(this.body.getLinearVelocity().y < 0){
 				this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, 1f));	
 			}
-
 		}
-		
-//		if(this.rightWallColliding() && !this.isJumping() ){
-		if(this.rightWallColliding() ){
-			if(this.body.getLinearVelocity().y < 0){
-				this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, 1f));
-			}
-
-		}
-		
+				
 		++groundPoundCounter;
 		if(this.groundPoundCounter > 10 && isGroundPounding){
 			this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, groundPoundPower));
@@ -253,15 +242,8 @@ public class Player {
 		if(getSensorGroundCollision().isColliding()){
 			isGroundPounding = false;
 			jumping = false;
-			System.out.println("250: " + getSensorGroundCollision().isColliding());
 		}
 
-	}
-	
-
-	private boolean isJumping() {
-		
-		return this.jumping;
 	}
 
 	public void accelerate(boolean left) {
@@ -293,16 +275,17 @@ public class Player {
 		
 		if(!isGroundPounding && (sensorGroundCollision.isColliding() || leftWallColliding() || rightWallColliding() ) ){
 			
-			float jumpSpeedX = this.body.getLinearVelocity().x;
-			
-			if(leftWallColliding()){
+			float jumpSpeedX=0; 
+					
+			if(sensorGroundCollision.isColliding()){
+				jumpSpeedX = this.body.getLinearVelocity().x;
+			} else if(leftWallColliding()){
 				jumpSpeedX = this.jumpPower;
 			} else if(rightWallColliding()){
 				jumpSpeedX = -this.jumpPower;
 			}
 			
 			this.body.setLinearVelocity(new Vec2(jumpSpeedX, this.jumpPower));
-			System.out.println("jump");
 		}
 	}
 	public void groundPound(){
