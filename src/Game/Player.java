@@ -230,17 +230,17 @@ public class Player {
 		
 //		if(this.leftWallColliding() && !this.isJumping() ){
 		if(this.leftWallColliding() ){
-			if(this.body.getLinearVelocity().y >= 0){
-				System.out.println("> 0");
-			} else {
-				this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, 0f));	
+			if(this.body.getLinearVelocity().y < 0){
+				this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, 1f));	
 			}
 
 		}
 		
-		if(this.rightWallColliding() && !this.isJumping() ){
-//		if(this.rightWallColliding() ){
-			this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, 0f));
+//		if(this.rightWallColliding() && !this.isJumping() ){
+		if(this.rightWallColliding() ){
+			if(this.body.getLinearVelocity().y < 0){
+				this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, 1f));
+			}
 
 		}
 		

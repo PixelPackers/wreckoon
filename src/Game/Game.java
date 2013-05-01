@@ -104,8 +104,9 @@ public class Game extends BasicGame {
 		points[0] = new Vec2(0f, 0f);
 		points[1] = new Vec2(6f, 0f);
 		points[2] = new Vec2(-2f, 2f);
-		polygon = new GameObjectPolygon(world, -5f, 34f, points, 0.9f, 0.5f, 0.5f, "images/player.png", BodyType.DYNAMIC);
+		polygon = new GameObjectPolygon(world, -5f, 0f, points, 0.9f, 0.5f, 0.7f, "images/player.png", BodyType.STATIC);
 
+		staticObjects.add( new GameObjectCircle(world, 2f, -4f, 1.5f, 0.9f, 0.5f, 0.7f, "images/player.png", BodyType.STATIC) );
 //		// JSON Loader
 //		String jsonFileAsString = "";
 //		try {
