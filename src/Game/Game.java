@@ -63,13 +63,11 @@ public class Game extends BasicGame {
 	@Override
 	public void init(GameContainer gc) throws SlickException {
 
-		/*
-		 * for (int y = 0; y < worldImages.length; ++y) { for (int x = 0; x <
-		 * worldImages[0].length; ++x) { //worldImages[y][x] = new
-		 * Image("images/world_x" + x % 2 + "_y" + y % 2 + ".png");
-		 * worldImages[y][x] = new Image("images/test" + (x + 1) + " (" + (y +
-		 * 1) + ").png"); } }
-		 */			
+//		for (int y = 0; y < worldImages.length; ++y) { 
+//			for (int x = 0; x < worldImages[0].length; ++x) {
+//				worldImages[y][x] = new	Image("images/world_x" + x % 2 + "_y" + y % 2 + ".png");
+//				worldImages[y][x] = new Image("images/test" + (x + 1) + " (" + (y +	1) + ").png"); } 
+//		}
 		
 		for (int i = 0; i <= 4; ++i) {
 			trashpile[i] = new Image("images/background" + (i + 1) + ".png");
@@ -120,7 +118,8 @@ public class Game extends BasicGame {
 //		JSONObject jsonObject = new Gson().fromJson(jsonFileAsString, JSONObject.class);
 //		jsonObject.createShapes(world, jsonObjects);
 //		
-		player = new Player(world, 4f, 4f, 1f, 2f, 11f, 0.3f, 0f, "images/player.png");
+		player = new Player(world, 4f, 4f);
+		world.setContactListener(new MyContactListener(player));
 	}
 
 //	private String readFile(String file) throws IOException {
@@ -142,6 +141,8 @@ public class Game extends BasicGame {
 	public void update(GameContainer gc, int delta) throws SlickException {
 		
 		processInput(gc);
+		
+		player.update();
 
 		cam.follow(player.getBody().getPosition().x, player.getBody().getPosition().y, 10);
 

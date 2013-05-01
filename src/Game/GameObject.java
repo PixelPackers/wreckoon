@@ -23,6 +23,7 @@ public abstract class GameObject {
 		this.bodyDef.type = bodyType;
 		this.bodyDef.position.set(posX, posY);
 		this.bodyDef.fixedRotation = fixedRotation;
+		// FIXME das gleiche wie in getReadyToRumble() erster aufruf
 		this.body = new Body(bodyDef, world);
 
 		this.fixtureDef = new FixtureDef();
