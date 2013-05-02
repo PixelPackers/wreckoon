@@ -13,8 +13,7 @@ import org.jbox2d.dynamics.World;
 
 // TODO make everything private
 public class JSONObject {
-
-	// TODO private
+	
 	List<RigidBody> rigidBodies;
 	
 	public void createShapes(World world, ArrayList<Body> jsonObjects){

@@ -16,12 +16,6 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Polygon;
 
 public class Player {
-
-	// TODO PLAYER.JAVA LIST
-	// 2 sensors pro seite für wand collision
-	// einen groundCollider
-	// 		für jump()
-	// die iwie einfärben zum debuggen?
 	
 	private final float MAX_VELOCITY_WALKING = 7f;
 	private final float MAX_VELOCITY_RUNNING = 20f;
@@ -35,8 +29,8 @@ public class Player {
 	private float groundPoundPower = -50f;
 
 	private boolean running = false;
+	private boolean bouncing = false;
 	private boolean groundPounding = false;
-	private boolean jumping = false;
 	private float	accelerationX = ACC_WALKING;
 	private float	maxVelocity = MAX_VELOCITY_WALKING;
 	
@@ -112,41 +106,34 @@ public class Player {
 		
 		this.createSensors();
 		
-	
 	}
 	
 	private void createSensors() {
-		System.out.println(this.body.getFixtureList().m_aabb.lowerBound.x);
-		System.out.println(this.body.getFixtureList().m_aabb.lowerBound.y);
-		System.out.println(this.body.getFixtureList().m_aabb.upperBound.x);
-		System.out.println(this.body.getFixtureList().m_aabb.upperBound.y);
 
-		// XXX WORK IN PROGRESS
-		// eine methode, die die aktuelle fixture nimmt und aufgrund derer die sensoren anordnet
-		
+		// delete old sensors
+		for (MySensor mySensor : sensorList){
+			this.body.destroyFixture( mySensor.getFixture() );
+		}
+		this.sensorList = new ArrayList<MySensor>();
+
+		float width = this.width;
+		float height = this.height;
+		if(this.isRunning()){
+			width = this.height;
+			height = this.width;
+		}
 		// wall collision sensors
 		float sensorSizeWidth	= width  * 0.125f;
 		float sensorSizeHeight	= height * 0.1f;
-		float default_xSpace = 0.5f;
-		float default_ySpace = 0.75f;
+		float default_xSpace = width*0.5f;
+		float default_ySpace = height*0.45f;
 		float xSpace = default_xSpace;
 		float ySpace = default_ySpace;
 		
 		for (int i=0;i<2; ++i){
-
-			if(i % 2 == 0){
-				xSpace = -default_xSpace;
-			} else {
-				xSpace = default_xSpace;
-			}
-			
+			if(i % 2 == 0){ xSpace = -default_xSpace; } else { xSpace = default_xSpace; }
 			for (int j=0;j<2; ++j){
-				 
-				if(j % 2 == 0){
-					ySpace = -default_ySpace;
-				} else {
-					ySpace = default_ySpace;
-				}
+				if(j % 2 == 0){ ySpace = -default_ySpace; } else { ySpace = default_ySpace;	}
 				
 				Vec2[] vertsSensor = new Vec2[]{
 					new Vec2(-sensorSizeWidth + xSpace,  sensorSizeHeight + ySpace),
@@ -171,10 +158,10 @@ public class Player {
 		float groundCollisionSensorHeight=0.2f;
 		
 		Vec2[] vertsGroundSensor = new Vec2[]{
-			new Vec2(-this.width * 0.25f, -this.height * 0.5f - groundCollisionSensorHeight),
-			new Vec2(-this.width * 0.25f, -this.height * 0.5f + groundCollisionSensorHeight),
-			new Vec2( this.width * 0.25f, -this.height * 0.5f + groundCollisionSensorHeight),
-			new Vec2( this.width * 0.25f, -this.height * 0.5f - groundCollisionSensorHeight)
+			new Vec2(-width * 0.45f, -height * 0.5f - groundCollisionSensorHeight),
+			new Vec2(-width * 0.45f, -height * 0.5f + groundCollisionSensorHeight),
+			new Vec2( width * 0.45f, -height * 0.5f + groundCollisionSensorHeight),
+			new Vec2( width * 0.45f, -height * 0.5f - groundCollisionSensorHeight)
 		};
 
 		PolygonShape sensorPolygonShape = new PolygonShape();
@@ -257,8 +244,9 @@ public class Player {
 	}
 	
 	public void update() {
+		// XXX evtl da checken, welche hitbox ausrichtung angebracht is
 		
-//		 FIXME radian / degree problem 
+//		 F I X M E radian / degree problem 
 //		if ( Math.abs( Math.toDegrees( this.body.getAngle() ) ) > this.maxPlayerRotation){
 //			this.body.setTransform(this.body.getPosition(), -10);
 //			this.body.m_angularVelocity = -(this.body.m_angularVelocity * 0.75f);
@@ -274,10 +262,17 @@ public class Player {
 //		}
 		
 		
-		if( this.leftWallColliding() || this.rightWallColliding() ){
+		if( this.isOnWall() ){
 			if(this.body.getLinearVelocity().y < 0){
-				this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, 1f));	
+				if( (this.leftWallColliding() && this.body.getLinearVelocity().x < 0 ) || (this.rightWallColliding() && this.body.getLinearVelocity().x > 0 )){
+
+					this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, 1f));	
+				}	else {
+
+					this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, -2f));
+				}
 			}
+			this.setRunning(false);
 		}
 				
 		++groundPoundCounter;
@@ -288,7 +283,7 @@ public class Player {
 //		if(getSensorGroundCollision().isColliding() && this.body.getLinearVelocity().y < 0f){
 		if(getSensorGroundCollision().isColliding()){
 			groundPounding = false;
-			jumping = false;
+			bouncing = false;
 		}
 
 	}
@@ -298,28 +293,24 @@ public class Player {
 			float velocityX 	= this.body.getLinearVelocity().x;
 			float velocityY 	= this.body.getLinearVelocity().y;
 			
-			if(sensorGroundCollision.isColliding()){
-				if( this.isRunning() ){
-					accelerationX 	= ACC_RUNNING;
-					maxVelocity 	= MAX_VELOCITY_RUNNING;
-					if(this.sensorGroundCollision.isColliding()){
-						// FIXME problem: man kann jetzt nur mehr im laufen springen fuer den kurzen moment wo spieler boden berührt
-						velocityY = 4f; // TODO mit += evtl iwie besser loesbar?
-					}
-					
-				} else {
-					accelerationX 	= ACC_WALKING;
-					maxVelocity		= MAX_VELOCITY_WALKING;
-				}
+			if( this.isOnGround() || this.isOnWall() ){
+				adjustVelocity();
 			}
 			
+			if( this.isRunning()){
+				if(!bouncing){
+//				if(!bouncing && this.isOnGround() && (this.sensorBottomLeft.isColliding() || this.sensorBottomRight.isColliding()) ){
+//					velocityY = 1f; // TODO mit += evtl iwie besser loesbar?
+					bouncing = true;
+				}
+			}
 			if (left){
 				// TODO Math.abs, verbraucht das mehr rechenleistung? als ob man die checkt obs pos sind?
-				accelerationX	= -Math.abs(accelerationX);
-				maxVelocity 	= -Math.abs(maxVelocity);
+				this.accelerationX	= -Math.abs(this.accelerationX);
+				this.maxVelocity 	= -Math.abs(this.maxVelocity);
 			} else {
-				accelerationX	= Math.abs(accelerationX);
-				maxVelocity 	= Math.abs(maxVelocity);
+				this.accelerationX	= Math.abs(this.accelerationX);
+				this.maxVelocity 	= Math.abs(this.maxVelocity);
 			}
 			
 			if(Math.abs(velocityX + accelerationX) < Math.abs(maxVelocity)){
@@ -330,28 +321,39 @@ public class Player {
 			
 	}
 	
+	public void adjustVelocity(){
+
+		if( this.isRunning() ){
+			accelerationX 	= ACC_RUNNING;
+			maxVelocity 	= MAX_VELOCITY_RUNNING;
+			
+		} else {
+			accelerationX 	= ACC_WALKING;
+			maxVelocity		= MAX_VELOCITY_WALKING;
+		}
+	}
+	
 	public void switchHitboxes(){
 
 		this.body.destroyFixture(this.firstFixture);
 		this.body.destroyFixture(this.secondFixture);
 		
-		if( isRunning() && this.body.getLinearVelocity().x != 0){ // TODO 2. if-part passt nicht ganz. funkt nciht, wenn man vom stand wegspringen will...
+		if( isRunning() ){ 
 			this.secondFixture = this.body.createFixture(this.secondFixtureDef);
+			createSensors();
 		} else {
 			this.firstFixture = this.body.createFixture(this.firstFixtureDef);
+			createSensors();
 
 		}
 		
 	}
 
 	public void jump(){
-		this.jumping = true;
 		
-		if(!groundPounding && (sensorGroundCollision.isColliding() || leftWallColliding() || rightWallColliding() ) ){
-			
+		if( !groundPounding && (sensorGroundCollision.isColliding() || leftWallColliding() || rightWallColliding() ) ){
 			float jumpSpeedX = 0; 
-					
-			if(sensorGroundCollision.isColliding()){
+			if( this.isOnGround()){
 				jumpSpeedX = this.body.getLinearVelocity().x;
 			} else if(leftWallColliding()){
 				jumpSpeedX = this.jumpPower * this.wallJumpPowerFactor;
@@ -361,15 +363,17 @@ public class Player {
 			
 			this.body.setLinearVelocity(new Vec2(jumpSpeedX, this.jumpPower));
 		}
+		
 	}
 	public void groundPound(){
-//		if(!isGroundPounding){
+		
 		if(groundPoundCounter > 50){
 			groundPounding = true;
 			
 			this.groundPoundCounter = 0;
 			this.getBody().setLinearVelocity(new Vec2(0f,0f));
 		}
+		
 	}
 	
 	public boolean leftWallColliding(){
@@ -378,18 +382,25 @@ public class Player {
 
 	public boolean rightWallColliding(){
 		return sensorBottomRight.isColliding() && sensorTopRight.isColliding();
-	}
-	
+	}	
 	
 	public boolean isRunning() {
 		return running;
 	}
 
 	public void setRunning(boolean running) {
-		if(this.running != running && this.sensorGroundCollision.isColliding() ){
+		if(this.running != running){
 			this.running = running;
 			this.switchHitboxes();
 		}
+	}
+	
+	public boolean isOnGround(){
+		return this.sensorGroundCollision.isColliding();
+	}
+	
+	public boolean isOnWall(){
+		return this.leftWallColliding() || this.rightWallColliding();
 	}
 
 	public Vec2 getCurrentVelocity(){

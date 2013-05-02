@@ -70,16 +70,16 @@ public class Game extends BasicGame {
 
 		
 
-		float testWidth = 3f; 
-		float testHeight = 3f;
-		float space = 20f;
-		int max = 5;
-		for(int i=0; i<max; ++i){
-			for(int j=0; j<max; ++j){
-				if(j==i)
-				staticObjects.add(new GameObjectBox(world,  space + i*testWidth,  j*testHeight, testWidth, testHeight, 0.5f,0.5f, 0f, "images/crate.png", BodyType.STATIC));
-			}
-		}
+//		float testWidth = 3f; 
+//		float testHeight = 3f;
+//		float space = 20f;
+//		int max = 5;
+//		for(int i=0; i<max; ++i){
+//			for(int j=0; j<max; ++j){
+//				if(j==i)
+//				staticObjects.add(new GameObjectBox(world,  space + i*testWidth,  j*testHeight, testWidth, testHeight, 0.5f,0.5f, 0f, "images/crate.png", BodyType.STATIC));
+//			}
+//		}
 		
 		
 		// ground
@@ -91,19 +91,22 @@ public class Game extends BasicGame {
 		staticObjects.add(new GameObjectBox(world,  25f, 0f, 1f, 20f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC));
 
 		// P O L Y G O N
-		Vec2[] points = new Vec2[3];
-		points[0] = new Vec2(0f, 0f);
-		points[2] = new Vec2(-15f, 0f);
-		points[1] = new Vec2(-15f, 12f);
-		polygon = new GameObjectPolygon(world, -5f, 0f, points, 0.9f, 0.5f, 0.3f, "images/player.png", BodyType.DYNAMIC);
-
-		staticObjects.add( new GameObjectCircle(world, 2f, -4f, 1.5f, 0.9f, 0.5f, 0.7f, "images/player.png", BodyType.STATIC) );
+//		Vec2[] points = new Vec2[3];
+//		points[0] = new Vec2(0f, 0f);
+//		points[2] = new Vec2(-15f, 0f);
+//		points[1] = new Vec2(-15f, 7.5f);
+//		polygon = new GameObjectPolygon(world, -5f, 0f, points, 0.9f, 0.5f, 0.3f, "images/player.png", BodyType.DYNAMIC);
+//
+//		staticObjects.add( new GameObjectCircle(world, 2f, -4f, 1.5f, 0.9f, 0.5f, 0.7f, "images/player.png", BodyType.STATIC) );
+		
+		
+		
+		
 //		// JSON Loader
 //		String jsonFileAsString = "";
 //		try {
 //			jsonFileAsString = readFile("etc/world");
 //		} catch (IOException e) {
-//			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
 //
@@ -182,7 +185,7 @@ public class Game extends BasicGame {
 		}
 
 		player.draw(g, debugView);
-		polygon.draw(g, debugView);
+//		polygon.draw(g, debugView);
 
 		// GUI
 		g.popTransform();
@@ -194,7 +197,7 @@ public class Game extends BasicGame {
 		g.setColor(Color.white);
 		g.drawString("Count: " + world.getBodyCount(), 0, 0);
 		
-		g.drawString("PlayerSpeed: " + player.getCurrentVelocity().toString(), 200, 10);
+		g.drawString("PlayerSpeed: " + player.isRunning(), 200, 10);
 		
 
 	}
@@ -349,10 +352,14 @@ public class Game extends BasicGame {
 		
 		// TODO crappy, weils keine keyUp() methode gibt. die reihenfolge muss auch so erhalten bleiben, sonsts is immer false
 		if(!input.isKeyPressed(input.KEY_LSHIFT) && !input.isKeyDown(input.KEY_RSHIFT)){
-			player.setRunning(false);
+//			if (player.isOnGround() ){
+				player.setRunning(false);
+//			}
 		}
 		if (input.isKeyDown(input.KEY_LSHIFT) || input.isKeyDown(input.KEY_RSHIFT)){
-			player.setRunning(true);
+			if (player.isOnGround() && player.getBody().getLinearVelocity().x != 0){
+				player.setRunning(true);
+			}
 		}
 
 		
