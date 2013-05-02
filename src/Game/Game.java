@@ -52,6 +52,8 @@ public class Game extends BasicGame {
 
 	@Override
 	public void init(GameContainer gc) throws SlickException {
+		
+		randomTests();
 
 //		for (int y = 0; y < worldImages.length; ++y) { 
 //			for (int x = 0; x < worldImages[0].length; ++x) {
@@ -85,14 +87,14 @@ public class Game extends BasicGame {
 
 		// walls
 		staticObjects.add(new GameObjectBox(world,  22f,  0f, 1f, 10f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC));
-		staticObjects.add(new GameObjectBox(world, -25f, 0f, 1f, 20f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC));
+		staticObjects.add(new GameObjectBox(world, -25f, 0f, 1f, 120f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC));
 		staticObjects.add(new GameObjectBox(world,  25f, 0f, 1f, 20f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC));
 
 		// P O L Y G O N
 		Vec2[] points = new Vec2[3];
 		points[0] = new Vec2(0f, 0f);
-		points[1] = new Vec2(6f, 0f);
-		points[2] = new Vec2(-2f, 2f);
+		points[2] = new Vec2(-15f, 0f);
+		points[1] = new Vec2(-15f, 12f);
 		polygon = new GameObjectPolygon(world, -5f, 0f, points, 0.9f, 0.5f, 0.3f, "images/player.png", BodyType.DYNAMIC);
 
 		staticObjects.add( new GameObjectCircle(world, 2f, -4f, 1.5f, 0.9f, 0.5f, 0.7f, "images/player.png", BodyType.STATIC) );
@@ -354,5 +356,8 @@ public class Game extends BasicGame {
 		}
 
 		
+	}
+	
+	public void randomTests(){
 	}
 }

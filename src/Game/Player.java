@@ -7,6 +7,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 import org.newdawn.slick.Graphics;
@@ -33,22 +34,27 @@ public class Player {
 	private float wallJumpPowerFactor = 0.3f;
 	private float groundPoundPower = -50f;
 
-	private boolean isRunning = false;
-	private boolean isGroundPounding = false;
+	private boolean running = false;
+	private boolean groundPounding = false;
 	private boolean jumping = false;
-	private float accelerationX = ACC_WALKING;
-	private float maxVelocity = MAX_VELOCITY_WALKING;
+	private float	accelerationX = ACC_WALKING;
+	private float	maxVelocity = MAX_VELOCITY_WALKING;
 	
 	private float	maxPlayerRotation = 10f;
 	private World world;
 	
 	private float width = 1f;
 	private float height = 2f;
-	private PolygonShape polygonShape = new PolygonShape();
+	private PolygonShape firstPolygonShape 		= new PolygonShape();
+	private PolygonShape secondPolygonShape 	= new PolygonShape();
 	
 	private Body 		body;
-	private BodyDef 	bodyDef = new BodyDef();
-	private FixtureDef 	fixtureDef = new FixtureDef();
+	private BodyDef 	bodyDef				= new BodyDef();
+	private Fixture 	firstFixture;
+	private Fixture 	secondFixture;
+	private FixtureDef 	firstFixtureDef 	= new FixtureDef();
+	private FixtureDef	secondFixtureDef	= new FixtureDef();
+	
 	private MySensor 	sensorTopLeft;
 	private MySensor 	sensorTopRight;
 	private MySensor	sensorBottomLeft;
@@ -72,53 +78,74 @@ public class Player {
 			new Vec2( width * 0.5f,  height * 0.5f)
 		};
 		
-		this.polygonShape.set(polygonShapeVerts, polygonShapeVerts.length);
+		this.firstPolygonShape.set(polygonShapeVerts, polygonShapeVerts.length);
 		
-		this.fixtureDef.density 	= 11f;
-		this.fixtureDef.friction 	= 0.3f;
-		this.fixtureDef.restitution = 0f;
-		this.fixtureDef.shape = polygonShape;
+		this.firstFixtureDef.density 	= 11f;
+		this.firstFixtureDef.friction 	= 0.3f;
+		this.firstFixtureDef.restitution = 0f;
+		this.firstFixtureDef.shape = firstPolygonShape;
 		
 		
 		this.img = new Image("images/player.png");
 
 		this.body = world.createBody(bodyDef);
-		this.body.createFixture(fixtureDef);
+		this.firstFixture = this.body.createFixture(firstFixtureDef);
 		this.body.setFixedRotation(true);
 		
+		// second hitbox
+		Vec2[] vertsSensor = new Vec2[]{
+			new Vec2(-height * 0.5f,  width * 0.5f),
+			new Vec2(-height * 0.5f, -width * 0.5f),
+			new Vec2( height * 0.5f, -width * 0.5f),
+			new Vec2( height * 0.5f,  width * 0.5f)
+		};
 
+		PolygonShape secondPolygonShape = new PolygonShape();
+		secondPolygonShape.set(vertsSensor, vertsSensor.length);
+		
+		this.secondFixtureDef = new FixtureDef();
+		this.secondFixtureDef.shape = secondPolygonShape;
+		this.secondPolygonShape = secondPolygonShape;
+
+		this.secondFixture = this.body.createFixture(secondFixtureDef);
+		
+		
 		this.createSensors();
 		
-		
+	
 	}
 	
 	private void createSensors() {
+		System.out.println(this.body.getFixtureList().m_aabb.lowerBound.x);
+		System.out.println(this.body.getFixtureList().m_aabb.lowerBound.y);
+		System.out.println(this.body.getFixtureList().m_aabb.upperBound.x);
+		System.out.println(this.body.getFixtureList().m_aabb.upperBound.y);
 
+		// XXX WORK IN PROGRESS
+		// eine methode, die die aktuelle fixture nimmt und aufgrund derer die sensoren anordnet
+		
 		// wall collision sensors
-		float sensorSizeWidth	= width  * 0.25f;
+		float sensorSizeWidth	= width  * 0.125f;
 		float sensorSizeHeight	= height * 0.1f;
-		float dxSpace = 0.5f;
-		float dySpace = 0.75f;
-		float xSpace = dxSpace;
-		float ySpace = dySpace;
+		float default_xSpace = 0.5f;
+		float default_ySpace = 0.75f;
+		float xSpace = default_xSpace;
+		float ySpace = default_ySpace;
 		
 		for (int i=0;i<2; ++i){
 
 			if(i % 2 == 0){
-				xSpace = -dxSpace;
+				xSpace = -default_xSpace;
+			} else {
+				xSpace = default_xSpace;
 			}
+			
 			for (int j=0;j<2; ++j){
-				
-				if(i % 2 == 0){
-					xSpace = -dxSpace;
-				} else {
-					xSpace = dxSpace;
-				}
 				 
 				if(j % 2 == 0){
-					ySpace = -dySpace;
+					ySpace = -default_ySpace;
 				} else {
-					ySpace = dySpace;
+					ySpace = default_ySpace;
 				}
 				
 				Vec2[] vertsSensor = new Vec2[]{
@@ -195,16 +222,32 @@ public class Player {
 	
 	public void drawOutline(Graphics g) {
 
-		Polygon polygonToDraw = new Polygon();
-		Vec2[] verts = this.polygonShape.getVertices();
 		
-		for (int i=0; i< this.polygonShape.m_vertexCount; ++i) {
-			Vec2 vert = verts[i];
-			Vec2 worldPoint = this.body.getWorldPoint(vert);
-			polygonToDraw.addPoint(worldPoint.x, -worldPoint.y);
+		if( !isRunning() ){
+			Polygon polygonToDraw = new Polygon();
+			Vec2[] verts = this.firstPolygonShape.getVertices();
+			
+			for (int i=0; i< this.firstPolygonShape.m_vertexCount; ++i) {
+				Vec2 vert = verts[i];
+				Vec2 worldPoint = this.body.getWorldPoint(vert);
+				polygonToDraw.addPoint(worldPoint.x, -worldPoint.y);
+			}
+			
+			g.draw(polygonToDraw);
+		} else {
+			
+			Polygon polygonToDraw = new Polygon();
+			Vec2[] verts = this.secondPolygonShape.getVertices();
+			
+			for (int i=0; i< this.secondPolygonShape.m_vertexCount; ++i) {
+				Vec2 vert = verts[i];
+				Vec2 worldPoint = this.body.getWorldPoint(vert);
+				polygonToDraw.addPoint(worldPoint.x, -worldPoint.y);
+			}
+			
+			g.draw(polygonToDraw);
 		}
-		
-		g.draw(polygonToDraw);
+	
 		
 		// draw sensors
 		for (MySensor mySensor : sensorList){
@@ -238,13 +281,13 @@ public class Player {
 		}
 				
 		++groundPoundCounter;
-		if(this.groundPoundCounter > 10 && isGroundPounding){
+		if(this.groundPoundCounter > 10 && groundPounding){
 			this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, groundPoundPower));
 
 		}
 //		if(getSensorGroundCollision().isColliding() && this.body.getLinearVelocity().y < 0f){
 		if(getSensorGroundCollision().isColliding()){
-			isGroundPounding = false;
+			groundPounding = false;
 			jumping = false;
 		}
 
@@ -252,15 +295,22 @@ public class Player {
 
 	public void accelerate(boolean left) {
 		
-		// FIXME wenn man auf max sprint beschleunigt und springt, kann man ohne sprint taste nicht gegenlenken, weil max speed f�r 'gehen' zu hoch w�re und somit eingabe ignoriert wird
-		// 		man kann mit 'gehen' nie gegenlenken, wenn speed h�her als maxGehen ist...
-		
-		
-//		if(!isGroundPounding){
 			float velocityX 	= this.body.getLinearVelocity().x;
+			float velocityY 	= this.body.getLinearVelocity().y;
+			
 			if(sensorGroundCollision.isColliding()){
-				accelerationX = (isRunning) ? ACC_RUNNING : ACC_WALKING;
-				maxVelocity 	= (isRunning) ? MAX_VELOCITY_RUNNING : MAX_VELOCITY_WALKING;
+				if( this.isRunning() ){
+					accelerationX 	= ACC_RUNNING;
+					maxVelocity 	= MAX_VELOCITY_RUNNING;
+					if(this.sensorGroundCollision.isColliding()){
+						// FIXME problem: man kann jetzt nur mehr im laufen springen fuer den kurzen moment wo spieler boden berührt
+						velocityY = 4f; // TODO mit += evtl iwie besser loesbar?
+					}
+					
+				} else {
+					accelerationX 	= ACC_WALKING;
+					maxVelocity		= MAX_VELOCITY_WALKING;
+				}
 			}
 			
 			if (left){
@@ -276,14 +326,28 @@ public class Player {
 				velocityX += accelerationX;
 			}
 			
-			this.body.setLinearVelocity(new Vec2(velocityX, this.body.getLinearVelocity().y));
-//		} // isGroundPounding Check end
+			this.body.setLinearVelocity(new Vec2(velocityX, velocityY));
+			
+	}
+	
+	public void switchHitboxes(){
+
+		this.body.destroyFixture(this.firstFixture);
+		this.body.destroyFixture(this.secondFixture);
+		
+		if( isRunning() && this.body.getLinearVelocity().x != 0){ // TODO 2. if-part passt nicht ganz. funkt nciht, wenn man vom stand wegspringen will...
+			this.secondFixture = this.body.createFixture(this.secondFixtureDef);
+		} else {
+			this.firstFixture = this.body.createFixture(this.firstFixtureDef);
+
+		}
+		
 	}
 
 	public void jump(){
 		this.jumping = true;
 		
-		if(!isGroundPounding && (sensorGroundCollision.isColliding() || leftWallColliding() || rightWallColliding() ) ){
+		if(!groundPounding && (sensorGroundCollision.isColliding() || leftWallColliding() || rightWallColliding() ) ){
 			
 			float jumpSpeedX = 0; 
 					
@@ -301,7 +365,7 @@ public class Player {
 	public void groundPound(){
 //		if(!isGroundPounding){
 		if(groundPoundCounter > 50){
-			isGroundPounding = true;
+			groundPounding = true;
 			
 			this.groundPoundCounter = 0;
 			this.getBody().setLinearVelocity(new Vec2(0f,0f));
@@ -318,11 +382,14 @@ public class Player {
 	
 	
 	public boolean isRunning() {
-		return isRunning;
+		return running;
 	}
 
-	public void setRunning(boolean isRunning) {
-		this.isRunning = isRunning;
+	public void setRunning(boolean running) {
+		if(this.running != running && this.sensorGroundCollision.isColliding() ){
+			this.running = running;
+			this.switchHitboxes();
+		}
 	}
 
 	public Vec2 getCurrentVelocity(){
