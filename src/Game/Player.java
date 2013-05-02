@@ -30,11 +30,14 @@ public class Player {
 	private int groundPoundCounter = 0;
 	
 	private float jumpPower = 20f;
+	private float wallJumpPowerFactor = 0.3f;
 	private float groundPoundPower = -50f;
 
 	private boolean isRunning = false;
 	private boolean isGroundPounding = false;
 	private boolean jumping = false;
+	private float accelerationX = ACC_WALKING;
+	private float maxVelocity = MAX_VELOCITY_WALKING;
 	
 	private float	maxPlayerRotation = 10f;
 	private World world;
@@ -85,6 +88,7 @@ public class Player {
 		
 
 		this.createSensors();
+		
 		
 	}
 	
@@ -253,16 +257,22 @@ public class Player {
 		
 		
 //		if(!isGroundPounding){
-			float velocityX = this.body.getLinearVelocity().x;
-			float accelerationX = (isRunning) ? ACC_RUNNING : ACC_WALKING;
-			float maxVelocity = (isRunning) ? MAX_VELOCITY_RUNNING : MAX_VELOCITY_WALKING;
-			
-			if (left){
-				accelerationX = -accelerationX;
-				maxVelocity = -maxVelocity;
+			float velocityX 	= this.body.getLinearVelocity().x;
+			if(sensorGroundCollision.isColliding()){
+				accelerationX = (isRunning) ? ACC_RUNNING : ACC_WALKING;
+				maxVelocity 	= (isRunning) ? MAX_VELOCITY_RUNNING : MAX_VELOCITY_WALKING;
 			}
 			
-			if(Math.abs(velocityX + accelerationX)  < Math.abs(maxVelocity)){
+			if (left){
+				// TODO Math.abs, verbraucht das mehr rechenleistung? als ob man die checkt obs pos sind?
+				accelerationX	= -Math.abs(accelerationX);
+				maxVelocity 	= -Math.abs(maxVelocity);
+			} else {
+				accelerationX	= Math.abs(accelerationX);
+				maxVelocity 	= Math.abs(maxVelocity);
+			}
+			
+			if(Math.abs(velocityX + accelerationX) < Math.abs(maxVelocity)){
 				velocityX += accelerationX;
 			}
 			
@@ -275,21 +285,22 @@ public class Player {
 		
 		if(!isGroundPounding && (sensorGroundCollision.isColliding() || leftWallColliding() || rightWallColliding() ) ){
 			
-			float jumpSpeedX=0; 
+			float jumpSpeedX = 0; 
 					
 			if(sensorGroundCollision.isColliding()){
 				jumpSpeedX = this.body.getLinearVelocity().x;
 			} else if(leftWallColliding()){
-				jumpSpeedX = this.jumpPower;
+				jumpSpeedX = this.jumpPower * this.wallJumpPowerFactor;
 			} else if(rightWallColliding()){
-				jumpSpeedX = -this.jumpPower;
+				jumpSpeedX = -this.jumpPower * this.wallJumpPowerFactor;
 			}
 			
 			this.body.setLinearVelocity(new Vec2(jumpSpeedX, this.jumpPower));
 		}
 	}
 	public void groundPound(){
-		if(!isGroundPounding){
+//		if(!isGroundPounding){
+		if(groundPoundCounter > 50){
 			isGroundPounding = true;
 			
 			this.groundPoundCounter = 0;

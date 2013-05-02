@@ -108,7 +108,7 @@ public class Game extends BasicGame {
 //		JSONObject jsonObject = new Gson().fromJson(jsonFileAsString, JSONObject.class);
 //		jsonObject.createShapes(world, jsonObjects);
 //		
-		player = new Player(world, 4f, 4f);
+		player = new Player(world, 2f, 4f);
 		world.setContactListener(new MyContactListener(player));
 	}
 
