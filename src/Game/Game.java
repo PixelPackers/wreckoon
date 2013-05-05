@@ -30,6 +30,8 @@ public class Game extends BasicGame {
 	 //*/
 	private boolean debugView = true;
 	
+	Tile deleteMeTest;
+	
 	private World world;
 
 	private ArrayList<GameObject> 	staticObjects 	= new ArrayList<GameObject>();
@@ -52,7 +54,8 @@ public class Game extends BasicGame {
 
 	@Override
 	public void init(GameContainer gc) throws SlickException {
-		
+		System.out.println(Float.MIN_VALUE);
+		System.out.println(Integer.MIN_VALUE);
 		randomTests();
 
 //		for (int y = 0; y < worldImages.length; ++y) { 
@@ -115,6 +118,9 @@ public class Game extends BasicGame {
 //		
 		player = new Player(world, 2f, 4f);
 		world.setContactListener(new MyContactListener(world, player, balls));
+		
+		
+		deleteMeTest = new Tile(world, 0, 0, 4, 0, false);
 	}
 
 //	private String readFile(String file) throws IOException {
@@ -187,6 +193,7 @@ public class Game extends BasicGame {
 
 		player.draw(g, debugView);
 //		polygon.draw(g, debugView);
+		deleteMeTest.draw(g);
 
 		// GUI
 		g.popTransform();

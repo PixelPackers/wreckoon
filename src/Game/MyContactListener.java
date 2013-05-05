@@ -34,7 +34,7 @@ public class MyContactListener implements ContactListener{
 			}
 		}
 		
-		if( contact.getFixtureA() == player.getTailFixture() ){
+		if (contact.getFixtureA() == player.getTailFixture()) {
 			System.out.println("hit_A");
 			
 			for (GameObject gameObject : dynamicObjects){
@@ -44,7 +44,7 @@ public class MyContactListener implements ContactListener{
 				}
 			}
 		}
-		if( contact.getFixtureB() == player.getTailFixture() ){
+		if (contact.getFixtureB() == player.getTailFixture()) {
 			System.out.println("hit_B");
 		}
 		
