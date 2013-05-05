@@ -17,19 +17,23 @@ import org.newdawn.slick.geom.Polygon;
 
 public class Player {
 	
+	private static final float TAILWHIP_DISTANCE = 5;
 	private final float MAX_VELOCITY_WALKING = 7f;
 	private final float MAX_VELOCITY_RUNNING = 20f;
 	private final float ACC_WALKING = 0.5f;
 	private final float ACC_RUNNING = 0.75f;
-	
+
 	private int groundPoundCounter = 0;
+	private int tailwhipCounter = 0;
 	
 	private float jumpPower = 20f;
 	private float wallJumpPowerFactor = 0.3f;
 	private float groundPoundPower = -50f;
 
+	private boolean left = false;
 	private boolean running = false;
 	private boolean bouncing = false;
+	private boolean doTailwhip = false;
 	private boolean groundPounding = false;
 	private float	accelerationX = ACC_WALKING;
 	private float	maxVelocity = MAX_VELOCITY_WALKING;
@@ -48,6 +52,10 @@ public class Player {
 	private Fixture 	secondFixture;
 	private FixtureDef 	firstFixtureDef 	= new FixtureDef();
 	private FixtureDef	secondFixtureDef	= new FixtureDef();
+
+	private Fixture		fixtureTail 		= new Fixture();
+	private FixtureDef	fixtureDefTail 		= new FixtureDef();
+	private PolygonShape polygonShapeTail	= new PolygonShape();
 	
 	private MySensor 	sensorTopLeft;
 	private MySensor 	sensorTopRight;
@@ -102,7 +110,7 @@ public class Player {
 		this.secondPolygonShape = secondPolygonShape;
 
 		this.secondFixture = this.body.createFixture(secondFixtureDef);
-		
+			
 		
 		this.createSensors();
 		
@@ -241,6 +249,19 @@ public class Player {
 			mySensor.draw(g, this.body);
 		}
 		
+		// draw tail while attacking
+		if( this.doTailwhip ){	
+			Polygon polygonToDraw = new Polygon();
+			Vec2[] verts = this.polygonShapeTail.getVertices();
+			
+			for (int i=0; i< this.polygonShapeTail.m_vertexCount; ++i) {
+				Vec2 vert = verts[i];
+				Vec2 worldPoint = this.body.getWorldPoint(vert);
+				polygonToDraw.addPoint(worldPoint.x, -worldPoint.y);
+			}
+			
+			g.draw(polygonToDraw);
+		}
 	}
 	
 	public void update() {
@@ -264,31 +285,40 @@ public class Player {
 		
 		if( this.isOnWall() ){
 			if(this.body.getLinearVelocity().y < 0){
-				if( (this.leftWallColliding() && this.body.getLinearVelocity().x < 0 ) || (this.rightWallColliding() && this.body.getLinearVelocity().x > 0 )){
-
+//				if( (this.leftWallColliding() && this.body.getLinearVelocity().x < 0 ) || (this.rightWallColliding() && this.body.getLinearVelocity().x > 0 )){
 					this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, 1f));	
-				}	else {
-
-					this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, -2f));
-				}
+//				}	else {
+//					this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, -2f));
+//				}
 			}
-			this.setRunning(false);
+//			if( !this.isOnGround()){
+//				this.setRunning(false);
+//			}
 		}
 				
-		++groundPoundCounter;
 		if(this.groundPoundCounter > 10 && groundPounding){
 			this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, groundPoundPower));
-
 		}
+		
+		// TODO konstante fuer speed
+		if( this.tailwhipCounter > 20 && this.doTailwhip ){
+			this.tailwhipFinalize();
+		}
+		
 //		if(getSensorGroundCollision().isColliding() && this.body.getLinearVelocity().y < 0f){
 		if(getSensorGroundCollision().isColliding()){
 			groundPounding = false;
 			bouncing = false;
 		}
+		
 
+		this.adjustHitboxes();
+		
+		increaseCounters();
+		
 	}
 
-	public void accelerate(boolean left) {
+	public void accelerate() {
 		
 			float velocityX 	= this.body.getLinearVelocity().x;
 			float velocityY 	= this.body.getLinearVelocity().y;
@@ -333,8 +363,9 @@ public class Player {
 		}
 	}
 	
-	public void switchHitboxes(){
+	public void adjustHitboxes(){
 
+		// TODO overhead evtl durch lastLeft != left loesbar?
 		this.body.destroyFixture(this.firstFixture);
 		this.body.destroyFixture(this.secondFixture);
 		
@@ -374,6 +405,72 @@ public class Player {
 			this.getBody().setLinearVelocity(new Vec2(0f,0f));
 		}
 		
+		if(this.isRunning()){
+			setRunning(false);
+		}
+		
+	}
+	
+	public void tailwhipInit(){
+ 
+		if( !this.doTailwhip ){
+			
+			
+			this.doTailwhip = true;
+			this.tailwhipCounter = 0;
+			
+
+			float tailWidth 	= 1.5f;
+			float tailHeight	= 0.5f;
+			float direction = this.width;
+			float distance = TAILWHIP_DISTANCE;
+			
+			if(this.movesLeft()){
+				 direction 	= -direction;
+				 distance 	= -distance;
+			}
+			
+			this.getBody().setLinearVelocity( new Vec2(distance, body.getLinearVelocity().y) );
+			
+			// TODO tail sollte beim normalen gehen nicht zentriert sein, sondern weiter unten
+			
+			Vec2[] vertsTail = new Vec2[]{
+				new Vec2( -tailWidth * 0.5f + direction, tailHeight * 0.5f ),
+				new Vec2( -tailWidth * 0.5f + direction, -tailHeight * 0.5f ),
+				new Vec2(  tailWidth * 0.5f + direction, -tailHeight * 0.5f ),
+				new Vec2(  tailWidth * 0.5f + direction, tailHeight * 0.5f )
+			};
+
+			this.polygonShapeTail = new PolygonShape();
+			this.polygonShapeTail.set(vertsTail, vertsTail.length);
+			
+			this.fixtureDefTail = new FixtureDef();
+			this.fixtureDefTail.shape = this.polygonShapeTail;
+			fixtureDefTail.isSensor=true;
+			
+
+			this.tailwhip();
+			
+			
+			
+		}
+	}
+	public void tailwhip(){
+		this.fixtureTail = this.body.createFixture(this.fixtureDefTail);
+	}
+	
+	public void tailwhipFinalize(){
+		
+		float distance = TAILWHIP_DISTANCE;
+		
+		if(this.movesLeft()){
+			 distance 	= -distance;
+		}
+
+		this.doTailwhip = false;
+		this.getBody().setLinearVelocity( new Vec2(-distance, body.getLinearVelocity().y) );
+		this.body.destroyFixture(this.fixtureTail);
+		
 	}
 	
 	public boolean leftWallColliding(){
@@ -384,14 +481,31 @@ public class Player {
 		return sensorBottomRight.isColliding() && sensorTopRight.isColliding();
 	}	
 	
+	
+	public void increaseCounters(){
+		++groundPoundCounter;
+		++tailwhipCounter;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	public boolean isRunning() {
 		return running;
 	}
 
 	public void setRunning(boolean running) {
+		// performance wenn man if weglaesst?
 		if(this.running != running){
 			this.running = running;
-			this.switchHitboxes();
 		}
 	}
 	
@@ -433,7 +547,17 @@ public class Player {
 	public MySensor getSensorGroundCollision() {
 		return sensorGroundCollision;
 	}
+	
+	public Fixture getTailFixture() {
+		return this.fixtureTail;
+	}
 
+	public void setLeft ( boolean left){
+		this.left = left;
+	}
+	public boolean movesLeft(){
+		return this.left;
+	}
 	
 	
 }

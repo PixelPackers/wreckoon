@@ -114,7 +114,7 @@ public class Game extends BasicGame {
 //		jsonObject.createShapes(world, jsonObjects);
 //		
 		player = new Player(world, 2f, 4f);
-		world.setContactListener(new MyContactListener(player));
+		world.setContactListener(new MyContactListener(world, player, balls));
 	}
 
 //	private String readFile(String file) throws IOException {
@@ -135,6 +135,7 @@ public class Game extends BasicGame {
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
 		
+//		System.out.println( " + + + N E W   F R A M E + + + " );
 		processInput(gc);
 		
 		player.update();
@@ -260,10 +261,12 @@ public class Game extends BasicGame {
 			player.jump();
 		}
 		if (input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
-			player.accelerate(true);
+			player.accelerate();
+			player.setLeft(true);
 		}
 		if (input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D)) {
-			player.accelerate(false);
+			player.accelerate();
+			player.setLeft(false);
 		}
 
 		if (input.isKeyPressed(Input.KEY_DOWN) || input.isKeyDown(Input.KEY_S)) {
@@ -351,7 +354,7 @@ public class Game extends BasicGame {
 		
 		
 		// TODO crappy, weils keine keyUp() methode gibt. die reihenfolge muss auch so erhalten bleiben, sonsts is immer false
-		if(!input.isKeyPressed(input.KEY_LSHIFT) && !input.isKeyDown(input.KEY_RSHIFT)){
+		if(!input.isKeyDown(input.KEY_LSHIFT) && !input.isKeyDown(input.KEY_RSHIFT)){
 //			if (player.isOnGround() ){
 				player.setRunning(false);
 //			}
@@ -359,7 +362,17 @@ public class Game extends BasicGame {
 		if (input.isKeyDown(input.KEY_LSHIFT) || input.isKeyDown(input.KEY_RSHIFT)){
 			if (player.isOnGround() && player.getBody().getLinearVelocity().x != 0){
 				player.setRunning(true);
+			} else if(player.isOnWall()){
+				player.setRunning(true);
+//				XXX wenn das einkommentiert is, rutscht er wenn er im sprint modus is
+//				player.switchHitboxes();
 			}
+			
+		}
+		
+
+		if (input.isKeyDown(input.KEY_H) ){
+			player.tailwhipInit();
 		}
 
 		
