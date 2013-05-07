@@ -83,7 +83,7 @@ public class Player {
 		this.firstPolygonShape.set(polygonShapeVerts, polygonShapeVerts.length);
 		
 		this.firstFixtureDef.density 	= 11f;
-		this.firstFixtureDef.friction 	= 0.3f;
+		this.firstFixtureDef.friction 	= 0.8f;
 		this.firstFixtureDef.restitution = 0f;
 		this.firstFixtureDef.shape = firstPolygonShape;
 		

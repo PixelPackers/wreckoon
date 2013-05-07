@@ -1,5 +1,8 @@
 package Game;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.jbox2d.collision.shapes.CircleShape;
@@ -16,9 +19,11 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 
+import com.google.gson.Gson;
+
 public class Game extends BasicGame {
 
-//	 /*/
+	 /*/
 	private static int screenWidth = 800;
 	private static int screenHeight = 600;
 	private static boolean fullScreen = false;
@@ -30,7 +35,7 @@ public class Game extends BasicGame {
 	 //*/
 	private boolean debugView = true;
 	
-	Tile deleteMeTest;
+	Tile newTile;
 	
 	private World world;
 
@@ -48,6 +53,7 @@ public class Game extends BasicGame {
 	private final float ZOOM_STEP = 1f;
 
 	private Camera cam = new Camera(0, screenHeight);
+	private Level level;
 
 	public Game() {
 		super("The Raccooning");
@@ -86,13 +92,13 @@ public class Game extends BasicGame {
 //		}
 		
 		
-		// ground
-		staticObjects.add(new GameObjectBox(world, 0f, -9f, 50f, 10f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC));
-
-		// walls
-		staticObjects.add(new GameObjectBox(world,  22f,  0f, 1f, 10f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC));
-		staticObjects.add(new GameObjectBox(world, -25f, 0f, 1f, 120f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC));
-		staticObjects.add(new GameObjectBox(world,  25f, 0f, 1f, 20f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC));
+//		// ground
+//		staticObjects.add(new GameObjectBox(world, 0f, -9f, 50f, 10f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC));
+//
+//		// walls
+//		staticObjects.add(new GameObjectBox(world,  22f,  0f, 1f, 10f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC));
+//		staticObjects.add(new GameObjectBox(world, -25f, 0f, 1f, 120f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC));
+//		staticObjects.add(new GameObjectBox(world,  25f, 0f, 1f, 20f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC));
 
 		// P O L Y G O N
 //		Vec2[] points = new Vec2[3];
@@ -101,10 +107,26 @@ public class Game extends BasicGame {
 //		points[1] = new Vec2(-15f, 7.5f);
 //		polygon = new GameObjectPolygon(world, -5f, 0f, points, 0.9f, 0.5f, 0.3f, "images/player.png", BodyType.DYNAMIC);
 //
-//		staticObjects.add( new GameObjectCircle(world, 2f, -4f, 1.5f, 0.9f, 0.5f, 0.7f, "images/player.png", BodyType.STATIC) );
+		//staticObjects.add( new GameObjectCircle(world, 2f, -4f, 1.5f, 0.9f, 0.5f, 0.7f, "images/player.png", BodyType.STATIC) );
 		
 		
+		// load the level
+		try {
+			String json = readFile("levels/big.json");
+			level = new Gson().fromJson(json, Level.class);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
+		for (int x = 0; x < level.getWidth(); ++x) {
+			for (int y = 0; y < level.getHeight(); ++y) {
+				Block b = level.getBlock(x, y);
+				if (b.getType() > 1) {
+					newTile = new Tile(world, x * 4, -y * 4, b.getType(), -b.getAngle(), b.isFlipped());
+					tiles.add(newTile);
+				}
+			}
+		}
 		
 //		// JSON Loader
 //		String jsonFileAsString = "";
@@ -120,14 +142,14 @@ public class Game extends BasicGame {
 		player = new Player(world, 2f, 4f);
 		world.setContactListener(new MyContactListener(world, player, balls));
 		
-		int[] tileTypes = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 15, 16, 17, 18, 19, 20, 21, 22, 23, 28, 29, 30, 31, 34, 43};
+		/*int[] tileTypes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 15, 16, 17, 18, 19, 20, 21, 22, 23, 28, 29, 30, 31, 34, 43};
 		
 		for (int i = 0; i < tileTypes.length; ++i) {
 			deleteMeTest = new Tile(world, i * 4, 0, tileTypes[i], 0, false);
 			tiles.add(deleteMeTest);
 			deleteMeTest = new Tile(world, i * 4, 16, tileTypes[i], 0, true);
 			tiles.add(deleteMeTest);
-		}
+		}*/
 	}
 
 //	private String readFile(String file) throws IOException {
@@ -144,6 +166,18 @@ public class Game extends BasicGame {
 //		reader.close();
 //		return stringBuilder.toString();
 //	}
+
+	private String readFile( String file ) throws IOException {
+	    BufferedReader reader = new BufferedReader( new FileReader (file));
+	    String line = null;
+	    StringBuilder stringBuilder = new StringBuilder();
+	    String ls = System.getProperty("line.separator");
+	    while((line = reader.readLine()) != null) {
+	        stringBuilder.append(line);
+	        stringBuilder.append(ls);
+	    }
+	    return stringBuilder.toString();
+	}
 
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
@@ -238,36 +272,37 @@ public class Game extends BasicGame {
 
 	public void drawBackground(Graphics g) {
 		// FIXME clean this crap up.
-		// *
-		g.pushTransform();
-		g.translate(cam.getX() * 0.475f * zoom + screenWidth / 2f, cam.getY() * 0.475f * zoom + screenHeight * 2f / 3f);
-		g.scale(zoom, zoom);
-		trashpile[2].draw(13, -18, 40f, 20f);
-		g.popTransform();
-
-		g.pushTransform();
-		g.translate(cam.getX() * 0.575f * zoom + screenWidth / 2f, cam.getY() * 0.575f * zoom + screenHeight * 2f / 3f);
-		g.scale(zoom, zoom);
-		trashpile[4].draw(6, -18, 40f, 20f);
-		g.popTransform();
-
-		g.pushTransform();
-		g.translate(cam.getX() * 0.675f * zoom + screenWidth / 2f, cam.getY() * 0.675f * zoom + screenHeight * 2f / 3f);
-		g.scale(zoom, zoom);
-		trashpile[3].draw(23, -18, 40f, 20f);
-		g.popTransform();
-
-		g.pushTransform();
-		g.translate(cam.getX() * 0.75f * zoom + screenWidth / 2f, cam.getY() * 0.75f * zoom + screenHeight * 2f / 3f);
-		g.scale(zoom, zoom);
-		trashpile[0].draw(-7, -29, 30f, 15f);
-		g.popTransform();
-
-		g.pushTransform();
-		g.translate(cam.getX() * 0.875f * zoom + screenWidth / 2f, cam.getY() * 0.875f * zoom + screenHeight * 2f / 3f);
-		g.scale(zoom, zoom);
-		trashpile[1].draw(15, -18, 40f, 20f);
-		g.popTransform();
+		if(!debugView){
+			g.pushTransform();
+			g.translate(cam.getX() * 0.475f * zoom + screenWidth / 2f, cam.getY() * 0.475f * zoom + screenHeight * 2f / 3f);
+			g.scale(zoom, zoom);
+			trashpile[2].draw(13, -18, 40f, 20f);
+			g.popTransform();
+	
+			g.pushTransform();
+			g.translate(cam.getX() * 0.575f * zoom + screenWidth / 2f, cam.getY() * 0.575f * zoom + screenHeight * 2f / 3f);
+			g.scale(zoom, zoom);
+			trashpile[4].draw(6, -18, 40f, 20f);
+			g.popTransform();
+	
+			g.pushTransform();
+			g.translate(cam.getX() * 0.675f * zoom + screenWidth / 2f, cam.getY() * 0.675f * zoom + screenHeight * 2f / 3f);
+			g.scale(zoom, zoom);
+			trashpile[3].draw(23, -18, 40f, 20f);
+			g.popTransform();
+	
+			g.pushTransform();
+			g.translate(cam.getX() * 0.75f * zoom + screenWidth / 2f, cam.getY() * 0.75f * zoom + screenHeight * 2f / 3f);
+			g.scale(zoom, zoom);
+			trashpile[0].draw(-7, -29, 30f, 15f);
+			g.popTransform();
+	
+			g.pushTransform();
+			g.translate(cam.getX() * 0.875f * zoom + screenWidth / 2f, cam.getY() * 0.875f * zoom + screenHeight * 2f / 3f);
+			g.scale(zoom, zoom);
+			trashpile[1].draw(15, -18, 40f, 20f);
+			g.popTransform();
+		}
 	}
 	
 	public void processInput(GameContainer gc) throws SlickException{
