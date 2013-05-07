@@ -1,0 +1,67 @@
+package Game;
+
+
+public class Level {
+
+	private float version = 1.0f;
+	private Block[][] blocks;
+	
+	public Level(int width, int height) {
+		this.blocks = new Block[width][height];
+		for (int x = 0; x < width; ++x) {
+			for (int y = 0; y < height; ++y) {
+				this.blocks[x][y] = new Block();
+			}
+		}
+	}
+	
+	public void setBlock(int x, int y, int brush, int angle, boolean flipped) {
+		this.blocks[x][y].set(brush, angle, flipped);
+	}
+	
+	public Block getBlock(int x, int y) {
+		return this.blocks[x][y];
+	}
+	
+	public int getWidth() {
+		return this.blocks.length;
+	}
+	
+	public int getHeight() {
+		return this.blocks[0].length;
+	}
+
+	public void shift(int dX, int dY) {
+		Block[][] tmp = new Block[this.getWidth()][this.getHeight()];
+		for (int x = 0; x < this.getWidth(); ++x) {
+			for (int y = 0; y < this.getHeight(); ++y) {
+				int refX = (this.getWidth() + x - dX) % this.getWidth();
+				int refY = (this.getHeight() + y - dY) % this.getHeight();
+				tmp[x][y] = new Block(this.blocks[refX][refY].getType(),
+						this.blocks[refX][refY].getAngle(),
+						this.blocks[refX][refY].isFlipped());
+			}
+		}
+		this.blocks = tmp;
+	}
+	
+	public void resize(int dX, int dY) {
+		if (this.getWidth() + dX > 0 && this.getHeight() + dY > 0) {
+			Block[][] tmp = new Block[this.getWidth() + dX][this.getHeight() + dY];
+			for (int x = 0; x < tmp.length; ++x) {
+				for (int y = 0; y < tmp[0].length; ++y) {
+					if (x < this.getWidth() && y < this.getHeight()) {
+						tmp[x][y] = new Block(this.blocks[x][y].getType(),
+								this.blocks[x][y].getAngle(),
+								this.blocks[x][y].isFlipped());
+					} else {
+						tmp[x][y] = new Block(0, 0, false);
+					}
+					
+				}
+			}
+			this.blocks = tmp;
+		}
+	}
+	
+}
