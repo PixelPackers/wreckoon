@@ -37,6 +37,7 @@ public class Game extends BasicGame {
 	private ArrayList<GameObject> 	staticObjects 	= new ArrayList<GameObject>();
 	private ArrayList<GameObject> 	balls 			= new ArrayList<GameObject>();
 //	private ArrayList<Body> 		jsonObjects 	= new ArrayList<Body>();
+	private ArrayList<Tile>			tiles			= new ArrayList<Tile>();
 	private Player player;
 	private GameObjectPolygon polygon;
 
@@ -119,8 +120,14 @@ public class Game extends BasicGame {
 		player = new Player(world, 2f, 4f);
 		world.setContactListener(new MyContactListener(world, player, balls));
 		
+		int[] tileTypes = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 15, 16, 17, 18, 19, 20, 21, 22, 23, 28, 29, 30, 31, 34, 43};
 		
-		deleteMeTest = new Tile(world, 0, 0, 4, 0, false);
+		for (int i = 0; i < tileTypes.length; ++i) {
+			deleteMeTest = new Tile(world, i * 4, 0, tileTypes[i], 0, false);
+			tiles.add(deleteMeTest);
+			deleteMeTest = new Tile(world, i * 4, 16, tileTypes[i], 0, true);
+			tiles.add(deleteMeTest);
+		}
 	}
 
 //	private String readFile(String file) throws IOException {
@@ -193,7 +200,9 @@ public class Game extends BasicGame {
 
 		player.draw(g, debugView);
 //		polygon.draw(g, debugView);
-		deleteMeTest.draw(g);
+		for (Tile tile : tiles) {
+			tile.draw(g);
+		}
 
 		// GUI
 		g.popTransform();
