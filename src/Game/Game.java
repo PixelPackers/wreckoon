@@ -23,7 +23,7 @@ import com.google.gson.Gson;
 
 public class Game extends BasicGame {
 
-	 /*/
+//	 /*/
 	private static int screenWidth = 800;
 	private static int screenHeight = 600;
 	private static boolean fullScreen = false;
@@ -48,6 +48,7 @@ public class Game extends BasicGame {
 
 	// private Image[][] worldImages = new Image[8][8];
 	private Image[] trashpile = new Image[5];
+	private GameObject lockedObject = null;
 
 	private float zoom = 30f;
 	private final float ZOOM_STEP = 1f;
@@ -191,6 +192,52 @@ public class Game extends BasicGame {
 
 		// world.step(timeStep, velocityIterations, positionIterations);
 		world.step(delta / 1000f, 18, 6);
+		
+		// keep telekinesis object in air
+
+				if(lockedObject != null){
+					float lockObjX = lockedObject.getBody().getPosition().x;
+					float lockObjY = lockedObject.getBody().getPosition().y;
+					
+					float floatingHeight = 0;
+					float floatingDistance = 2;
+					float teleSpeed = 4f;
+				
+					int left = 1;
+					float targetX = player.getBody().getPosition().x + floatingDistance;
+					
+					if(player.movesLeft()){
+						targetX = player.getBody().getPosition().x - floatingDistance;
+						left = -1;
+					}
+					
+					float targetY = player.getBody().getPosition().y;
+
+					float distanceX = lockObjX - targetX;
+//					float distanceY = lockObjY - targetY;
+					
+					
+					if(Math.abs(distanceX) > 4){
+						teleSpeed *= 3;
+					}
+					if(lockObjY < targetY+floatingHeight)
+						lockedObject.getBody().setLinearVelocity(new Vec2(lockedObject.getBody().m_linearVelocity.x, teleSpeed));
+					
+					if(player.movesLeft()){
+
+						if( lockObjX > targetX )
+							lockedObject.getBody().setLinearVelocity(new Vec2(left*teleSpeed, lockedObject.getBody().m_linearVelocity.y));
+						else
+							lockedObject.getBody().setLinearVelocity(new Vec2(left*-teleSpeed, lockedObject.getBody().m_linearVelocity.y));
+					 
+					} else {
+						if( lockObjX < targetX )
+							lockedObject.getBody().setLinearVelocity(new Vec2(left*teleSpeed, lockedObject.getBody().m_linearVelocity.y));
+						else
+							lockedObject.getBody().setLinearVelocity(new Vec2(left*-teleSpeed, lockedObject.getBody().m_linearVelocity.y));
+					}
+					
+				}
 	}
 
 	@Override
@@ -424,6 +471,28 @@ public class Game extends BasicGame {
 
 		if (input.isKeyDown(input.KEY_H) ){
 			player.tailwhipInit();
+		}
+		if (input.isKeyPressed(input.KEY_T) ){
+//			System.out.println("telekinese key is down");
+//			player.telekinesis();
+			
+			if(lockedObject == null){
+				
+				for (GameObject object : balls) {
+	
+					float objectX = object.getBody().getPosition().x;
+					float playerX = player.getBody().getPosition().x;
+					float distance = Math.abs(objectX - playerX);
+					float space = 5f;
+	
+					if (distance < space) {
+						lockedObject = object;
+						break;
+					}	
+				}
+			} else {
+				lockedObject = null;
+			}	
 		}
 
 		
