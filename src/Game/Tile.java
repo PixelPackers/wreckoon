@@ -47,7 +47,7 @@ public class Tile {
 		this.body = this.world.createBody(bodyDef);
 
 		FixtureDef fixtureDef	= new FixtureDef();
-		fixtureDef.friction		= 0.8f;
+//		fixtureDef.friction		= 0.8f;
 		fixtureDef.restitution	= 0f;
 		
 		for(Vec2[] verts : arrayList){

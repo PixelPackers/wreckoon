@@ -38,6 +38,13 @@ public class Player {
 	private float	accelerationX = ACC_WALKING;
 	private float	maxVelocity = MAX_VELOCITY_WALKING;
 	
+
+	private GameObject lockedObject = null;
+	private boolean		charging = false;
+	private int			shootingPower = 0;
+	private Vec2 		lockedPlayerPosition;
+	private	Vec2 		shootingDirection = new Vec2(1,1);
+	
 	private float	maxPlayerRotation = 10f;
 	private World world;
 	
@@ -83,7 +90,7 @@ public class Player {
 		this.firstPolygonShape.set(polygonShapeVerts, polygonShapeVerts.length);
 		
 		this.firstFixtureDef.density 	= 11f;
-		this.firstFixtureDef.friction 	= 0.8f;
+		this.firstFixtureDef.friction 	= 0.2f;
 		this.firstFixtureDef.restitution = 0f;
 		this.firstFixtureDef.shape = firstPolygonShape;
 		
@@ -93,6 +100,7 @@ public class Player {
 		this.body = world.createBody(bodyDef);
 		this.firstFixture = this.body.createFixture(firstFixtureDef);
 		this.body.setFixedRotation(true);
+		this.body.setLinearDamping(0.5f);
 		
 		// second hitbox
 		Vec2[] vertsSensor = new Vec2[]{
@@ -319,35 +327,37 @@ public class Player {
 	}
 
 	public void accelerate() {
+		if(this.isCharging())
+			return;
 		
-			float velocityX 	= this.body.getLinearVelocity().x;
-			float velocityY 	= this.body.getLinearVelocity().y;
-			
-			if( this.isOnGround() || this.isOnWall() ){
-				adjustVelocity();
-			}
-			
-			if( this.isRunning()){
-				if(!bouncing){
+		float velocityX 	= this.body.getLinearVelocity().x;
+		float velocityY 	= this.body.getLinearVelocity().y;
+		
+		if( this.isOnGround() || this.isOnWall() ){
+			adjustVelocity();
+		}
+		
+		if( this.isRunning()){
+			if(!bouncing){
 //				if(!bouncing && this.isOnGround() && (this.sensorBottomLeft.isColliding() || this.sensorBottomRight.isColliding()) ){
 //					velocityY = 1f; // TODO mit += evtl iwie besser loesbar?
-					bouncing = true;
-				}
+				bouncing = true;
 			}
-			if (left){
-				// TODO Math.abs, verbraucht das mehr rechenleistung? als ob man die checkt obs pos sind?
-				this.accelerationX	= -Math.abs(this.accelerationX);
-				this.maxVelocity 	= -Math.abs(this.maxVelocity);
-			} else {
-				this.accelerationX	= Math.abs(this.accelerationX);
-				this.maxVelocity 	= Math.abs(this.maxVelocity);
-			}
-			
-			if(Math.abs(velocityX + accelerationX) < Math.abs(maxVelocity)){
-				velocityX += accelerationX;
-			}
-			
-			this.body.setLinearVelocity(new Vec2(velocityX, velocityY));
+		}
+		if (left){
+			// TODO Math.abs, verbraucht das mehr rechenleistung? als ob man die checkt obs pos sind?
+			this.accelerationX	= -Math.abs(this.accelerationX);
+			this.maxVelocity 	= -Math.abs(this.maxVelocity);
+		} else {
+			this.accelerationX	= Math.abs(this.accelerationX);
+			this.maxVelocity 	= Math.abs(this.maxVelocity);
+		}
+		
+		if(Math.abs(velocityX + accelerationX) < Math.abs(maxVelocity)){
+			velocityX += accelerationX;
+		}
+		
+		this.body.setLinearVelocity(new Vec2(velocityX, velocityY));
 			
 	}
 	
@@ -381,6 +391,9 @@ public class Player {
 	}
 
 	public void jump(){
+
+		if(this.isCharging())
+			return;
 		
 		if( !groundPounding && (sensorGroundCollision.isColliding() || leftWallColliding() || rightWallColliding() ) ){
 			float jumpSpeedX = 0; 
@@ -482,10 +495,176 @@ public class Player {
 	}	
 	
 	
+	
+	
+	public void floatLockedObject(){
+
+		float 	floatingDistanceX	= 2f;
+		float 	floatingDistanceY	= 2f;
+		
+		if( !this.isCharging() ) {
+			if(lockedObject != null){
+				float	lockObjX			= lockedObject.getBody().getPosition().x;
+				float	lockObjY			= lockedObject.getBody().getPosition().y;
+				
+			
+				int 	directionMultiplier = (this.movesLeft()) ? -1 : 1;
+	
+				float 	playerX				= this.getBody().getPosition().x;
+				float 	playerY				= this.getBody().getPosition().y;
+				float 	targetX				= playerX + floatingDistanceX * directionMultiplier;
+				float 	targetY				= playerY + floatingDistanceY;
+	
+				float	distanceX	=	Math.abs( lockObjX ) - Math.abs( playerX ) ;
+				float	distanceY	=	Math.abs( lockObjY ) - Math.abs( playerY ) ;
+	
+				if(distanceX < 0.5f){
+					distanceX=0.5f;
+	//				System.out.println("a");
+				}
+				float speed = 0.5f * 1f/Math.abs(distanceX);
+	/*
+				if(lockObjX < targetX){
+	//				lockedObject.getBody().setLinearVelocity(new Vec2( player.getCurrentMaxSpeed(), lockedObject.getBody().m_linearVelocity.y));
+	//				lockedObject.getBody().applyForce(
+	//					new Vec2( player.getCurrentMaxSpeed() , lockedObject.getBody().m_linearVelocity.y),
+	//					lockedObject.getBody().getPosition()
+	//				);
+					lockedObject.getBody().applyLinearImpulse(
+	//				lockedObject.getBody().applyForce(
+						new Vec2( speed , 0),
+						lockedObject.getBody().getPosition()
+					);
+				} else {
+	//				lockedObject.getBody().setLinearVelocity(new Vec2(-player.getCurrentMaxSpeed(), lockedObject.getBody().m_linearVelocity.y));
+	//				lockedObject.getBody().applyForce(
+	//						new Vec2( -player.getCurrentMaxSpeed() , lockedObject.getBody().m_linearVelocity.y),
+	//						lockedObject.getBody().getPosition()
+	//					);
+					lockedObject.getBody().applyLinearImpulse(
+	//				lockedObject.getBody().applyForce(
+						new Vec2( -speed , 0),
+						lockedObject.getBody().getPosition()
+					);
+				}
+								
+				
+				if(lockObjY < targetY){
+	
+	//				lockedObject.getBody().applyForce(
+	//					world.getGravity().mul( - lockedObject.getBody().getMass() ),
+	//					lockedObject.getBody().getPosition()
+	//				);
+	
+					lockedObject.getBody().setLinearVelocity(new Vec2( lockedObject.getBody().m_linearVelocity.x, this.getCurrentMaxSpeed()));
+				} else {
+					lockedObject.getBody().setLinearVelocity(new Vec2( lockedObject.getBody().m_linearVelocity.x, -this.getCurrentMaxSpeed()));
+				}
+				
+				
+				
+				
+				
+	//
+	//			if(player.movesLeft()){
+	//				
+	//				
+	//			 	// object is between player and desired position
+	//				if(distanceX < floatingDistanceX && lockObjX < playerX)
+	//					lockedObject.getBody().setLinearVelocity(new Vec2( player.getCurrentMaxSpeed(), lockedObject.getBody().m_linearVelocity.y));
+	//				else 
+	//					lockedObject.getBody().setLinearVelocity(new Vec2(-player.getCurrentMaxSpeed(), lockedObject.getBody().m_linearVelocity.y));
+	//				
+	//			} else {
+	//				
+	//
+	//			 	// object is between player and desired position
+	//				if(distanceX < floatingDistanceX && lockObjX > playerX)
+	//					lockedObject.getBody().setLinearVelocity(new Vec2(-player.getCurrentMaxSpeed(), lockedObject.getBody().m_linearVelocity.y));
+	//				else 
+	//					lockedObject.getBody().setLinearVelocity(new Vec2( player.getCurrentMaxSpeed(), lockedObject.getBody().m_linearVelocity.y));
+	//				
+	//			}
+				
+				
+	//			if(distanceY < floatingDistanceY)
+	//				lockedObject.getBody().setLinearVelocity(new Vec2(lockedObject.getBody().m_linearVelocity.x, left*player.getCurrentMaxSpeed()));
+	//			else
+	//				lockedObject.getBody().setLinearVelocity(new Vec2(lockedObject.getBody().m_linearVelocity.x, -(left*player.getCurrentMaxSpeed()*0.5f ) ) );
+				
+	//*/
+				lockedObject.getBody().setTransform(new Vec2(targetX, targetY), 0);
+				Vec2 antiGravity = this.world.getGravity().negate();
+				antiGravity.mul(lockedObject.getBody().getMass());
+				lockedObject.getBody().applyForce(antiGravity , lockedObject.getBody().getPosition());
+			}
+		} else { // charging
+
+			// TODO work in progress, machen, dass objekt dann steuerbar um den spieler herum bewegt werden kann. abstand sollte immer gleich sein
+			// 		iwie mit floating distancx / distancey .normalize();...?
+			
+			// das da eigtl (r)echt sinnlos...
+//			Vec2 pos = shootingDirection;
+//			pos.normalize();
+//			lockedObject.getBody().setTransform(new Vec2(
+//					lockedObject.getBody().getPosition().x - this.getBody().getPosition().x,
+//					lockedObject.getBody().getPosition().y - this.getBody().getPosition().y 
+//					), 0);
+			
+//			this.shootingDirection.normalize();
+//			this.shootingDirection.mul(2);
+			
+			lockedObject.getBody().setTransform(new Vec2(
+					this.getBody().getPosition().x + this.shootingDirection.x,
+					this.getBody().getPosition().y + this.shootingDirection.y 
+					), 0);
+		}
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	public void startCharging(){
+
+		this.setShootingPower(0);
+		this.setCharging(true);
+		this.setLockedPlayerPosition(this.getBody().getPosition());
+		this.shootingDirection = new Vec2(
+				lockedObject.getBody().getPosition().x - this.getBody().getPosition().x,
+				lockedObject.getBody().getPosition().y - this.getBody().getPosition().y
+				);
+		}
+	
+	public void shoot(){
+
+		this.shootingDirection.normalize();
+	
+		lockedObject.getBody().setLinearVelocity(shootingDirection.mul(this.getShootingPower() ) );
+
+		
+		this.releaseObject();
+		this.setCharging(false);
+	}
+	
 	public void increaseCounters(){
 		++groundPoundCounter;
 		++tailwhipCounter;
+		setShootingPower(getShootingPower() + 1);
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
@@ -559,5 +738,54 @@ public class Player {
 		return this.left;
 	}
 	
+	public float getCurrentMaxSpeed(){
+		return (this.isRunning()) ? this.MAX_VELOCITY_RUNNING : this.MAX_VELOCITY_WALKING;
+	}
+	
+	public void lockObject(GameObject lockObj){
+		this.lockedObject = lockObj;
+	}
+	public void releaseObject(){
+		if(this.hasLockedObject()){
+			lockedObject = null;
+		}
+	}
+	
+	public boolean hasLockedObject(){
+		return this.lockedObject != null;
+	}
+	
+	
+	public boolean isCharging(){
+		return this.charging;
+	}
+	
+	public void setCharging(boolean charging){
+		this.charging = charging;
+	}
+
+	public Vec2 getLockedPlayerPosition() {
+		return lockedPlayerPosition;
+	}
+
+	public void setLockedPlayerPosition(Vec2 lockedPlayerPosition) {
+		this.lockedPlayerPosition = lockedPlayerPosition;
+	}
+
+	public int getShootingPower() {
+		return shootingPower;
+	}
+
+	public void setShootingPower(int shootingPower) {
+		this.shootingPower = shootingPower;
+	}
+	
+	public Vec2 getShootingDirection() {
+		return shootingDirection;
+	}
+
+//	public void setShootingPower(int shootingPower) {
+//		this.shootingPower = shootingPower;
+//	}
 	
 }

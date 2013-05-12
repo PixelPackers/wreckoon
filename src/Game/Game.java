@@ -48,7 +48,6 @@ public class Game extends BasicGame {
 
 	// private Image[][] worldImages = new Image[8][8];
 	private Image[] trashpile = new Image[5];
-	private GameObject lockedObject = null;
 
 	private float zoom = 30f;
 	private final float ZOOM_STEP = 1f;
@@ -62,10 +61,7 @@ public class Game extends BasicGame {
 
 	@Override
 	public void init(GameContainer gc) throws SlickException {
-		System.out.println(Float.MIN_VALUE);
-		System.out.println(Integer.MIN_VALUE);
-		randomTests();
-
+		
 //		for (int y = 0; y < worldImages.length; ++y) { 
 //			for (int x = 0; x < worldImages[0].length; ++x) {
 //				worldImages[y][x] = new	Image("images/world_x" + x % 2 + "_y" + y % 2 + ".png");
@@ -187,57 +183,14 @@ public class Game extends BasicGame {
 		processInput(gc);
 		
 		player.update();
-
+		player.floatLockedObject();
+		
 		cam.follow(player.getBody().getPosition().x, player.getBody().getPosition().y, 10);
 
 		// world.step(timeStep, velocityIterations, positionIterations);
 		world.step(delta / 1000f, 18, 6);
 		
-		// keep telekinesis object in air
 
-				if(lockedObject != null){
-					float lockObjX = lockedObject.getBody().getPosition().x;
-					float lockObjY = lockedObject.getBody().getPosition().y;
-					
-					float floatingHeight = 0;
-					float floatingDistance = 2;
-					float teleSpeed = 4f;
-				
-					int left = 1;
-					float targetX = player.getBody().getPosition().x + floatingDistance;
-					
-					if(player.movesLeft()){
-						targetX = player.getBody().getPosition().x - floatingDistance;
-						left = -1;
-					}
-					
-					float targetY = player.getBody().getPosition().y;
-
-					float distanceX = lockObjX - targetX;
-//					float distanceY = lockObjY - targetY;
-					
-					
-					if(Math.abs(distanceX) > 4){
-						teleSpeed *= 3;
-					}
-					if(lockObjY < targetY+floatingHeight)
-						lockedObject.getBody().setLinearVelocity(new Vec2(lockedObject.getBody().m_linearVelocity.x, teleSpeed));
-					
-					if(player.movesLeft()){
-
-						if( lockObjX > targetX )
-							lockedObject.getBody().setLinearVelocity(new Vec2(left*teleSpeed, lockedObject.getBody().m_linearVelocity.y));
-						else
-							lockedObject.getBody().setLinearVelocity(new Vec2(left*-teleSpeed, lockedObject.getBody().m_linearVelocity.y));
-					 
-					} else {
-						if( lockObjX < targetX )
-							lockedObject.getBody().setLinearVelocity(new Vec2(left*teleSpeed, lockedObject.getBody().m_linearVelocity.y));
-						else
-							lockedObject.getBody().setLinearVelocity(new Vec2(left*-teleSpeed, lockedObject.getBody().m_linearVelocity.y));
-					}
-					
-				}
 	}
 
 	@Override
@@ -295,7 +248,7 @@ public class Game extends BasicGame {
 		g.setColor(Color.white);
 		g.drawString("Count: " + world.getBodyCount(), 0, 0);
 		
-		g.drawString("PlayerSpeed: " + player.isRunning(), 200, 10);
+		g.drawString("ShootingDirection: " + player.getShootingDirection(), 200, 10);
 		
 
 	}
@@ -356,20 +309,49 @@ public class Game extends BasicGame {
 		Input input = gc.getInput();
 
 		if (input.isKeyPressed(Input.KEY_SPACE) || input.isKeyPressed(Input.KEY_W) || input.isKeyPressed(Input.KEY_UP)) {
-			player.jump();
+			
+			 if( !player.isCharging() ) {
+				player.jump();
+			}
+			 
 		}
 		if (input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
-			player.accelerate();
-			player.setLeft(true);
+			if( player.isCharging() ){
+				player.getShootingDirection().x -= 1;
+			} else {
+				player.setLeft(true);
+				player.accelerate();
+			}
 		}
 		if (input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D)) {
-			player.accelerate();
-			player.setLeft(false);
+
+			if( player.isCharging() ){
+				player.getShootingDirection().x += 1;
+			} else {
+				player.setLeft(false);
+				player.accelerate();
+			}
 		}
 
-		if (input.isKeyPressed(Input.KEY_DOWN) || input.isKeyDown(Input.KEY_S)) {
-			player.groundPound();
+		if (input.isKeyPressed(Input.KEY_DOWN) || input.isKeyPressed(Input.KEY_S)) {
+			 if( !player.isCharging() ) {
+				player.groundPound();
+			}
 		}
+		
+		if (input.isKeyDown(Input.KEY_SPACE) || input.isKeyDown(Input.KEY_W) || input.isKeyDown(Input.KEY_UP)) {
+			if( player.isCharging() ){
+				player.getShootingDirection().y += 1;
+			} 
+		}
+		
+		if (input.isKeyDown(Input.KEY_DOWN) || input.isKeyDown(Input.KEY_S)) {
+			if( player.isCharging() ){
+				player.getShootingDirection().y -= 1;
+			}
+		}
+			
+		
 
 		// TODO Kamera Smoothness muss auch angepasst werden, je nach Zoom
 		if (input.isKeyDown(Input.KEY_E)) {
@@ -472,11 +454,10 @@ public class Game extends BasicGame {
 		if (input.isKeyDown(input.KEY_H) ){
 			player.tailwhipInit();
 		}
+		
 		if (input.isKeyPressed(input.KEY_T) ){
-//			System.out.println("telekinese key is down");
-//			player.telekinesis();
 			
-			if(lockedObject == null){
+			if( !player.hasLockedObject() ){
 				
 				for (GameObject object : balls) {
 	
@@ -486,18 +467,31 @@ public class Game extends BasicGame {
 					float space = 5f;
 	
 					if (distance < space) {
-						lockedObject = object;
+						player.lockObject(object);
 						break;
 					}	
 				}
 			} else {
-				lockedObject = null;
+				player.releaseObject();
 			}	
 		}
 
+
+		boolean shootkeyDown = false;
 		
+		if (input.isKeyDown( input.KEY_N) ){
+			shootkeyDown = true;
+		}
+
+		if( player.hasLockedObject() ){
+			if( shootkeyDown){
+				if( !player.isCharging() ){
+					player.startCharging(); 
+				}
+			} else if( player.isCharging() ) {
+				player.shoot();
+			}
+		}		
 	}
 	
-	public void randomTests(){
-	}
 }
