@@ -471,6 +471,10 @@ public class Game extends BasicGame {
 						break;
 					}	
 				}
+			} else if(player.isCharging()) {
+				GameObject locked = player.getLockedObject();
+				player.shoot();
+				player.lockObject(locked);
 			} else {
 				player.releaseObject();
 			}	
@@ -495,3 +499,56 @@ public class Game extends BasicGame {
 	}
 	
 }
+
+
+
+// first version of telekinesis
+// too lazy to check if needed any more...
+/*
+
+public void telekinesis(){
+		if(lockedObject != null){
+			float lockObjX = lockedObject.getBody().getPosition().x;
+			float lockObjY = lockedObject.getBody().getPosition().y;
+			
+			float floatingHeight = 0;
+			float floatingDistance = 2;
+			float teleSpeed = 4f;
+			
+			int left = 1;
+			float targetX = player.getBody().getPosition().x + floatingDistance;
+			
+			if(player.movesLeft()){
+				targetX = player.getBody().getPosition().x - floatingDistance;
+				left = -1;
+			}
+			
+			float targetY = player.getBody().getPosition().y + player.getHeight();
+
+			float distanceX = lockObjX - targetX;
+//					float distanceY = lockObjY - targetY;
+			
+			if(Math.abs(distanceX) > 2){
+				teleSpeed *= 4;
+			}
+			
+			if(lockObjY < targetY+floatingHeight)
+				lockedObject.getBody().setLinearVelocity(new Vec2(lockedObject.getBody().m_linearVelocity.x, teleSpeed));
+			
+			if(player.movesLeft()){
+
+				if( lockObjX > targetX )
+					lockedObject.getBody().setLinearVelocity(new Vec2(left*teleSpeed, lockedObject.getBody().m_linearVelocity.y));
+				else
+					lockedObject.getBody().setLinearVelocity(new Vec2(left*-teleSpeed, lockedObject.getBody().m_linearVelocity.y));
+			 
+			} else {
+				if( lockObjX < targetX )
+					lockedObject.getBody().setLinearVelocity(new Vec2(left*teleSpeed, lockedObject.getBody().m_linearVelocity.y));
+				else
+					lockedObject.getBody().setLinearVelocity(new Vec2(left*-teleSpeed, lockedObject.getBody().m_linearVelocity.y));
+			}
+			
+		}
+	}
+*/

@@ -783,6 +783,10 @@ public class Player {
 	public Vec2 getShootingDirection() {
 		return shootingDirection;
 	}
+	
+	public GameObject getLockedObject(){
+		return this.lockedObject;
+	}
 
 //	public void setShootingPower(int shootingPower) {
 //		this.shootingPower = shootingPower;
