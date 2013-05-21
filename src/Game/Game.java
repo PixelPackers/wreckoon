@@ -247,8 +247,9 @@ public class Game extends BasicGame {
 		g.drawRect(50, 55, 10 * zoom, 1);
 		g.setColor(Color.white);
 		g.drawString("Count: " + world.getBodyCount(), 0, 0);
-		
+
 		g.drawString("ShootingDirection: " + player.getShootingDirection(), 200, 10);
+		g.drawString("ShootingPower: " + player.getShootingPower(), 200, 30);
 		
 
 	}
@@ -317,7 +318,8 @@ public class Game extends BasicGame {
 		}
 		if (input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
 			if( player.isCharging() ){
-				player.getShootingDirection().x -= 1;
+//				player.getShootingDirection().x -= 1;
+				player.increaseShootingDirection(-1, 0);
 			} else {
 				player.setLeft(true);
 				player.accelerate();
@@ -326,7 +328,8 @@ public class Game extends BasicGame {
 		if (input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D)) {
 
 			if( player.isCharging() ){
-				player.getShootingDirection().x += 1;
+//				player.getShootingDirection().x += 1;
+				player.increaseShootingDirection( 1, 0);
 			} else {
 				player.setLeft(false);
 				player.accelerate();
@@ -341,13 +344,15 @@ public class Game extends BasicGame {
 		
 		if (input.isKeyDown(Input.KEY_SPACE) || input.isKeyDown(Input.KEY_W) || input.isKeyDown(Input.KEY_UP)) {
 			if( player.isCharging() ){
-				player.getShootingDirection().y += 1;
+//				player.getShootingDirection().y += 1;
+				player.increaseShootingDirection(0, 1);
 			} 
 		}
 		
 		if (input.isKeyDown(Input.KEY_DOWN) || input.isKeyDown(Input.KEY_S)) {
 			if( player.isCharging() ){
-				player.getShootingDirection().y -= 1;
+//				player.getShootingDirection().y -= 1;
+				player.increaseShootingDirection(0, -1);
 			}
 		}
 			

@@ -18,11 +18,18 @@ import org.newdawn.slick.geom.Polygon;
 public class Player {
 	
 	private static final float TAILWHIP_DISTANCE = 5;
+//	private final float MAX_VELOCITY_WALKING = 7f;
+//	private final float MAX_VELOCITY_RUNNING = 20f;
+//	private final float ACC_WALKING = 0.5f;
+//	private final float ACC_RUNNING = 0.75f;
+//	
+	// XXX more friction test
 	private final float MAX_VELOCITY_WALKING = 7f;
 	private final float MAX_VELOCITY_RUNNING = 20f;
-	private final float ACC_WALKING = 0.5f;
-	private final float ACC_RUNNING = 0.75f;
-
+	private final float ACC_WALKING = 1.5f;
+	private final float ACC_RUNNING = 1.75f;
+	private final float playerFriction = 2.2f;
+	
 	private int groundPoundCounter = 0;
 	private int tailwhipCounter = 0;
 	
@@ -35,18 +42,20 @@ public class Player {
 	private boolean bouncing = false;
 	private boolean doTailwhip = false;
 	private boolean groundPounding = false;
+	//XXX ??
 	private float	accelerationX = ACC_WALKING;
 	private float	maxVelocity = MAX_VELOCITY_WALKING;
 	
 
 	private GameObject lockedObject = null;
 	private boolean		charging = false;
-	private int			shootingPower = 0;
+	private float		shootingPower = 0f;
+	private float 		maxShootingPower = 50f;
 	private Vec2 		lockedPlayerPosition;
 	private	Vec2 		shootingDirection = new Vec2(1,1);
 	
-	private float	maxPlayerRotation = 10f;
-	private World world;
+	private float		maxPlayerRotation = 10f;
+	private World		world;
 	
 	private float width = 1f;
 	private float height = 2f;
@@ -90,7 +99,8 @@ public class Player {
 		this.firstPolygonShape.set(polygonShapeVerts, polygonShapeVerts.length);
 		
 		this.firstFixtureDef.density 	= 11f;
-		this.firstFixtureDef.friction 	= 0.2f;
+		this.firstFixtureDef.friction 	= playerFriction;
+		// XXX braucht ma das? evtl wegen vom reifen wegbouncen?
 		this.firstFixtureDef.restitution = 0f;
 		this.firstFixtureDef.shape = firstPolygonShape;
 		
@@ -100,7 +110,7 @@ public class Player {
 		this.body = world.createBody(bodyDef);
 		this.firstFixture = this.body.createFixture(firstFixtureDef);
 		this.body.setFixedRotation(true);
-		this.body.setLinearDamping(0.5f);
+//		this.body.setLinearDamping(0.7f);
 		
 		// second hitbox
 		Vec2[] vertsSensor = new Vec2[]{
@@ -113,7 +123,10 @@ public class Player {
 		PolygonShape secondPolygonShape = new PolygonShape();
 		secondPolygonShape.set(vertsSensor, vertsSensor.length);
 		
-		this.secondFixtureDef = new FixtureDef();
+		this.secondFixtureDef.density 	= 11f;
+		this.secondFixtureDef.friction 	= playerFriction;
+		// XXX braucht ma das? evtl wegen vom reifen wegbouncen? selbes wie oben
+//		this.secondFixtureDef.restitution = 0f;
 		this.secondFixtureDef.shape = secondPolygonShape;
 		this.secondPolygonShape = secondPolygonShape;
 
@@ -494,139 +507,98 @@ public class Player {
 		return sensorBottomRight.isColliding() && sensorTopRight.isColliding();
 	}	
 	
-	
-	
-	
+	// passt der methoden name??
 	public void floatLockedObject(){
 
 		float 	floatingDistanceX	= 2f;
 		float 	floatingDistanceY	= 2f;
 		
 		if( !this.isCharging() ) {
-			if(lockedObject != null){
-				float	lockObjX			= lockedObject.getBody().getPosition().x;
-				float	lockObjY			= lockedObject.getBody().getPosition().y;
-				
 			
+			if(lockedObject != null){
+
 				int 	directionMultiplier = (this.movesLeft()) ? -1 : 1;
-	
+
 				float 	playerX				= this.getBody().getPosition().x;
 				float 	playerY				= this.getBody().getPosition().y;
+				
 				float 	targetX				= playerX + floatingDistanceX * directionMultiplier;
 				float 	targetY				= playerY + floatingDistanceY;
-	
-				float	distanceX	=	Math.abs( lockObjX ) - Math.abs( playerX ) ;
-				float	distanceY	=	Math.abs( lockObjY ) - Math.abs( playerY ) ;
-	
-				if(distanceX < 0.5f){
-					distanceX=0.5f;
-	//				System.out.println("a");
-				}
-				float speed = 0.5f * 1f/Math.abs(distanceX);
-	/*
-				if(lockObjX < targetX){
-	//				lockedObject.getBody().setLinearVelocity(new Vec2( player.getCurrentMaxSpeed(), lockedObject.getBody().m_linearVelocity.y));
-	//				lockedObject.getBody().applyForce(
-	//					new Vec2( player.getCurrentMaxSpeed() , lockedObject.getBody().m_linearVelocity.y),
-	//					lockedObject.getBody().getPosition()
-	//				);
-					lockedObject.getBody().applyLinearImpulse(
-	//				lockedObject.getBody().applyForce(
-						new Vec2( speed , 0),
-						lockedObject.getBody().getPosition()
-					);
-				} else {
-	//				lockedObject.getBody().setLinearVelocity(new Vec2(-player.getCurrentMaxSpeed(), lockedObject.getBody().m_linearVelocity.y));
-	//				lockedObject.getBody().applyForce(
-	//						new Vec2( -player.getCurrentMaxSpeed() , lockedObject.getBody().m_linearVelocity.y),
-	//						lockedObject.getBody().getPosition()
-	//					);
-					lockedObject.getBody().applyLinearImpulse(
-	//				lockedObject.getBody().applyForce(
-						new Vec2( -speed , 0),
-						lockedObject.getBody().getPosition()
-					);
-				}
-								
 				
-				if(lockObjY < targetY){
-	
-	//				lockedObject.getBody().applyForce(
-	//					world.getGravity().mul( - lockedObject.getBody().getMass() ),
-	//					lockedObject.getBody().getPosition()
-	//				);
-	
-					lockedObject.getBody().setLinearVelocity(new Vec2( lockedObject.getBody().m_linearVelocity.x, this.getCurrentMaxSpeed()));
-				} else {
-					lockedObject.getBody().setLinearVelocity(new Vec2( lockedObject.getBody().m_linearVelocity.x, -this.getCurrentMaxSpeed()));
-				}
+				// object tracks player movement
+				moveFloatingObjectToTarget( targetX, targetY);
 				
-				
-				
-				
-				
-	//
-	//			if(player.movesLeft()){
-	//				
-	//				
-	//			 	// object is between player and desired position
-	//				if(distanceX < floatingDistanceX && lockObjX < playerX)
-	//					lockedObject.getBody().setLinearVelocity(new Vec2( player.getCurrentMaxSpeed(), lockedObject.getBody().m_linearVelocity.y));
-	//				else 
-	//					lockedObject.getBody().setLinearVelocity(new Vec2(-player.getCurrentMaxSpeed(), lockedObject.getBody().m_linearVelocity.y));
-	//				
-	//			} else {
-	//				
-	//
-	//			 	// object is between player and desired position
-	//				if(distanceX < floatingDistanceX && lockObjX > playerX)
-	//					lockedObject.getBody().setLinearVelocity(new Vec2(-player.getCurrentMaxSpeed(), lockedObject.getBody().m_linearVelocity.y));
-	//				else 
-	//					lockedObject.getBody().setLinearVelocity(new Vec2( player.getCurrentMaxSpeed(), lockedObject.getBody().m_linearVelocity.y));
-	//				
-	//			}
-				
-				
-	//			if(distanceY < floatingDistanceY)
-	//				lockedObject.getBody().setLinearVelocity(new Vec2(lockedObject.getBody().m_linearVelocity.x, left*player.getCurrentMaxSpeed()));
-	//			else
-	//				lockedObject.getBody().setLinearVelocity(new Vec2(lockedObject.getBody().m_linearVelocity.x, -(left*player.getCurrentMaxSpeed()*0.5f ) ) );
-				
-	//*/
-				lockedObject.getBody().setTransform(new Vec2(targetX, targetY), 0);
-				Vec2 antiGravity = this.world.getGravity().negate();
-				antiGravity.mul(lockedObject.getBody().getMass());
-				lockedObject.getBody().applyForce(antiGravity , lockedObject.getBody().getPosition());
 			}
 		} else { // charging
-
-			// TODO work in progress, machen, dass objekt dann steuerbar um den spieler herum bewegt werden kann. abstand sollte immer gleich sein
-			// 		iwie mit floating distancx / distancey .normalize();...?
 			
-			// das da eigtl (r)echt sinnlos...
-//			Vec2 pos = shootingDirection;
-//			pos.normalize();
-//			lockedObject.getBody().setTransform(new Vec2(
-//					lockedObject.getBody().getPosition().x - this.getBody().getPosition().x,
-//					lockedObject.getBody().getPosition().y - this.getBody().getPosition().y 
-//					), 0);
+			Vec2 placement = this.shootingDirection.clone();
+			placement.normalize();
+			placement = placement.mul(3f);
 			
-//			this.shootingDirection.normalize();
-//			this.shootingDirection.mul(2);
-			
+			//*
 			lockedObject.getBody().setTransform(new Vec2(
-					this.getBody().getPosition().x + this.shootingDirection.x,
-					this.getBody().getPosition().y + this.shootingDirection.y 
+					this.getBody().getPosition().x + placement.x,
+					this.getBody().getPosition().y + placement.y 
 					), 0);
+			Vec2 antiGravity = this.world.getGravity().negate();
+			antiGravity = antiGravity.mul(lockedObject.getBody().getMass());
+			lockedObject.getBody().applyForce(antiGravity , lockedObject.getBody().getPosition());
+			
+			/*/
+			moveFloatingObjectToTarget(this.getBody().getPosition().x + placement.x, this.getBody().getPosition().y + placement.y);
+			//*/
+			
 		}
 		
 	}
 	
+	private void moveFloatingObjectToTarget( float targetX, float targetY ){
+
+		float	lockObjX			= lockedObject.getBody().getPosition().x;
+		float	lockObjY			= lockedObject.getBody().getPosition().y;
 	
-	
-	
-	
-	
+		/* braucht ma alles nicht bzw nur für speed, der grad auskommentiert is
+		float	distanceX	=	Math.abs( lockObjX ) - Math.abs( this.getBody().getPosition().x ) ;
+		float	distanceY	=	Math.abs( lockObjY ) - Math.abs( this.getBody().getPosition().y ) ;
+
+		// minimal distance
+		if(distanceX < 0.5f){
+			distanceX=0.5f;
+		}//*/
+		
+		// XXX
+		// float speed = 0.5f * 1f/Math.abs(distanceX);
+		float speed = MAX_VELOCITY_RUNNING;
+		
+		float tolerance = 1f;
+		
+		if(lockObjX + tolerance < targetX)
+			lockedObject.getBody().setLinearVelocity( new Vec2( speed, lockedObject.getBody().m_linearVelocity.y ));
+		else if(lockObjX - tolerance > targetX) 
+			lockedObject.getBody().setLinearVelocity( new Vec2(-speed,lockedObject.getBody().m_linearVelocity.y ));
+		else
+			lockedObject.getBody().setLinearVelocity( new Vec2(lockedObject.getBody().m_linearVelocity.x*0.5f,lockedObject.getBody().m_linearVelocity.y ));
+			
+		if(lockObjY < targetY){ // up
+			lockedObject.getBody().setLinearVelocity( new Vec2( lockedObject.getBody().m_linearVelocity.x, speed
+//					-( this.world.getGravity().y*lockedObject.getBody().getMass()) 
+					));
+			
+			
+		} else { // down
+			lockedObject.getBody().setLinearVelocity( new Vec2( lockedObject.getBody().m_linearVelocity.x, -speed ));
+		}	
+		
+		
+		// XXX is setting object to target position (no transition animation)
+//		lockedObject.getBody().setTransform(new Vec2(targetX, targetY), 0);
+//		lockedObject.getBody().setTransform(new Vec2(lockObjX, targetY), 0);
+		
+		
+		// XXX ANTIGRAVITY remove every force in any direction --> float / stay in place
+//		lockedObject.getBody().setLinearVelocity(new Vec2(0,0));
+		
+	}
 	
 	public void startCharging(){
 
@@ -650,10 +622,11 @@ public class Player {
 		this.setCharging(false);
 	}
 	
-	public void increaseCounters(){
+	private void increaseCounters(){
 		++groundPoundCounter;
 		++tailwhipCounter;
-		setShootingPower(getShootingPower() + 1);
+		if(shootingPower < maxShootingPower)
+			++shootingPower;
 	}
 	
 	
@@ -772,11 +745,11 @@ public class Player {
 		this.lockedPlayerPosition = lockedPlayerPosition;
 	}
 
-	public int getShootingPower() {
+	public float getShootingPower() {
 		return shootingPower;
 	}
 
-	public void setShootingPower(int shootingPower) {
+	public void setShootingPower(float shootingPower) {
 		this.shootingPower = shootingPower;
 	}
 	
@@ -787,7 +760,17 @@ public class Player {
 	public GameObject getLockedObject(){
 		return this.lockedObject;
 	}
+	public void increaseShootingDirection(float x, float y){
+		
+		int maxRadius = 25;
+		this.shootingDirection.x += x;
+		this.shootingDirection.y += y;
 
+		this.shootingDirection.normalize();
+		this.shootingDirection = this.shootingDirection.mul(maxRadius);
+			
+	}
+	
 //	public void setShootingPower(int shootingPower) {
 //		this.shootingPower = shootingPower;
 //	}
