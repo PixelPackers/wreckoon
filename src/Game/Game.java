@@ -44,6 +44,7 @@ public class Game extends BasicGame {
 //	private ArrayList<Body> 		jsonObjects 	= new ArrayList<Body>();
 	private ArrayList<Tile>			tiles			= new ArrayList<Tile>();
 	private Player player;
+	private Enemy enemy;
 	private GameObjectPolygon polygon;
 
 	// private Image[][] worldImages = new Image[8][8];
@@ -137,7 +138,9 @@ public class Game extends BasicGame {
 //		jsonObject.createShapes(world, jsonObjects);
 //		
 		player = new Player(world, 2f, 4f);
-		world.setContactListener(new MyContactListener(world, player, balls));
+		world.setContactListener(new MyContactListener(this));
+
+		enemy = new Enemy(this, 10f, 5f, 3f, 3f, 0.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC);
 		
 		/*int[] tileTypes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 15, 16, 17, 18, 19, 20, 21, 22, 23, 28, 29, 30, 31, 34, 43};
 		
@@ -183,7 +186,8 @@ public class Game extends BasicGame {
 		processInput(gc);
 		
 		player.update();
-		player.floatLockedObject();
+		
+		enemy.update();
 		
 		cam.follow(player.getBody().getPosition().x, player.getBody().getPosition().y, 10);
 
@@ -242,6 +246,7 @@ public class Game extends BasicGame {
 		}
 
 		player.draw(g, debugView);
+		enemy.draw(g, debugView);
 //		polygon.draw(g, debugView);
 		for (Tile tile : tiles) {
 			tile.draw(g);
@@ -364,7 +369,7 @@ public class Game extends BasicGame {
 		}
 
 		if (input.isKeyPressed(Input.KEY_DOWN) || input.isKeyPressed(Input.KEY_S)) {
-			 if( !player.isCharging() ) {
+			 if( !player.isCharging() && !player.isOnWall() && !player.isOnGround()) {
 				player.groundPound();
 			}
 		}
@@ -532,59 +537,18 @@ public class Game extends BasicGame {
 			}	
 		}
 		return null;
-	}	
-}
-
-
-
-
-// first version of telekinesis
-// too lazy to check if needed any more...
-/*
-
-public void telekinesis(){
-		if(lockedObject != null){
-			float lockObjX = lockedObject.getBody().getPosition().x;
-			float lockObjY = lockedObject.getBody().getPosition().y;
-			
-			float floatingHeight = 0;
-			float floatingDistance = 2;
-			float teleSpeed = 4f;
-			
-			int left = 1;
-			float targetX = player.getBody().getPosition().x + floatingDistance;
-			
-			if(player.movesLeft()){
-				targetX = player.getBody().getPosition().x - floatingDistance;
-				left = -1;
-			}
-			
-			float targetY = player.getBody().getPosition().y + player.getHeight();
-
-			float distanceX = lockObjX - targetX;
-//					float distanceY = lockObjY - targetY;
-			
-			if(Math.abs(distanceX) > 2){
-				teleSpeed *= 4;
-			}
-			
-			if(lockObjY < targetY+floatingHeight)
-				lockedObject.getBody().setLinearVelocity(new Vec2(lockedObject.getBody().m_linearVelocity.x, teleSpeed));
-			
-			if(player.movesLeft()){
-
-				if( lockObjX > targetX )
-					lockedObject.getBody().setLinearVelocity(new Vec2(left*teleSpeed, lockedObject.getBody().m_linearVelocity.y));
-				else
-					lockedObject.getBody().setLinearVelocity(new Vec2(left*-teleSpeed, lockedObject.getBody().m_linearVelocity.y));
-			 
-			} else {
-				if( lockObjX < targetX )
-					lockedObject.getBody().setLinearVelocity(new Vec2(left*teleSpeed, lockedObject.getBody().m_linearVelocity.y));
-				else
-					lockedObject.getBody().setLinearVelocity(new Vec2(left*-teleSpeed, lockedObject.getBody().m_linearVelocity.y));
-			}
-			
-		}
 	}
-*/
+	
+	public World getWorld() {
+		return world;
+	}
+	public Player getPlayer() {
+		return player;
+	}
+	public Enemy getEnemy(){
+		return enemy;
+	}
+	public ArrayList<GameObject> getBalls() {
+		return balls;
+	}
+}

@@ -3,6 +3,7 @@ package Game;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.World;
+import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
 
 public class GameObjectBox extends GameObjectPolygon {
@@ -26,5 +27,9 @@ public class GameObjectBox extends GameObjectPolygon {
 		float angle = this.body.getAngle();
 		img.setRotation(-(float) Math.toDegrees(angle));
 		img.draw(position.x - this.width / 2, -position.y - this.height / 2, this.width, this.height);
+	}
+	@Override
+	public void drawOutline(Graphics g){
+		super.drawOutline(g);
 	}
 }

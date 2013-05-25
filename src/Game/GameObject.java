@@ -37,7 +37,7 @@ public abstract class GameObject {
 		this.body.createFixture(fixtureDef);
 	}
 
-	public void draw(Graphics g, boolean debugView){
+	public final void draw(Graphics g, boolean debugView){
 		if(debugView || this.img == null)
 			this.drawOutline(g);
 		else 

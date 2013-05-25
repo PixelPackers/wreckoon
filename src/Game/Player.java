@@ -110,7 +110,7 @@ public class Player {
 		this.body = world.createBody(bodyDef);
 		this.firstFixture = this.body.createFixture(firstFixtureDef);
 		// FIXME das oder body.sweep verwenden?
-//		this.body.setFixedRotation(true);
+		this.body.setFixedRotation(true);
 //		this.body.setLinearDamping(0.7f);
 		
 		// second hitbox
@@ -339,7 +339,10 @@ public class Player {
 		increaseCounters();
 		
 		// FIXME das oder fixed rotation verwenden?
-		this.body.m_sweep.a = 0;
+//		this.body.m_sweep.a = 0;
+		
+
+		this.floatLockedObject();
 		
 	}
 
@@ -354,13 +357,6 @@ public class Player {
 			adjustVelocity();
 		}
 		
-		if( this.isRunning()){
-			if(!bouncing){
-//				if(!bouncing && this.isOnGround() && (this.sensorBottomLeft.isColliding() || this.sensorBottomRight.isColliding()) ){
-//					velocityY = 1f; // TODO mit += evtl iwie besser loesbar?
-				bouncing = true;
-			}
-		}
 		if (left){
 			// TODO Math.abs, verbraucht das mehr rechenleistung? als ob man die checkt obs pos sind?
 			this.accelerationX	= -Math.abs(this.accelerationX);
@@ -375,7 +371,18 @@ public class Player {
 		}
 		
 		this.body.setLinearVelocity(new Vec2(velocityX, velocityY));
-			
+		
+//		if( this.isRunning()){
+//			if(!bouncing){
+////				if(!bouncing && this.isOnGround() && (this.sensorBottomLeft.isColliding() || this.sensorBottomRight.isColliding()) ){
+////					velocityY = 1f; // TODO mit += evtl iwie besser loesbar?
+//				bouncing = true;
+//			}
+//			if(this.isOnGround()){
+//				this.body.setLinearVelocity(new Vec2( this.body.getLinearVelocity().x, 1) );
+//				System.out.println(this.body.getLinearVelocity());
+//			}
+//		}	
 	}
 	
 	public void adjustVelocity(){
