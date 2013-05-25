@@ -41,10 +41,10 @@ public class Game extends BasicGame {
 
 	private ArrayList<GameObject> 	staticObjects 	= new ArrayList<GameObject>();
 	private ArrayList<GameObject> 	balls 			= new ArrayList<GameObject>();
+	private ArrayList<Enemy> 	enemies			= new ArrayList<Enemy>();
 //	private ArrayList<Body> 		jsonObjects 	= new ArrayList<Body>();
 	private ArrayList<Tile>			tiles			= new ArrayList<Tile>();
 	private Player player;
-	private Enemy enemy;
 	private GameObjectPolygon polygon;
 
 	// private Image[][] worldImages = new Image[8][8];
@@ -140,7 +140,9 @@ public class Game extends BasicGame {
 		player = new Player(world, 2f, 4f);
 		world.setContactListener(new MyContactListener(this));
 
-		enemy = new Enemy(this, 10f, 5f, 3f, 3f, 0.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC);
+		enemies.add( new EnemyStupidFollower(this, 10f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
+		enemies.add( new EnemyStupidFollower(this, 15f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
+		enemies.add( new EnemyStupidFollower(this, 124f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
 		
 		/*int[] tileTypes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 15, 16, 17, 18, 19, 20, 21, 22, 23, 28, 29, 30, 31, 34, 43};
 		
@@ -187,7 +189,9 @@ public class Game extends BasicGame {
 		
 		player.update();
 		
-		enemy.update();
+		for(Enemy enemy : enemies){
+			enemy.update();
+		}
 		
 		cam.follow(player.getBody().getPosition().x, player.getBody().getPosition().y, 10);
 
@@ -246,7 +250,9 @@ public class Game extends BasicGame {
 		}
 
 		player.draw(g, debugView);
-		enemy.draw(g, debugView);
+		for(Enemy enemy : enemies){
+			enemy.draw(g, debugView);	
+		}
 //		polygon.draw(g, debugView);
 		for (Tile tile : tiles) {
 			tile.draw(g);
@@ -545,8 +551,8 @@ public class Game extends BasicGame {
 	public Player getPlayer() {
 		return player;
 	}
-	public Enemy getEnemy(){
-		return enemy;
+	public ArrayList<Enemy> getEnemies() {
+		return enemies;
 	}
 	public ArrayList<GameObject> getBalls() {
 		return balls;

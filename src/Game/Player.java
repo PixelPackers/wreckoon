@@ -614,9 +614,9 @@ public class Player {
 			float distanceFactor = Math.abs(targetX - lockedObject.getBody().getLinearVelocity().y);
 			distanceFactor = (float) Math.sqrt(distanceFactor) * slowDownFactor;
 
-			System.out.print(distanceFactor + "    ");
+//			System.out.print(distanceFactor + "    ");
 			distanceFactor = (distanceFactor > max) ? max : distanceFactor;
-			System.out.println(distanceFactor);
+//			System.out.println(distanceFactor);
 			
 			Vec2 antiGravity = this.world.getGravity().clone();
 			antiGravity = antiGravity.mul(distanceFactor * lockedObject.getBody().getMass()).negate();
@@ -817,5 +817,8 @@ public class Player {
 //	public void setShootingPower(int shootingPower) {
 //		this.shootingPower = shootingPower;
 //	}
-	
+
+	public boolean isGroundPounding() {
+		return groundPounding;
+	}
 }

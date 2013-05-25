@@ -3,6 +3,7 @@ package Game;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 import org.newdawn.slick.Graphics;
@@ -14,6 +15,7 @@ public abstract class GameObject {
 	protected Body 			body;
 	protected BodyDef 		bodyDef;
 	protected FixtureDef 	fixtureDef;
+	protected Fixture 		fixture;
 
 	protected Image 		img;
 
@@ -34,7 +36,7 @@ public abstract class GameObject {
 
 	protected void getReadyToRumble(World world) {
 		this.body = world.createBody(bodyDef);
-		this.body.createFixture(fixtureDef);
+		this.fixture = this.body.createFixture(fixtureDef);
 	}
 
 	public final void draw(Graphics g, boolean debugView){
@@ -50,5 +52,7 @@ public abstract class GameObject {
 	public Body getBody() {
 		return body;
 	}
-
+	public Fixture getFixture() {
+		return fixture;
+	}
 }
