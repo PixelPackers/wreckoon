@@ -109,7 +109,8 @@ public class Player {
 
 		this.body = world.createBody(bodyDef);
 		this.firstFixture = this.body.createFixture(firstFixtureDef);
-		this.body.setFixedRotation(true);
+		// FIXME das oder body.sweep verwenden?
+//		this.body.setFixedRotation(true);
 //		this.body.setLinearDamping(0.7f);
 		
 		// second hitbox
@@ -337,6 +338,9 @@ public class Player {
 		
 		increaseCounters();
 		
+		// FIXME das oder fixed rotation verwenden?
+		this.body.m_sweep.a = 0;
+		
 	}
 
 	public void accelerate() {
@@ -408,14 +412,24 @@ public class Player {
 		if(this.isCharging())
 			return;
 		
-		if( !groundPounding && (sensorGroundCollision.isColliding() || leftWallColliding() || rightWallColliding() ) ){
+		if( !groundPounding && (sensorGroundCollision.isColliding() || leftWallColliding() || rightWallColliding() ) ) {
+			
 			float jumpSpeedX = 0; 
+			
 			if( this.isOnGround()){
+				
 				jumpSpeedX = this.body.getLinearVelocity().x;
+				
 			} else if(leftWallColliding()){
+				
+				this.left = false;
 				jumpSpeedX = this.jumpPower * this.wallJumpPowerFactor;
+				
 			} else if(rightWallColliding()){
+				
+				this.left = true;
 				jumpSpeedX = -this.jumpPower * this.wallJumpPowerFactor;
+				
 			}
 			
 			this.body.setLinearVelocity(new Vec2(jumpSpeedX, this.jumpPower));
@@ -540,6 +554,7 @@ public class Player {
 					this.getBody().getPosition().x + placement.x,
 					this.getBody().getPosition().y + placement.y 
 					), 0);
+			
 			Vec2 antiGravity = this.world.getGravity().negate();
 			antiGravity = antiGravity.mul(lockedObject.getBody().getMass());
 			lockedObject.getBody().applyForce(antiGravity , lockedObject.getBody().getPosition());
@@ -570,24 +585,45 @@ public class Player {
 		// float speed = 0.5f * 1f/Math.abs(distanceX);
 		float speed = MAX_VELOCITY_RUNNING;
 		
-		float tolerance = 1f;
+		float toleranceX = 1f;
 		
-		if(lockObjX + tolerance < targetX)
+		if(lockObjX + toleranceX < targetX)
 			lockedObject.getBody().setLinearVelocity( new Vec2( speed, lockedObject.getBody().m_linearVelocity.y ));
-		else if(lockObjX - tolerance > targetX) 
+		else if(lockObjX - toleranceX > targetX) 
 			lockedObject.getBody().setLinearVelocity( new Vec2(-speed,lockedObject.getBody().m_linearVelocity.y ));
-		else
+		else // within tolerance
 			lockedObject.getBody().setLinearVelocity( new Vec2(lockedObject.getBody().m_linearVelocity.x*0.5f,lockedObject.getBody().m_linearVelocity.y ));
 			
-		if(lockObjY < targetY){ // up
-			lockedObject.getBody().setLinearVelocity( new Vec2( lockedObject.getBody().m_linearVelocity.x, speed
-//					-( this.world.getGravity().y*lockedObject.getBody().getMass()) 
-					));
+		
+		// XXX telekinesis work in progress
+		float toleranceY= 0f;
+		if(lockObjY + toleranceY < targetY){ // should move up
+//			lockedObject.getBody().setLinearVelocity( new Vec2( lockedObject.getBody().m_linearVelocity.x, speed
+//					-( this.world.getGravity().y) 
+//					));			
+
+			float max = 2f;
+			float slowDownFactor = 1.4f;
+			float distanceFactor = Math.abs(targetX - lockedObject.getBody().getLinearVelocity().y);
+			distanceFactor = (float) Math.sqrt(distanceFactor) * slowDownFactor;
+
+			System.out.print(distanceFactor + "    ");
+			distanceFactor = (distanceFactor > max) ? max : distanceFactor;
+			System.out.println(distanceFactor);
 			
+			Vec2 antiGravity = this.world.getGravity().clone();
+			antiGravity = antiGravity.mul(distanceFactor * lockedObject.getBody().getMass()).negate();
+//			lockedObject.getBody().applyLinearImpulse(antiGravity, lockedObject.getBody().getWorldCenter());
+			lockedObject.getBody().applyForce(antiGravity, lockedObject.getBody().getWorldCenter());
 			
-		} else { // down
-			lockedObject.getBody().setLinearVelocity( new Vec2( lockedObject.getBody().m_linearVelocity.x, -speed ));
-		}	
+		} else if(lockObjY - toleranceY > targetY) { // should move down 
+			// let gravity do the work...
+//			lockedObject.getBody().setLinearVelocity( new Vec2( lockedObject.getBody().m_linearVelocity.x, -speed ));
+		}	else { // within tolerance
+			
+		}
+		// balloon example...
+//		lockedObject.getBody().applyForce(this.world.getGravity().negate().mul(lockedObject.getBody().getMass()), lockedObject.getBody().getWorldCenter()	);
 		
 		
 		// XXX is setting object to target position (no transition animation)

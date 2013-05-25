@@ -227,9 +227,18 @@ public class Game extends BasicGame {
 //				fixture = fixture.getNext();
 //			}
 //		}
-
+		GameObject glowingObj = chooseTelekinesisTarget();
 		for (GameObject ball : balls) {
+			
+			Color tmpColor;
+			tmpColor = g.getColor();
+			
+			if(ball == glowingObj) {
+				g.setColor(new Color(155,155,255));
+			}
 			ball.draw(g, debugView);
+			g.setColor(tmpColor);
+			
 		}
 
 		player.draw(g, debugView);
@@ -316,23 +325,41 @@ public class Game extends BasicGame {
 			}
 			 
 		}
+		float minCounterSteerSpeed = 5;
 		if (input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
 			if( player.isCharging() ){
 //				player.getShootingDirection().x -= 1;
 				player.increaseShootingDirection(-1, 0);
 			} else {
-				player.setLeft(true);
-				player.accelerate();
+				if( player.isOnGround() ) {
+					player.setLeft(true);
+				} 
+				if(player.movesLeft() ) {
+					player.accelerate();
+				} else if( player.getBody().getLinearVelocity().x > minCounterSteerSpeed) { 
+					player.setLeft(true);
+					player.accelerate();
+					player.setLeft(false);					
+				}
 			}
 		}
+
 		if (input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D)) {
 
 			if( player.isCharging() ){
 //				player.getShootingDirection().x += 1;
 				player.increaseShootingDirection( 1, 0);
 			} else {
-				player.setLeft(false);
-				player.accelerate();
+				if( player.isOnGround() ) {
+					player.setLeft(false);
+				} 
+				if ( !player.movesLeft() ) {
+					player.accelerate();
+				} else if( player.getBody().getLinearVelocity().x < -minCounterSteerSpeed) { 
+					player.setLeft(false);
+					player.accelerate();
+					player.setLeft(true);					
+				}
 			}
 		}
 
@@ -464,18 +491,8 @@ public class Game extends BasicGame {
 			
 			if( !player.hasLockedObject() ){
 				
-				for (GameObject object : balls) {
-	
-					float objectX = object.getBody().getPosition().x;
-					float playerX = player.getBody().getPosition().x;
-					float distance = Math.abs(objectX - playerX);
-					float space = 5f;
-	
-					if (distance < space) {
-						player.lockObject(object);
-						break;
-					}	
-				}
+				player.lockObject(chooseTelekinesisTarget() );
+				
 			} else if(player.isCharging()) {
 				GameObject locked = player.getLockedObject();
 				player.shoot();
@@ -502,8 +519,22 @@ public class Game extends BasicGame {
 			}
 		}		
 	}
-	
+	public GameObject chooseTelekinesisTarget(){
+		for (GameObject object : balls) {
+			
+			float objectX = object.getBody().getPosition().x;
+			float playerX = player.getBody().getPosition().x;
+			float distance = Math.abs(objectX - playerX);
+			float space = 5f;
+
+			if (distance < space) {
+				return object;
+			}	
+		}
+		return null;
+	}	
 }
+
 
 
 
