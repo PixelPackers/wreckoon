@@ -38,27 +38,5 @@ public class EnemyStupidFollower extends Enemy {
 		}
 	}
 	
-	@Override
-	public void drawOutline(Graphics g){
-				
-		Polygon polygonToDraw = new Polygon();
-		Vec2[] verts = this.polygonShape.getVertices();
-		for (int i=0; i< this.polygonShape.m_vertexCount; ++i) {
-			Vec2 vert = verts[i];
-			Vec2 worldPoint = this.body.getWorldPoint(vert);
-			polygonToDraw.addPoint(worldPoint.x, -worldPoint.y);
-		}
-		
-		if(this.dead)
-			g.setColor(Color.red);
-		g.draw(polygonToDraw);
-		g.setColor(Color.white);
-		
-		
-		// draw sensors
-		for (MySensor mySensor : sensorList){
-			mySensor.draw(g, this.body);
-		}
-		
-	}
+	
 }
