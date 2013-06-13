@@ -354,6 +354,12 @@ public class Game extends BasicGame {
 					player.setLeft(false);					
 				}
 			}
+		} else {
+			if(player.getBody().getLinearVelocity().x < 0 && player.isOnGround()) {
+//				player.getBody().setLinearVelocity(new Vec2(0, player.getBody().getLinearVelocity().y ) );
+				/// XXX MAGIC NUMBERS
+				player.getBody().applyLinearImpulse(new Vec2(10,0), player.getBody().getPosition());
+			}
 		}
 
 		if (input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D)) {
@@ -373,11 +379,24 @@ public class Game extends BasicGame {
 					player.setLeft(true);					
 				}
 			}
+		}  else {
+			if(player.getBody().getLinearVelocity().x > 0 && player.isOnGround()) {
+//				player.getBody().setLinearVelocity(new Vec2(0, player.getBody().getLinearVelocity().y ) );
+				/// XXX MAGIC NUMBERS
+				player.getBody().applyLinearImpulse(new Vec2(-10,0), player.getBody().getPosition());
+			}
 		}
 
 		if (input.isKeyPressed(Input.KEY_DOWN) || input.isKeyPressed(Input.KEY_S)) {
 			 if( !player.isCharging() && !player.isOnWall() && !player.isOnGround()) {
 				player.groundPound();
+			} else if (player.isOnWall()){
+				if(player.leftWallColliding()){
+					// XXX magic numbers
+					player.getBody().setLinearVelocity(new Vec2(3,0));
+				} else if(player.rightWallColliding()){
+					player.getBody().setLinearVelocity(new Vec2(-3,0));
+				}
 			}
 		}
 		
