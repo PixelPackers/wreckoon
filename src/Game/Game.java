@@ -41,7 +41,7 @@ public class Game extends BasicGame {
 
 	private ArrayList<GameObject> 	staticObjects 	= new ArrayList<GameObject>();
 	private ArrayList<GameObject> 	balls 			= new ArrayList<GameObject>();
-	private ArrayList<Enemy> 	enemies			= new ArrayList<Enemy>();
+	private ArrayList<Enemy> 		enemies			= new ArrayList<Enemy>();
 //	private ArrayList<Body> 		jsonObjects 	= new ArrayList<Body>();
 	private ArrayList<Tile>			tiles			= new ArrayList<Tile>();
 	private Player player;
@@ -140,9 +140,10 @@ public class Game extends BasicGame {
 		player = new Player(world, 2f, 4f);
 		world.setContactListener(new MyContactListener(this));
 
-		enemies.add( new EnemyStupidFollower(this, 10f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
-		enemies.add( new EnemyStupidFollower(this, 15f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
+//		enemies.add( new EnemyStupidFollower(this, 10f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
+//		enemies.add( new EnemyStupidFollower(this, 15f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
 		enemies.add( new EnemyStupidFollower(this, 124f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
+		enemies.add( new EnemyPrimitive		(this, 14f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
 		
 		/*int[] tileTypes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 15, 16, 17, 18, 19, 20, 21, 22, 23, 28, 29, 30, 31, 34, 43};
 		
