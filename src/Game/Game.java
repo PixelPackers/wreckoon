@@ -337,7 +337,11 @@ public class Game extends BasicGame {
 			}
 			 
 		}
-		float minCounterSteerSpeed = 5;
+		
+		/// XXX MAGIC NUMBERS
+		/// max gegenlenken
+		float minCounterSteerSpeed = (!player.isJumpingFromWall() ) ? -5 : 5; 
+		
 		if (input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
 			if( player.isCharging() ){
 //				player.getShootingDirection().x -= 1;
@@ -355,6 +359,7 @@ public class Game extends BasicGame {
 				}
 			}
 		} else {
+			// control slippery
 			if(player.getBody().getLinearVelocity().x < 0 && player.isOnGround()) {
 //				player.getBody().setLinearVelocity(new Vec2(0, player.getBody().getLinearVelocity().y ) );
 				/// XXX MAGIC NUMBERS

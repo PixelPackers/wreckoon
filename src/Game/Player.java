@@ -39,9 +39,9 @@ public class Player {
 
 	private boolean left = false;
 	private boolean running = false;
-	private boolean bouncing = false;
 	private boolean doTailwhip = false;
 	private boolean groundPounding = false;
+	private boolean jumpingFromWall = false;
 	//XXX ??
 	private float	accelerationX = ACC_WALKING;
 	private float	maxVelocity = MAX_VELOCITY_WALKING;
@@ -329,12 +329,12 @@ public class Player {
 		
 //		if(getSensorGroundCollision().isColliding() && this.body.getLinearVelocity().y < 0f){
 		if(getSensorGroundCollision().isColliding()){
-			groundPounding = false;
-			bouncing = false;
+			this.groundPounding = false;
+			this.jumpingFromWall = false;
 		}
 		
 
-		this.adjustHitboxes();
+//		this.adjustHitboxes();
 		
 		increaseCounters();
 		
@@ -349,7 +349,7 @@ public class Player {
 	public void accelerate() {
 		if(this.isCharging())
 			return;
-		
+		//*
 		float velocityX 	= this.body.getLinearVelocity().x;
 		float velocityY 	= this.body.getLinearVelocity().y;
 		
@@ -369,20 +369,15 @@ public class Player {
 		if(Math.abs(velocityX + accelerationX) < Math.abs(maxVelocity)){
 			velocityX += accelerationX;
 		}
-		
+
 		this.body.setLinearVelocity(new Vec2(velocityX, velocityY));
 		
-//		if( this.isRunning()){
-//			if(!bouncing){
-////				if(!bouncing && this.isOnGround() && (this.sensorBottomLeft.isColliding() || this.sensorBottomRight.isColliding()) ){
-////					velocityY = 1f; // TODO mit += evtl iwie besser loesbar?
-//				bouncing = true;
-//			}
-//			if(this.isOnGround()){
-//				this.body.setLinearVelocity(new Vec2( this.body.getLinearVelocity().x, 1) );
-//				System.out.println(this.body.getLinearVelocity());
-//			}
-//		}	
+		/*/
+		/// XXX MAGIC NUMBERS
+		float speed = (left) ? -15 : 15;
+		this.body.applyLinearImpulse(new Vec2(speed, 0), this.body.getPosition());
+		//*/
+	
 	}
 	
 	public void adjustVelocity(){
@@ -398,7 +393,7 @@ public class Player {
 	}
 	
 	public void adjustHitboxes(){
-
+		
 		// TODO overhead evtl durch lastLeft != left loesbar?
 		this.body.destroyFixture(this.firstFixture);
 		this.body.destroyFixture(this.secondFixture);
@@ -421,25 +416,25 @@ public class Player {
 		
 		if( !groundPounding && (sensorGroundCollision.isColliding() || leftWallColliding() || rightWallColliding() ) ) {
 			
-			float jumpSpeedX = 0; 
+			// normal jump / on ground
+			float jumpSpeedX = this.body.getLinearVelocity().x;
+			float jumpSpeedY = this.jumpPower; 
 			
-			if( this.isOnGround()){
-				
-				jumpSpeedX = this.body.getLinearVelocity().x;
-				
-			} else if(leftWallColliding()){
+			if(leftWallColliding()){
 				
 				this.left = false;
-				jumpSpeedX = this.jumpPower * this.wallJumpPowerFactor;
+				jumpSpeedX = this.jumpPower;
+				this.jumpingFromWall = true;
 				
 			} else if(rightWallColliding()){
 				
 				this.left = true;
-				jumpSpeedX = -this.jumpPower * this.wallJumpPowerFactor;
-				
+				jumpSpeedX = -this.jumpPower;
+				this.jumpingFromWall = true;
+			
 			}
 			
-			this.body.setLinearVelocity(new Vec2(jumpSpeedX, this.jumpPower));
+			this.body.setLinearVelocity(new Vec2(jumpSpeedX, jumpSpeedY));
 		}
 		
 	}
@@ -701,6 +696,8 @@ public class Player {
 		// performance wenn man if weglaesst?
 		if(this.running != running){
 			this.running = running;
+
+			adjustHitboxes();
 		}
 	}
 	
@@ -820,5 +817,9 @@ public class Player {
 
 	public boolean isGroundPounding() {
 		return groundPounding;
+	}
+	
+	public boolean isJumpingFromWall(){
+		return this.jumpingFromWall;
 	}
 }
