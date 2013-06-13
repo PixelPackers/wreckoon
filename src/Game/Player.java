@@ -80,7 +80,6 @@ public class Player {
 	private MySensor	sensorGroundCollision;
 
 	private ArrayList<MySensor> sensorList			= new ArrayList<MySensor>();
-	
 	private Image 		img;
 	
 	public Player(World world, float posX, float posY) throws SlickException {
@@ -135,6 +134,7 @@ public class Player {
 			
 		
 		this.createSensors();
+		this.adjustHitboxes();
 		
 	}
 	
