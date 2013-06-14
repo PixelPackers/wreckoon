@@ -341,6 +341,7 @@ public class Game extends BasicGame {
 		/// XXX MAGIC NUMBERS
 		/// max gegenlenken
 		float minCounterSteerSpeed = (!player.isJumpingFromWall() ) ? -5 : 5; 
+		float slowDownForce = 20;
 		
 		if (input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
 			if( player.isCharging() ){
@@ -361,9 +362,7 @@ public class Game extends BasicGame {
 		} else {
 			// control slippery
 			if(player.getBody().getLinearVelocity().x < 0 && player.isOnGround()) {
-//				player.getBody().setLinearVelocity(new Vec2(0, player.getBody().getLinearVelocity().y ) );
-				/// XXX MAGIC NUMBERS
-				player.getBody().applyLinearImpulse(new Vec2(10,0), player.getBody().getPosition());
+				player.getBody().applyLinearImpulse(new Vec2(slowDownForce,0), player.getBody().getPosition());
 			}
 		}
 
@@ -386,9 +385,7 @@ public class Game extends BasicGame {
 			}
 		}  else {
 			if(player.getBody().getLinearVelocity().x > 0 && player.isOnGround()) {
-//				player.getBody().setLinearVelocity(new Vec2(0, player.getBody().getLinearVelocity().y ) );
-				/// XXX MAGIC NUMBERS
-				player.getBody().applyLinearImpulse(new Vec2(-10,0), player.getBody().getPosition());
+				player.getBody().applyLinearImpulse(new Vec2(-slowDownForce,0), player.getBody().getPosition());
 			}
 		}
 

@@ -10,9 +10,11 @@ import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
+import org.newdawn.slick.Animation;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Polygon;
 
 public class Player {
@@ -28,7 +30,7 @@ public class Player {
 	private final float MAX_VELOCITY_RUNNING = 20f;
 	private final float ACC_WALKING = 1.5f;
 	private final float ACC_RUNNING = 1.75f;
-	private final float playerFriction = 2.2f;
+	private final float playerFriction = 0.5f;
 	
 	private int groundPoundCounter = 0;
 	private int tailwhipCounter = 0;
@@ -81,6 +83,12 @@ public class Player {
 
 	private ArrayList<MySensor> sensorList			= new ArrayList<MySensor>();
 	private Image 		img;
+	
+	private SpriteSheet spriteSheet;
+	private Block[] 	tiles 			= new Block[5];
+	private Animation 	playerSprite;
+	private int 		tx				= 0;
+
 	
 	public Player(World world, float posX, float posY) throws SlickException {
 		
@@ -135,6 +143,24 @@ public class Player {
 		
 		this.createSensors();
 		this.adjustHitboxes();
+		
+		loadSpriteSheet();
+		
+	}
+	
+	// FIXME mo
+	private void loadSpriteSheet() throws SlickException{
+		
+		this.spriteSheet = new SpriteSheet("images/runcycle.png", 735, 385);
+		playerSprite = new Animation();
+		playerSprite.setAutoUpdate(true);
+		
+		for (int i=0; i<5; ++i) {
+			++this.tx;
+//			playerSprite.addFrame(spriteSheet.getSprite(tx,0), 32);
+		}
+		 
+		 
 		
 	}
 	
@@ -234,6 +260,8 @@ public class Player {
 		
 		img.setRotation(-(float) Math.toDegrees(angle));
 		img.draw(position.x - this.width / 2, -position.y - this.height / 2, this.width, this.height);
+		// FIXME mo
+//		playerSprite.draw();
 		
 	}
 	
@@ -420,7 +448,9 @@ public class Player {
 			float jumpSpeedX = this.body.getLinearVelocity().x;
 			float jumpSpeedY = this.jumpPower; 
 			
-			if(leftWallColliding()){
+			if (this.isOnGround()){
+				
+			} else if(leftWallColliding()){
 				
 				this.left = false;
 				jumpSpeedX = this.jumpPower;
@@ -574,7 +604,7 @@ public class Player {
 		float	lockObjX			= lockedObject.getBody().getPosition().x;
 		float	lockObjY			= lockedObject.getBody().getPosition().y;
 	
-		/* braucht ma alles nicht bzw nur für speed, der grad auskommentiert is
+		/* braucht ma alles nicht bzw nur fï¿½r speed, der grad auskommentiert is
 		float	distanceX	=	Math.abs( lockObjX ) - Math.abs( this.getBody().getPosition().x ) ;
 		float	distanceY	=	Math.abs( lockObjY ) - Math.abs( this.getBody().getPosition().y ) ;
 
