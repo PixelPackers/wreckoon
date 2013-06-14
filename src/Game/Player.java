@@ -30,7 +30,7 @@ public class Player {
 	private final float MAX_VELOCITY_RUNNING = 20f;
 	private final float ACC_WALKING = 1.5f;
 	private final float ACC_RUNNING = 1.75f;
-	private final float playerFriction = 0.5f;
+	private final float playerFriction = 2.2f;
 	
 	private int groundPoundCounter = 0;
 	private int tailwhipCounter = 0;
@@ -336,7 +336,7 @@ public class Player {
 		if( this.isOnWall() ){
 			if(this.body.getLinearVelocity().y < 0){
 //				if( (this.leftWallColliding() && this.body.getLinearVelocity().x < 0 ) || (this.rightWallColliding() && this.body.getLinearVelocity().x > 0 )){
-					this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, 1f));	
+//					this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, 1f));	
 //				}	else {
 //					this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, -2f));
 //				}

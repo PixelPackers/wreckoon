@@ -348,10 +348,10 @@ public class Game extends BasicGame {
 //				player.getShootingDirection().x -= 1;
 				player.increaseShootingDirection(-1, 0);
 			} else {
-				if( player.isOnGround() ) {
+				if (player.isOnGround()) {
 					player.setLeft(true);
 				} 
-				if(player.movesLeft() ) {
+				if (player.movesLeft()) {
 					player.accelerate();
 				} else if( player.getBody().getLinearVelocity().x > minCounterSteerSpeed) { 
 					player.setLeft(true);
@@ -368,16 +368,16 @@ public class Game extends BasicGame {
 
 		if (input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D)) {
 
-			if( player.isCharging() ){
+			if(player.isCharging()){
 //				player.getShootingDirection().x += 1;
 				player.increaseShootingDirection( 1, 0);
 			} else {
-				if( player.isOnGround() ) {
+				if (player.isOnGround()) {
 					player.setLeft(false);
-				} 
-				if ( !player.movesLeft() ) {
+				}
+				if (!player.movesLeft()) {
 					player.accelerate();
-				} else if( player.getBody().getLinearVelocity().x < -minCounterSteerSpeed) { 
+				} else if (player.getBody().getLinearVelocity().x < -minCounterSteerSpeed) { 
 					player.setLeft(false);
 					player.accelerate();
 					player.setLeft(true);					
