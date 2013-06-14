@@ -11,6 +11,9 @@ import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
+import org.newdawn.slick.SlickException;
+import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Polygon;
 
 public class Tile {
@@ -24,17 +27,19 @@ public class Tile {
 	private int 	angle;
 	private boolean flipped;
 	
+	private static SpriteSheet img;
 	
 	
-	
-	public Tile (World world, float x, float y, int type, int angle, boolean flipped) {
+	public Tile (World world, float x, float y, int type, int angle, boolean flipped) throws SlickException {
 	
 		this.world 		= world;
-		this.x		= x;
-		this.y		= y;
+		this.x			= x;
+		this.y			= y;
 		this.flipped	= flipped;
 		this.angle 		= angle;
 		this.type 		= type;
+		
+		Tile.img = new SpriteSheet("images/tiles.png", 256, 256);
 		
 		BodyDef bodyDef = new BodyDef(); 
 		bodyDef.type = BodyType.STATIC;
@@ -587,8 +592,24 @@ public class Tile {
 		
 		return newFixtures;
 	}
+	
+	public void draw(Graphics g, boolean debugView){
+		if (debugView || this.img == null) {
+			this.drawOutline(g);
+		} else { 
+			this.drawImage();
+		}
+	}
+	
+	public void drawImage() {
+		// FIXME magic numbers
+		//Image image = Tile.img.getSubImage(this.type % 12, this.type / 12).getFlippedCopy(flipped, false);
+		Image image = Tile.img.getSubImage((this.type % 12) * 512 + 2, (this.type / 12) * 512 + 2, 508, 508).getFlippedCopy(flipped, false);
+		image.setRotation(-angle);
+		image.draw(this.x - 2, -this.y - 2, 4, 4);
+	}
 
-	public void draw(Graphics g) {
+	public void drawOutline(Graphics g) {
 		Fixture fixtureList = this.body.getFixtureList();
 		// System.out.println(f.m_shape);
 		while (fixtureList != null) {

@@ -1,6 +1,7 @@
 package Game;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
@@ -84,11 +85,16 @@ public class Player {
 	private ArrayList<MySensor> sensorList			= new ArrayList<MySensor>();
 	private Image 		img;
 	
-	private SpriteSheet spriteSheet;
-	private Block[] 	tiles 			= new Block[5];
-	private Animation 	playerSprite;
-	private int 		tx				= 0;
+	private SpriteSheet sheetWalk;
+	private SpriteSheet sheetRun;
+	private HashMap<String, Animation> animations = new HashMap<String, Animation>();
 
+	private void initAnimations() throws SlickException {
+		sheetWalk = new SpriteSheet("images/walkcycle.png", 575, 550);
+		sheetRun = new SpriteSheet("images/runcycle.png", 735, 385);
+		animations.put("run", new Animation(sheetRun, 100));
+		animations.put("walk", new Animation(sheetWalk, 100));
+	}
 	
 	public Player(World world, float posX, float posY) throws SlickException {
 		
@@ -103,6 +109,8 @@ public class Player {
 			new Vec2( width * 0.5f,  height * 0.5f)
 		};
 		
+		initAnimations();
+		
 		this.firstPolygonShape.set(polygonShapeVerts, polygonShapeVerts.length);
 		
 		this.firstFixtureDef.density 	= 11f;
@@ -110,7 +118,6 @@ public class Player {
 		// XXX braucht ma das? evtl wegen vom reifen wegbouncen?
 		this.firstFixtureDef.restitution = 0f;
 		this.firstFixtureDef.shape = firstPolygonShape;
-		
 		
 		this.img = new Image("images/player.png");
 
@@ -139,29 +146,9 @@ public class Player {
 		this.secondPolygonShape = secondPolygonShape;
 
 		this.secondFixture = this.body.createFixture(secondFixtureDef);
-			
 		
 		this.createSensors();
-		this.adjustHitboxes();
-		
-		loadSpriteSheet();
-		
-	}
-	
-	// FIXME mo
-	private void loadSpriteSheet() throws SlickException{
-		
-		this.spriteSheet = new SpriteSheet("images/runcycle.png", 735, 385);
-		playerSprite = new Animation();
-		playerSprite.setAutoUpdate(true);
-		
-		for (int i=0; i<5; ++i) {
-			++this.tx;
-//			playerSprite.addFrame(spriteSheet.getSprite(tx,0), 32);
-		}
-		 
-		 
-		
+		this.adjustHitboxes();		
 	}
 	
 	private void createSensors() {
@@ -206,7 +193,6 @@ public class Player {
 				fixtureDefSensor.isSensor=true;
 		
 				sensorList.add(new MySensor(this.body.createFixture(fixtureDefSensor), sensorPolygonShape ) );
-				
 			}
 		}
 		
@@ -238,36 +224,30 @@ public class Player {
 	}
 
 	public void draw(Graphics g, boolean debugView){
-		
-		if(debugView || this.img == null)
+		if (debugView || this.img == null) {
 			this.drawOutline(g);
-		else 
+		} else { 
 			this.drawImage();
-		
+		}
 	}
 	
-	public void die(){
-		
+	public void die() {
 		System.out.println("You just did dies!");
 		this.world.setGravity( new Vec2(0,0) );
-		
 	}
 	
 	public void drawImage(){
-		
 		Vec2 position	= this.body.getPosition();
-		float angle		= this.body.getAngle();
+		animations.get("run").draw(position.x, -position.y, 2, 1);
 		
-		img.setRotation(-(float) Math.toDegrees(angle));
-		img.draw(position.x - this.width / 2, -position.y - this.height / 2, this.width, this.height);
-		// FIXME mo
-//		playerSprite.draw();
-		
+//		Vec2 position	= this.body.getPosition();
+//		float angle		= this.body.getAngle();
+//		
+//		img.setRotation(-(float) Math.toDegrees(angle));
+//		img.draw(position.x - this.width / 2, -position.y - this.height / 2, this.width, this.height);		
 	}
 	
 	public void drawOutline(Graphics g) {
-
-		
 		if( !isRunning() ){
 			Polygon polygonToDraw = new Polygon();
 			Vec2[] verts = this.firstPolygonShape.getVertices();
@@ -292,7 +272,6 @@ public class Player {
 			
 			g.draw(polygonToDraw);
 		}
-	
 		
 		// draw sensors
 		for (MySensor mySensor : sensorList){

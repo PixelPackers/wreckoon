@@ -18,6 +18,7 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.SpriteSheet;
 
 import com.google.gson.Gson;
 
@@ -33,25 +34,23 @@ public class Game extends BasicGame {
 	 private static int screenHeight = 1080;
 	 private static boolean fullScreen = true;
 	 //*/
+	
 	private boolean debugView = true;
 	
-	Tile newTile;
+	private float zoom = 30f;
+	private final float ZOOM_STEP = 1f;
 	
 	private World world;
 
 	private ArrayList<GameObject> 	staticObjects 	= new ArrayList<GameObject>();
 	private ArrayList<GameObject> 	balls 			= new ArrayList<GameObject>();
 	private ArrayList<Enemy> 		enemies			= new ArrayList<Enemy>();
-//	private ArrayList<Body> 		jsonObjects 	= new ArrayList<Body>();
 	private ArrayList<Tile>			tiles			= new ArrayList<Tile>();
 	private Player player;
-	private GameObjectPolygon polygon;
 
-	// private Image[][] worldImages = new Image[8][8];
 	private Image[] trashpile = new Image[5];
-
-	private float zoom = 30f;
-	private final float ZOOM_STEP = 1f;
+	
+	private SpriteSheet tileImages;
 
 	private Camera cam = new Camera(0, screenHeight);
 	private Level level;
@@ -63,50 +62,11 @@ public class Game extends BasicGame {
 	@Override
 	public void init(GameContainer gc) throws SlickException {
 		
-//		for (int y = 0; y < worldImages.length; ++y) { 
-//			for (int x = 0; x < worldImages[0].length; ++x) {
-//				worldImages[y][x] = new	Image("images/world_x" + x % 2 + "_y" + y % 2 + ".png");
-//				worldImages[y][x] = new Image("images/test" + (x + 1) + " (" + (y +	1) + ").png"); } 
-//		}
-		
 		for (int i = 0; i <= 4; ++i) {
 			trashpile[i] = new Image("images/background" + (i + 1) + ".png");
 		}
-
-		// world = new World(gravity, doSleep);
+		
 		world = new World(new Vec2(0f, -30f), false);
-
-		
-
-//		float testWidth = 3f; 
-//		float testHeight = 3f;
-//		float space = 20f;
-//		int max = 5;
-//		for(int i=0; i<max; ++i){
-//			for(int j=0; j<max; ++j){
-//				if(j==i)
-//				staticObjects.add(new GameObjectBox(world,  space + i*testWidth,  j*testHeight, testWidth, testHeight, 0.5f,0.5f, 0f, "images/crate.png", BodyType.STATIC));
-//			}
-//		}
-		
-		
-//		// ground
-//		staticObjects.add(new GameObjectBox(world, 0f, -9f, 50f, 10f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC));
-//
-//		// walls
-//		staticObjects.add(new GameObjectBox(world,  22f,  0f, 1f, 10f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC));
-//		staticObjects.add(new GameObjectBox(world, -25f, 0f, 1f, 120f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC));
-//		staticObjects.add(new GameObjectBox(world,  25f, 0f, 1f, 20f, 0.5f, 0.5f, 0f, "images/crate.png", BodyType.STATIC));
-
-		// P O L Y G O N
-//		Vec2[] points = new Vec2[3];
-//		points[0] = new Vec2(0f, 0f);
-//		points[2] = new Vec2(-15f, 0f);
-//		points[1] = new Vec2(-15f, 7.5f);
-//		polygon = new GameObjectPolygon(world, -5f, 0f, points, 0.9f, 0.5f, 0.3f, "images/player.png", BodyType.DYNAMIC);
-//
-		//staticObjects.add( new GameObjectCircle(world, 2f, -4f, 1.5f, 0.9f, 0.5f, 0.7f, "images/player.png", BodyType.STATIC) );
-		
 		
 		// load the level
 		try {
@@ -119,24 +79,13 @@ public class Game extends BasicGame {
 		for (int x = 0; x < level.getWidth(); ++x) {
 			for (int y = 0; y < level.getHeight(); ++y) {
 				Block b = level.getBlock(x, y);
-				if (b.getType() > 1) {
-					newTile = new Tile(world, x * 4, -y * 4, b.getType(), -b.getAngle(), b.isFlipped());
+				if (b.getType() > 0) {
+					Tile newTile = new Tile(world, x * 4, -y * 4, b.getType(), -b.getAngle(), b.isFlipped());
 					tiles.add(newTile);
 				}
 			}
 		}
 		
-//		// JSON Loader
-//		String jsonFileAsString = "";
-//		try {
-//			jsonFileAsString = readFile("etc/world");
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//
-//		JSONObject jsonObject = new Gson().fromJson(jsonFileAsString, JSONObject.class);
-//		jsonObject.createShapes(world, jsonObjects);
-//		
 		player = new Player(world, 2f, 4f);
 		world.setContactListener(new MyContactListener(this));
 
@@ -145,30 +94,7 @@ public class Game extends BasicGame {
 		enemies.add( new EnemyStupidFollower(this, 124f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
 		enemies.add( new EnemyPrimitive		(this, 14f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
 		
-		/*int[] tileTypes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 15, 16, 17, 18, 19, 20, 21, 22, 23, 28, 29, 30, 31, 34, 43};
-		
-		for (int i = 0; i < tileTypes.length; ++i) {
-			deleteMeTest = new Tile(world, i * 4, 0, tileTypes[i], 0, false);
-			tiles.add(deleteMeTest);
-			deleteMeTest = new Tile(world, i * 4, 16, tileTypes[i], 0, true);
-			tiles.add(deleteMeTest);
-		}*/
 	}
-
-//	private String readFile(String file) throws IOException {
-//		BufferedReader reader = new BufferedReader(new FileReader(file));
-//		String line = null;
-//		StringBuilder stringBuilder = new StringBuilder();
-//		String ls = System.getProperty("line.separator");
-//
-//		while ((line = reader.readLine()) != null) {
-//			stringBuilder.append(line);
-//			stringBuilder.append(ls);
-//		}
-//
-//		reader.close();
-//		return stringBuilder.toString();
-//	}
 
 	private String readFile( String file ) throws IOException {
 	    BufferedReader reader = new BufferedReader( new FileReader (file));
@@ -184,8 +110,6 @@ public class Game extends BasicGame {
 
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
-		
-//		System.out.println( " + + + N E W   F R A M E + + + " );
 		processInput(gc);
 		
 		player.update();
@@ -196,10 +120,7 @@ public class Game extends BasicGame {
 		
 		cam.follow(player.getBody().getPosition().x, player.getBody().getPosition().y, 10);
 
-		// world.step(timeStep, velocityIterations, positionIterations);
 		world.step(delta / 1000f, 18, 6);
-		
-
 	}
 
 	@Override
@@ -215,27 +136,6 @@ public class Game extends BasicGame {
 			staticObj.draw(g, debugView);
 		}
 
-//		for (Body body : jsonObjects) {
-//			Fixture fixture = body.getFixtureList();
-//			// System.out.println(f.m_shape);
-//			while (fixture != null) {
-//				Polygon polygon = new Polygon();
-//				PolygonShape polygonShape = (PolygonShape) fixture.getShape();
-//
-//				Vec2[] verts = polygonShape.getVertices();
-//				for (int i = 0; i < polygonShape.getVertexCount(); ++i) {
-//					Vec2 worldPoint = body.getWorldPoint(verts[i]);
-//					polygon.addPoint(worldPoint.x, -worldPoint.y);
-//					// p.addPoint(b.getPosition().x+ verts[i].x,
-//					// -(b.getPosition().y +verts[i].y));
-//				}
-//				g.pushTransform();
-//				g.draw(polygon);
-//
-//				g.popTransform();
-//				fixture = fixture.getNext();
-//			}
-//		}
 		GameObject glowingObj = chooseTelekinesisTarget();
 		for (GameObject ball : balls) {
 			
@@ -254,9 +154,9 @@ public class Game extends BasicGame {
 		for(Enemy enemy : enemies){
 			enemy.draw(g, debugView);	
 		}
-//		polygon.draw(g, debugView);
+		
 		for (Tile tile : tiles) {
-			tile.draw(g);
+			tile.draw(g, debugView);
 		}
 
 		// GUI
