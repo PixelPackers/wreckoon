@@ -88,12 +88,14 @@ public class Player {
 	private SpriteSheet sheetWalk;
 	private SpriteSheet sheetRun;
 	private HashMap<String, Animation> animations = new HashMap<String, Animation>();
+	private Animation currentAnimation;
 
 	private void initAnimations() throws SlickException {
 		sheetWalk = new SpriteSheet("images/walkcycle.png", 575, 550);
 		sheetRun = new SpriteSheet("images/runcycle.png", 735, 385);
 		animations.put("run", new Animation(sheetRun, 100));
 		animations.put("walk", new Animation(sheetWalk, 100));
+		currentAnimation = animations.get("walk");
 	}
 	
 	public Player(World world, float posX, float posY) throws SlickException {
@@ -222,29 +224,39 @@ public class Player {
 		sensorBottomRight 	= sensorList.get(2);
 		sensorTopRight 		= sensorList.get(3);
 	}
-
-	public void draw(Graphics g, boolean debugView){
-		if (debugView || this.img == null) {
-			this.drawOutline(g);
-		} else { 
-			this.drawImage();
-		}
-	}
 	
 	public void die() {
 		System.out.println("You just did dies!");
 		this.world.setGravity( new Vec2(0,0) );
 	}
 	
+	public void draw(Graphics g, boolean debugView){
+//		if (debugView || this.img == null) {
+			this.drawOutline(g);
+//		} else { 
+			this.drawImage();
+//		}
+	}
+	
 	public void drawImage(){
 		Vec2 position	= this.body.getPosition();
-		animations.get("run").draw(position.x, -position.y, 2, 1);
 		
-//		Vec2 position	= this.body.getPosition();
-//		float angle		= this.body.getAngle();
-//		
-//		img.setRotation(-(float) Math.toDegrees(angle));
-//		img.draw(position.x - this.width / 2, -position.y - this.height / 2, this.width, this.height);		
+		// XXX MAGIC NUMBERS
+		float drawWidth =  currentAnimation.getWidth() / 200; 
+		float drawHeight = currentAnimation.getHeight() / 200;
+		
+		if(left){
+			currentAnimation.draw( position.x + drawWidth*0.5f,
+					-position.y-drawHeight*0.5f -0.5f, // -0.5f --> sonst wuerde sprite in den boden hinein stehen 
+					-drawWidth, 
+					drawHeight );	
+		} else {
+			currentAnimation.draw( position.x - drawWidth*0.5f,
+					-position.y-drawHeight*0.5f -0.5f, // -0.5f --> sonst wuerde sprite in den boden hinein stehen 
+					drawWidth, 
+					drawHeight );
+		}
+		
 	}
 	
 	public void drawOutline(Graphics g) {
@@ -295,23 +307,9 @@ public class Player {
 	
 	public void update() {
 		// XXX evtl da checken, welche hitbox ausrichtung angebracht is
+				
 		
-//		 F I X M E radian / degree problem 
-//		if ( Math.abs( Math.toDegrees( this.body.getAngle() ) ) > this.maxPlayerRotation){
-//			this.body.setTransform(this.body.getPosition(), -10);
-//			this.body.m_angularVelocity = -(this.body.m_angularVelocity * 0.75f);
-//		}
-		
-		// if player wouldnt use fixedRotation, this would only allow an specific angle
-//		float currentRotation = (float) (Math.toDegrees( this.body.getAngle()) );
-//		if( currentRotation < -this.maxPlayerRotation){
-//			this.body.setTransform(this.body.getPosition(), (float)Math.toRadians(-this.maxPlayerRotation));
-//		}
-//		if( currentRotation > this.maxPlayerRotation){
-//			this.body.setTransform(this.body.getPosition(), (float)Math.toRadians(this.maxPlayerRotation));
-//		}
-		
-		
+		// abwaerts bewegung an wand
 		if( this.isOnWall() ){
 			if(this.body.getLinearVelocity().y < 0){
 //				if( (this.leftWallColliding() && this.body.getLinearVelocity().x < 0 ) || (this.rightWallColliding() && this.body.getLinearVelocity().x > 0 )){
@@ -356,13 +354,12 @@ public class Player {
 	public void accelerate() {
 		if(this.isCharging())
 			return;
-		//*
 		float velocityX 	= this.body.getLinearVelocity().x;
 		float velocityY 	= this.body.getLinearVelocity().y;
-		
 		if( this.isOnGround() || this.isOnWall() ){
 			adjustVelocity();
 		}
+//		/*
 		
 		if (left){
 			// TODO Math.abs, verbraucht das mehr rechenleistung? als ob man die checkt obs pos sind?
@@ -380,9 +377,12 @@ public class Player {
 		this.body.setLinearVelocity(new Vec2(velocityX, velocityY));
 		
 		/*/
+		// another movement approach by using linearImpulse
 		/// XXX MAGIC NUMBERS
 		float speed = (left) ? -15 : 15;
-		this.body.applyLinearImpulse(new Vec2(speed, 0), this.body.getPosition());
+		if ( Math.abs(velocityX + accelerationX) < Math.abs(maxVelocity)*2.5f  ) {
+			this.body.applyLinearImpulse(new Vec2(speed, 0), this.body.getPosition());
+		}
 		//*/
 	
 	}
@@ -408,9 +408,11 @@ public class Player {
 		if( isRunning() ){ 
 			this.secondFixture = this.body.createFixture(this.secondFixtureDef);
 			createSensors();
+			this.currentAnimation = animations.get("run");
 		} else {
 			this.firstFixture = this.body.createFixture(this.firstFixtureDef);
 			createSensors();
+			this.currentAnimation = animations.get("walk");
 
 		}
 		
