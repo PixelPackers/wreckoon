@@ -85,16 +85,20 @@ public class Player {
 	private ArrayList<MySensor> sensorList			= new ArrayList<MySensor>();
 	private Image 		img;
 	
-	private SpriteSheet sheetWalk;
-	private SpriteSheet sheetRun;
 	private HashMap<String, Animation> animations = new HashMap<String, Animation>();
 	private Animation currentAnimation;
 
 	private void initAnimations() throws SlickException {
-		sheetWalk = new SpriteSheet("images/walkcycle.png", 575, 550);
-		sheetRun = new SpriteSheet("images/runcycle.png", 735, 385);
-		animations.put("run", new Animation(sheetRun, 100));
-		animations.put("walk", new Animation(sheetWalk, 100));
+		
+		// XXX evtl auch da eine hashmap verwenden?
+		SpriteSheet sheetWalk = 	new SpriteSheet("images/walkcycle.png", 575, 550);
+		SpriteSheet sheetRun = 		new SpriteSheet("images/runcycle.png", 735, 385);
+		SpriteSheet sheetWallJump = new SpriteSheet("images/walljump.png", 620, 685);
+		
+		animations.put("run", 		new Animation(sheetRun,			100));
+		animations.put("walk", 		new Animation(sheetWalk,		100));
+		animations.put("wallJump", 	new Animation(sheetWallJump, 	100));
+		
 		currentAnimation = animations.get("walk");
 	}
 	
@@ -242,8 +246,8 @@ public class Player {
 		Vec2 position	= this.body.getPosition();
 		
 		// XXX MAGIC NUMBERS
-		float drawWidth =  currentAnimation.getWidth() / 200; 
-		float drawHeight = currentAnimation.getHeight() / 200;
+		float drawWidth =  currentAnimation.getWidth() / 150; 
+		float drawHeight = currentAnimation.getHeight() / 150;
 		
 		if(left){
 			currentAnimation.draw( position.x + drawWidth*0.5f,
@@ -431,18 +435,25 @@ public class Player {
 			
 			if (this.isOnGround()){
 				
-			} else if(leftWallColliding()){
+//				this.currentAnimation = animations.get("jump");
 				
-				this.left = false;
-				jumpSpeedX = this.jumpPower;
-				this.jumpingFromWall = true;
+			} else {
+
+				this.currentAnimation = animations.get("wallJump");
 				
-			} else if(rightWallColliding()){
+				if(leftWallColliding()){
+					
+					this.left = false;
+					jumpSpeedX = this.jumpPower;
+					this.jumpingFromWall = true;
+					
+				} else if(rightWallColliding()){
+					
+					this.left = true;
+					jumpSpeedX = -this.jumpPower;
+					this.jumpingFromWall = true;
 				
-				this.left = true;
-				jumpSpeedX = -this.jumpPower;
-				this.jumpingFromWall = true;
-			
+				}
 			}
 			
 			this.body.setLinearVelocity(new Vec2(jumpSpeedX, jumpSpeedY));

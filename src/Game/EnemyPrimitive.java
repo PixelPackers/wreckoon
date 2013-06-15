@@ -11,7 +11,7 @@ public class EnemyPrimitive extends Enemy{
 	private final static int IDLE_WAITING_TIME 			= 100;
 	
 	private float	speed			= -5;
-	private int		updateCoutner	= 0;
+	private int		updateCounter	= 0;
 	private boolean	idle			= false;
 	
 	public EnemyPrimitive(Game game, float posX, float posY, float width, float height, float density, float friction, float restitution, String imgPath,
@@ -31,19 +31,20 @@ public class EnemyPrimitive extends Enemy{
 			}
 			
 			
-			if(this.isOnWall()  && updateCoutner > DIRECTION_SWITCH_MIN_TIME){
-				speed = -speed;
+			if(this.isOnWall()  && updateCounter > DIRECTION_SWITCH_MIN_TIME && !idle){
 				idle = true;
-				updateCoutner=0;
+				updateCounter=0;
 			}
 			
-			if ( idle && updateCoutner > IDLE_WAITING_TIME){
+			if ( idle && updateCounter > IDLE_WAITING_TIME){
+
+				speed = -speed;
 				this.idle = false;
-				updateCoutner=0;
+				updateCounter=0;
 			}
 		}
 		
-		++updateCoutner;
+		++updateCounter;
 	}
 
 }

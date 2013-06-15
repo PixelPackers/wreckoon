@@ -17,6 +17,7 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
+import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 
@@ -94,8 +95,10 @@ public class Game extends BasicGame {
 		enemies.add( new EnemyStupidFollower(this, 124f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
 		enemies.add( new EnemyPrimitive		(this, 14f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
 		
+//		music();
+		
 	}
-
+	
 	private String readFile( String file ) throws IOException {
 	    BufferedReader reader = new BufferedReader( new FileReader (file));
 	    String line = null;
@@ -480,4 +483,12 @@ public class Game extends BasicGame {
 	public ArrayList<GameObject> getBalls() {
 		return balls;
 	}
+	
+	private void music() throws SlickException {
+		Music music = new Music("audio/Part 1_ Loop _Lang.wav");
+		music.play();
+		music.loop();
+	}
+
+	
 }
