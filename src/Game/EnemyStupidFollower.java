@@ -19,7 +19,7 @@ public class EnemyStupidFollower extends Enemy {
 	
 	public void update(){
 		
-		if(!dead){ 
+		if (!isDead() ){ 
 			Player player = this.game.getPlayer();
 			float speed = 5;
 			float x = speed;

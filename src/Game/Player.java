@@ -95,9 +95,12 @@ public class Player {
 		SpriteSheet sheetRun = 		new SpriteSheet("images/runcycle.png", 735, 385);
 		SpriteSheet sheetWallJump = new SpriteSheet("images/walljump.png", 620, 685);
 		
+		Animation ani = new Animation(sheetWallJump, 	100);
+		ani.setLooping(false);
+		
 		animations.put("run", 		new Animation(sheetRun,			100));
 		animations.put("walk", 		new Animation(sheetWalk,		100));
-		animations.put("wallJump", 	new Animation(sheetWallJump, 	100));
+		animations.put("wallJump", 	ani);
 		
 		currentAnimation = animations.get("walk");
 	}
@@ -230,16 +233,20 @@ public class Player {
 	}
 	
 	public void die() {
-		System.out.println("You just did dies!");
-		this.world.setGravity( new Vec2(0,0) );
+		System.out.println("You just died, loser!");
 	}
 	
 	public void draw(Graphics g, boolean debugView){
 //		if (debugView || this.img == null) {
-			this.drawOutline(g);
+//			this.drawOutline(g);
 //		} else { 
-			this.drawImage();
+//			this.drawImage();
 //		}
+
+		// sprite testing
+		this.drawImage();
+		this.drawOutline(g);
+		
 	}
 	
 	public void drawImage(){
@@ -440,6 +447,7 @@ public class Player {
 			} else {
 
 				this.currentAnimation = animations.get("wallJump");
+				this.currentAnimation.restart();
 				
 				if(leftWallColliding()){
 					
@@ -843,5 +851,15 @@ public class Player {
 	
 	public boolean isJumpingFromWall(){
 		return this.jumpingFromWall;
+	}
+	
+	public Fixture getFixture(){
+		
+		if(running){
+			return secondFixture;
+		} else {
+			return firstFixture;
+		}
+		
 	}
 }

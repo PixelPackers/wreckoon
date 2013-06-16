@@ -8,12 +8,15 @@ import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.contacts.Contact;
 
 public class MyContactListener implements ContactListener{
 
 	private Game game;
+
+	float minKillingSpeed = 30;
 	
 	public MyContactListener(Game game) {
 		this.game = game;
@@ -25,7 +28,7 @@ public class MyContactListener implements ContactListener{
 		// player sensors
 		for( MySensor sensor : game.getPlayer().getSensorList() ){
 			
-			if (contact.getFixtureA() == sensor.getFixture()||
+			if (contact.getFixtureA() == sensor.getFixture() ||
 				contact.getFixtureB() == sensor.getFixture()
 			){
 				sensor.increaseCollidingCounter();
@@ -36,7 +39,7 @@ public class MyContactListener implements ContactListener{
 		if (	contact.getFixtureA() == game.getPlayer().getTailFixture()
 			|| 	contact.getFixtureB() == game.getPlayer().getTailFixture() ) {
 			
-			for (GameObject gameObject : game.getBalls()){
+			for (GameObject gameObject : game.getDynamicObjects()){
 				if (	gameObject.getBody().getFixtureList() == contact.getFixtureB() 
 					||	gameObject.getBody().getFixtureList() == contact.getFixtureA()){
 					
@@ -55,7 +58,6 @@ public class MyContactListener implements ContactListener{
 		} 
 		
 		// groundpounding
-
 		if(game.getPlayer().isGroundPounding() ){
 
 			if (	contact.getFixtureA() == game.getPlayer().getSensorGroundCollision().getFixture()
@@ -79,6 +81,33 @@ public class MyContactListener implements ContactListener{
 					contact.getFixtureB() == sensor.getFixture()
 				){
 					sensor.increaseCollidingCounter();
+				}
+			}
+		}
+		
+		// player + enemy contact --> die()
+		if( game.getPlayer().getFixture() == contact.getFixtureA() || game.getPlayer().getFixture() == contact.getFixtureB() ){
+		
+			for( Enemy enemy : game.getEnemies()){
+				if ( !enemy.isDead() ){
+					if (enemy.getFixture() == contact.getFixtureA() || enemy.getFixture() == contact.getFixtureB() ){
+						game.getPlayer().die();
+					}
+				}
+			}
+		}
+		
+		for( Enemy enemy : game.getEnemies()){
+			if ( !enemy.isDead() ){
+				for(GameObject dynamicObject : game.getDynamicObjects() ){
+					if (enemy.getFixture() == contact.getFixtureA() || enemy.getFixture() == contact.getFixtureB() ){
+						if (dynamicObject.getFixture() == contact.getFixtureA() || dynamicObject.getFixture() == contact.getFixtureB() ){
+							if (dynamicObject.getBody().getLinearVelocity().x > minKillingSpeed || dynamicObject.getBody().getLinearVelocity().y > minKillingSpeed ){
+								enemy.die();
+							}
+							
+						}
+					}
 				}
 			}
 		}

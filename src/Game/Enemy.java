@@ -18,7 +18,7 @@ public abstract class Enemy extends GameObjectBox {
 	protected float width;
 	protected float height;
 	
-	boolean dead = false;
+	private boolean dead = false;
 	
 	protected ArrayList<MySensor> sensorList = new ArrayList<MySensor>();
 	protected MySensor 	sensorLeft;
@@ -172,6 +172,10 @@ public abstract class Enemy extends GameObjectBox {
 		float x = (game.getPlayer().movesLeft()) ? -force : force;
 		this.body.applyLinearImpulse(new Vec2 ( x, force), this.body.getWorldCenter());
 		this.dead=true;
+	}
+	
+	public boolean isDead() {
+		return dead;
 	}
 	
 	public abstract void update();

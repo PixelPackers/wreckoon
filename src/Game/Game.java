@@ -44,14 +44,12 @@ public class Game extends BasicGame {
 	private World world;
 
 	private ArrayList<GameObject> 	staticObjects 	= new ArrayList<GameObject>();
-	private ArrayList<GameObject> 	balls 			= new ArrayList<GameObject>();
+	private ArrayList<GameObject> 	dynamicObjects 	= new ArrayList<GameObject>();
 	private ArrayList<Enemy> 		enemies			= new ArrayList<Enemy>();
 	private ArrayList<Tile>			tiles			= new ArrayList<Tile>();
 	private Player player;
 
 	private Image[] trashpile = new Image[5];
-	
-	private SpriteSheet tileImages;
 
 	private Camera cam = new Camera(0, screenHeight);
 	private Level level;
@@ -141,7 +139,7 @@ public class Game extends BasicGame {
 		}
 
 		GameObject glowingObj = chooseTelekinesisTarget();
-		for (GameObject ball : balls) {
+		for (GameObject ball : dynamicObjects) {
 			
 			Color tmpColor;
 			tmpColor = g.getColor();
@@ -335,13 +333,13 @@ public class Game extends BasicGame {
 		}
 
 		if (input.isKeyPressed(Input.KEY_X)) {
-			if (!balls.isEmpty()) {
+			if (!dynamicObjects.isEmpty()) {
 				// GameObject o = crates.get(0);
 				// o.getBody().setLinearVelocity( new Vec2(0, 14 ) );
 				// world.destroyBody( o.getBody() );
 				// crates.remove(o);
 			}
-			for (GameObject o : balls) {
+			for (GameObject o : dynamicObjects) {
 
 				float oX = o.getBody().getPosition().x;
 				float pX = player.getBody().getPosition().x;
@@ -356,10 +354,10 @@ public class Game extends BasicGame {
 		}
 		if (input.isKeyDown(Input.KEY_Y)) {
 			for(int i=0; i < 10; ++i){
-				if (!balls.isEmpty()) {
-					GameObject o = balls.get(0);
+				if (!dynamicObjects.isEmpty()) {
+					GameObject o = dynamicObjects.get(0);
 					world.destroyBody(o.getBody());
-					balls.remove(o);
+					dynamicObjects.remove(o);
 				} else {
 					break;
 				}
@@ -382,13 +380,13 @@ public class Game extends BasicGame {
 			for (int i = 0; i < 4; ++i) {
 				GameObjectCircle ball = new GameObjectCircle(world, player.getBody().getPosition().x, player.getBody().getPosition().y - size
 						* 2, size, 1f, 0.5f, 0f, "images/player.png", BodyType.DYNAMIC);
-				balls.add(ball);
+				dynamicObjects.add(ball);
 			}
 		}
 
 		if (input.isKeyDown(Input.KEY_V)) {
-			if (!balls.isEmpty()) {
-				GameObject o = balls.get(10);
+			if (!dynamicObjects.isEmpty()) {
+				GameObject o = dynamicObjects.get(10);
 				o.getBody().setTransform(new Vec2(player.getBody().getPosition().x + 2, player.getBody().getPosition().y + 1) // vec2
 																																// end
 						, 0); // transform end
@@ -457,7 +455,7 @@ public class Game extends BasicGame {
 		}		
 	}
 	public GameObject chooseTelekinesisTarget(){
-		for (GameObject object : balls) {
+		for (GameObject object : dynamicObjects) {
 			
 			float objectX = object.getBody().getPosition().x;
 			float playerX = player.getBody().getPosition().x;
@@ -480,8 +478,8 @@ public class Game extends BasicGame {
 	public ArrayList<Enemy> getEnemies() {
 		return enemies;
 	}
-	public ArrayList<GameObject> getBalls() {
-		return balls;
+	public ArrayList<GameObject> getDynamicObjects() {
+		return dynamicObjects;
 	}
 	
 	private void music() throws SlickException {

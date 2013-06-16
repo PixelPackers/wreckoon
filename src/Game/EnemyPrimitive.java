@@ -23,7 +23,7 @@ public class EnemyPrimitive extends Enemy{
 
 	@Override
 	public void update() {
-		if(!dead){ 
+		if ( !isDead() ){ 
 		
 			if(this.isOnGround() && !idle){
 				this.body.setLinearVelocity(new Vec2(speed, this.body.getLinearVelocity().y) );
