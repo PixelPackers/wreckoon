@@ -51,7 +51,7 @@ public class Player {
 	private float	maxVelocity = MAX_VELOCITY_WALKING;
 	
 
-	private GameObject lockedObject = null;
+	private GameObject 	lockedObject = null;
 	private boolean		charging = false;
 	private float		shootingPower = 0f;
 	private float 		maxShootingPower = 50f;
@@ -92,20 +92,22 @@ public class Player {
 	private void initAnimations() throws SlickException {
 		
 		// XXX evtl auch da eine hashmap verwenden?
-		SpriteSheet sheetWalk = 	new SpriteSheet("images/walkcycle.png", 575, 550);
-		SpriteSheet sheetRun = 		new SpriteSheet("images/runcycle.png", 735, 385);
-		SpriteSheet sheetWallJump = new SpriteSheet("images/walljump.png", 620, 685);
-		SpriteSheet sheetTailwhip = new SpriteSheet("images/tailwhip.png", 770, 360);
+		SpriteSheet sheetWalk 		= new SpriteSheet("images/walkcycle.png", 575, 550);
+		SpriteSheet sheetRun 		= new SpriteSheet("images/runcycle.png", 735, 385);
+		SpriteSheet sheetWallJump	= new SpriteSheet("images/walljump.png", 620, 685);
+		SpriteSheet sheetTailwhip	= new SpriteSheet("images/tailwhip.png", 770, 360);
+		SpriteSheet sheetIdle		= new SpriteSheet("images/rayingame.png", 454, 575);
 
 		Animation animationWallJump = new Animation(sheetWallJump, 	100);
 		animationWallJump.setLooping(false);
 		Animation animationTailwhip = new Animation(sheetTailwhip, 	TAILWHIP_TIME);
 		animationTailwhip.setLooping(false);
 		
-		animations.put("run", 		new Animation(sheetRun,			100));
-		animations.put("walk", 		new Animation(sheetWalk,		100));
+		animations.put("run", 		new Animation(sheetRun,		100));
+		animations.put("walk", 		new Animation(sheetWalk,	100));
 		animations.put("wallJump", 	animationWallJump);
 		animations.put("tailwhip", 	animationTailwhip);
+		animations.put("idle", 		new Animation(sheetIdle,	100) );
 		
 		currentAnimation = animations.get("walk");
 	}
@@ -365,6 +367,12 @@ public class Player {
 
 		this.floatLockedObject();
 		
+		if( !isRunning() && this.isOnGround() && !this.doTailwhip &&
+				(Math.abs(this.getBody().getLinearVelocity().x) < 1)  
+				){
+			this.currentAnimation = animations.get("idle");
+		}
+		
 	}
 
 	public void accelerate() {
@@ -490,7 +498,7 @@ public class Player {
 	
 	public void tailwhipInit(){
  
-		if( !this.doTailwhip ){
+		if( !this.doTailwhip && !this.groundPounding ){
 			
 			
 			this.doTailwhip = true;
