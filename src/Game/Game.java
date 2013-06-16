@@ -250,19 +250,21 @@ public class Game extends BasicGame {
 //				player.getShootingDirection().x -= 1;
 				player.increaseShootingDirection(-1, 0);
 			} else {
-				if (player.isOnGround()) {
+//				if (player.isOnGround()) {
 					player.setLeft(true);
-				} 
+//				} 
 				if (player.movesLeft()) {
 					player.accelerate();
-				} else if( player.getBody().getLinearVelocity().x > minCounterSteerSpeed) { 
-					player.setLeft(true);
-					player.accelerate();
-					player.setLeft(false);					
-				}
+				} 
+//				else if( player.getBody().getLinearVelocity().x > minCounterSteerSpeed) { 
+//					player.setLeft(true);
+//					player.accelerate();
+//					player.setLeft(false);					
+//				}
 			}
 		} else {
 			// control slippery
+			// TODO evtl herausheben und in der update die bewegungsrichtung überprüfen dh das für links und rechts dasselbe funkt und verwendet wird
 			if(player.getBody().getLinearVelocity().x < 0 && player.isOnGround()) {
 				player.getBody().applyLinearImpulse(new Vec2(slowDownForce,0), player.getBody().getPosition());
 			}
@@ -274,16 +276,17 @@ public class Game extends BasicGame {
 //				player.getShootingDirection().x += 1;
 				player.increaseShootingDirection( 1, 0);
 			} else {
-				if (player.isOnGround()) {
+//				if (player.isOnGround()) {
 					player.setLeft(false);
-				}
+//				}
 				if (!player.movesLeft()) {
 					player.accelerate();
-				} else if (player.getBody().getLinearVelocity().x < -minCounterSteerSpeed) { 
-					player.setLeft(false);
-					player.accelerate();
-					player.setLeft(true);					
 				}
+//				else if (player.getBody().getLinearVelocity().x < -minCounterSteerSpeed) { 
+//					player.setLeft(false);
+//					player.accelerate();
+//					player.setLeft(true);					
+//				}
 			}
 		}  else {
 			if(player.getBody().getLinearVelocity().x > 0 && player.isOnGround()) {

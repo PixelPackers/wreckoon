@@ -20,8 +20,8 @@ import org.newdawn.slick.geom.Polygon;
 
 public class Player {
 
-	private static final float	TAILWHIP_DISTANCE	= 15;
-	private static final int	TAILWHIP_TIME		= 100;
+	private static final float	TAILWHIP_DISTANCE	= 20f;
+	private static final int	TAILWHIP_TIME		= 110;
 //	private final float MAX_VELOCITY_WALKING = 7f;
 //	private final float MAX_VELOCITY_RUNNING = 20f;
 //	private final float ACC_WALKING = 0.5f;
@@ -32,7 +32,7 @@ public class Player {
 	private final float MAX_VELOCITY_RUNNING = 20f;
 	private final float ACC_WALKING = 1.5f;
 	private final float ACC_RUNNING = 1.75f;
-	private final float playerFriction = 2.2f;
+	private final float playerFriction = 1f;
 	
 	private int groundPoundCounter = 0;
 	private int tailwhipCounter = 0;
@@ -367,7 +367,7 @@ public class Player {
 
 		this.floatLockedObject();
 		
-		if( !isRunning() && this.isOnGround() && !this.doTailwhip &&
+		if( this.isOnGround() && !this.doTailwhip &&
 				(Math.abs(this.getBody().getLinearVelocity().x) < 1)  
 				){
 			this.currentAnimation = animations.get("idle");
@@ -376,14 +376,17 @@ public class Player {
 	}
 
 	public void accelerate() {
+		
 		if(this.isCharging())
 			return;
+		
 		float velocityX 	= this.body.getLinearVelocity().x;
 		float velocityY 	= this.body.getLinearVelocity().y;
+		
 		if( this.isOnGround() || this.isOnWall() ){
 			adjustVelocity();
 		}
-//		/*
+		/*
 		
 		if (left){
 			// TODO Math.abs, verbraucht das mehr rechenleistung? als ob man die checkt obs pos sind?
@@ -403,11 +406,22 @@ public class Player {
 		/*/
 		// another movement approach by using linearImpulse
 		/// XXX MAGIC NUMBERS
-		float speed = (left) ? -15 : 15;
-		if ( Math.abs(velocityX + accelerationX) < Math.abs(maxVelocity)*2.5f  ) {
-			this.body.applyLinearImpulse(new Vec2(speed, 0), this.body.getPosition());
+//		float speed = (left) ? -15 : 15;
+//		if ( Math.abs(velocityX + accelerationX) < Math.abs(maxVelocity)*1.5f  ) {
+//			this.body.applyLinearImpulse(new Vec2(speed, 0), this.body.getPosition());
+//		}
+
+		float speed = (left) ? -800 : 800;
+		if ( Math.abs(velocityX + accelerationX) < Math.abs(maxVelocity)*1.5f  ) {
+			this.body.applyForce( new Vec2(speed, 0), this.body.getPosition() );
 		}
 		//*/
+		
+		if(this.running){
+			this.currentAnimation = animations.get("run");
+		} else {
+			this.currentAnimation = animations.get("walk");	
+		}
 	
 	}
 	
@@ -432,11 +446,9 @@ public class Player {
 		if( isRunning() ){ 
 			this.secondFixture = this.body.createFixture(this.secondFixtureDef);
 			createSensors();
-			this.currentAnimation = animations.get("run");
 		} else {
 			this.firstFixture = this.body.createFixture(this.firstFixtureDef);
 			createSensors();
-			this.currentAnimation = animations.get("walk");
 
 		}
 		
@@ -465,13 +477,13 @@ public class Player {
 				if(leftWallColliding()){
 					
 					this.left = false;
-					jumpSpeedX = this.jumpPower;
+					jumpSpeedX = this.jumpPower * 0.5f;
 					this.jumpingFromWall = true;
 					
 				} else if(rightWallColliding()){
 					
 					this.left = true;
-					jumpSpeedX = -this.jumpPower;
+					jumpSpeedX = -this.jumpPower * 0.5f;
 					this.jumpingFromWall = true;
 				
 				}
@@ -555,7 +567,7 @@ public class Player {
 		}
 
 		this.doTailwhip = false;
-		if(isOnGround()){
+		if(isOnGround() && false){
 			this.getBody().setLinearVelocity( new Vec2(-distance, body.getLinearVelocity().y) );
 		}
 		this.body.destroyFixture(this.fixtureTail);
