@@ -19,8 +19,9 @@ import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Polygon;
 
 public class Player {
-	
-	private static final float TAILWHIP_DISTANCE = 5;
+
+	private static final float	TAILWHIP_DISTANCE	= 15;
+	private static final int	TAILWHIP_TIME		= 100;
 //	private final float MAX_VELOCITY_WALKING = 7f;
 //	private final float MAX_VELOCITY_RUNNING = 20f;
 //	private final float ACC_WALKING = 0.5f;
@@ -94,13 +95,17 @@ public class Player {
 		SpriteSheet sheetWalk = 	new SpriteSheet("images/walkcycle.png", 575, 550);
 		SpriteSheet sheetRun = 		new SpriteSheet("images/runcycle.png", 735, 385);
 		SpriteSheet sheetWallJump = new SpriteSheet("images/walljump.png", 620, 685);
-		
-		Animation ani = new Animation(sheetWallJump, 	100);
-		ani.setLooping(false);
+		SpriteSheet sheetTailwhip = new SpriteSheet("images/tailwhip.png", 770, 360);
+
+		Animation animationWallJump = new Animation(sheetWallJump, 	100);
+		animationWallJump.setLooping(false);
+		Animation animationTailwhip = new Animation(sheetTailwhip, 	TAILWHIP_TIME);
+		animationTailwhip.setLooping(false);
 		
 		animations.put("run", 		new Animation(sheetRun,			100));
 		animations.put("walk", 		new Animation(sheetWalk,		100));
-		animations.put("wallJump", 	ani);
+		animations.put("wallJump", 	animationWallJump);
+		animations.put("tailwhip", 	animationTailwhip);
 		
 		currentAnimation = animations.get("walk");
 	}
@@ -520,7 +525,9 @@ public class Player {
 			this.fixtureDefTail.shape = this.polygonShapeTail;
 			fixtureDefTail.isSensor=true;
 			
-
+			this.currentAnimation = animations.get("tailwhip");
+			this.currentAnimation.restart();
+			
 			this.tailwhip();
 			
 			
@@ -540,7 +547,9 @@ public class Player {
 		}
 
 		this.doTailwhip = false;
-		this.getBody().setLinearVelocity( new Vec2(-distance, body.getLinearVelocity().y) );
+		if(isOnGround()){
+			this.getBody().setLinearVelocity( new Vec2(-distance, body.getLinearVelocity().y) );
+		}
 		this.body.destroyFixture(this.fixtureTail);
 		
 	}
