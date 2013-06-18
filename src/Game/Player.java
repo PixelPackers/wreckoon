@@ -102,7 +102,7 @@ public class Player {
 		SpriteSheet sheetRun 		= new SpriteSheet("images/runcycle.png", 735, 385);
 		SpriteSheet sheetWallJump	= new SpriteSheet("images/walljump.png", 620, 685);
 		SpriteSheet sheetTailwhip	= new SpriteSheet("images/tailwhip.png", 770, 360);
-		SpriteSheet sheetIdle		= new SpriteSheet("images/rayingame.png", 454, 575);
+		SpriteSheet sheetIdle		= new SpriteSheet("images/idle.png", 454, 575);
 
 		Animation animationWallJump = new Animation(sheetWallJump, 	100);
 		animationWallJump.setLooping(false);
@@ -113,7 +113,7 @@ public class Player {
 		animations.put("walk", 		new Animation(sheetWalk,	100));
 		animations.put("wallJump", 	animationWallJump);
 		animations.put("tailwhip", 	animationTailwhip);
-		animations.put("idle", 		new Animation(sheetIdle,	100) );
+		animations.put("idle", 		new Animation(sheetIdle,	400) );
 		
 		currentAnimation = animations.get("walk");
 	}
