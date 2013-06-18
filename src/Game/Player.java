@@ -108,12 +108,15 @@ public class Player {
 		animationWallJump.setLooping(false);
 		Animation animationTailwhip = new Animation(sheetTailwhip, 	TAILWHIP_TIME);
 		animationTailwhip.setLooping(false);
+		Animation animationIdle = new Animation(sheetIdle, 	200);
+		animationIdle.setPingPong(true);
+		
 		
 		animations.put("run", 		new Animation(sheetRun,		100));
 		animations.put("walk", 		new Animation(sheetWalk,	100));
 		animations.put("wallJump", 	animationWallJump);
 		animations.put("tailwhip", 	animationTailwhip);
-		animations.put("idle", 		new Animation(sheetIdle,	400) );
+		animations.put("idle", 		animationIdle );
 		
 		currentAnimation = animations.get("walk");
 	}
