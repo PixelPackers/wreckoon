@@ -34,8 +34,9 @@ public class Player {
 	private final float ACC_RUNNING = 1.75f;
 	private final float playerFriction = 1f;
 	
-	private int groundPoundCounter = 0;
-	private int tailwhipCounter = 0;
+	private int groundPoundCounter	= 0;
+	private int tailwhipCounter		= 0;
+	private int idleCounter			= 0;
 	
 	private float jumpPower = 20f;
 	private float wallJumpPowerFactor = 0.3f;
@@ -76,6 +77,11 @@ public class Player {
 	private Fixture		fixtureTail 		= new Fixture();
 	private FixtureDef	fixtureDefTail 		= new FixtureDef();
 	private PolygonShape polygonShapeTail	= new PolygonShape();
+	
+
+	private Fixture		fixtureLaser 		= new Fixture();
+	private FixtureDef	fixtureDefLaser 	= new FixtureDef();
+	private PolygonShape polygonShapeLaser	= new PolygonShape();
 	
 	private MySensor 	sensorTopLeft;
 	private MySensor 	sensorTopRight;
@@ -163,6 +169,24 @@ public class Player {
 
 		this.secondFixture = this.body.createFixture(secondFixtureDef);
 		
+		// eye phaser
+		Vec2[] vertsLaser = new Vec2[]{
+			new Vec2( this.getBody().getPosition() ),
+			new Vec2( this.getBody().getPosition().x, this.getBody().getPosition().y + 1),
+			new Vec2( this.getBody().getPosition().x + 50, this.getBody().getPosition().y + 1),
+			new Vec2( this.getBody().getPosition().x + 50, this.getBody().getPosition().y)
+		};
+
+		this.polygonShapeLaser = new PolygonShape();
+		this.polygonShapeLaser.set(vertsLaser, vertsLaser.length);
+		
+		this.fixtureDefLaser = new FixtureDef();
+		this.fixtureDefLaser.shape = this.polygonShapeLaser;
+		fixtureDefLaser.isSensor=true;
+		
+		this.fixtureLaser = this.body.createFixture(this.fixtureDefLaser);
+//		this.body.destroyFixture(this.fixtureLaser);
+	
 		this.createSensors();
 		this.adjustHitboxes();		
 	}
@@ -244,15 +268,17 @@ public class Player {
 	}
 	
 	public void draw(Graphics g, boolean debugView){
-//		if (debugView || this.img == null) {
-//			this.drawOutline(g);
-//		} else { 
-//			this.drawImage();
-//		}
+		if (debugView || this.img == null) {
+			this.drawOutline(g);
+		} else { 
+			this.drawImage();
+		}
+		
+		
 
 		// sprite testing
-		this.drawImage();
-		this.drawOutline(g);
+//		this.drawImage();
+//		this.drawOutline(g);
 		
 	}
 	
@@ -318,9 +344,22 @@ public class Player {
 				Vec2 worldPoint = this.body.getWorldPoint(vert);
 				polygonToDraw.addPoint(worldPoint.x, -worldPoint.y);
 			}
-			
 			g.draw(polygonToDraw);
 		}
+		
+		// augenlaser
+
+		Polygon polygonToDraw = new Polygon();
+		Vec2[] verts = this.polygonShapeLaser.getVertices();
+		
+		for (int i=0; i< this.polygonShapeLaser.m_vertexCount; ++i) {
+			Vec2 vert = verts[i];
+			Vec2 worldPoint = this.body.getWorldPoint(vert);
+			polygonToDraw.addPoint(worldPoint.x, -worldPoint.y);
+		}
+		
+		g.draw(polygonToDraw);
+		
 	}
 	
 	public void update() {
@@ -364,12 +403,9 @@ public class Player {
 		// FIXME das oder fixed rotation verwenden?
 //		this.body.m_sweep.a = 0;
 		
-
 		this.floatLockedObject();
-		
-		if( this.isOnGround() && !this.doTailwhip &&
-				(Math.abs(this.getBody().getLinearVelocity().x) < 1)  
-				){
+
+		if( this.isOnGround() && !this.isRunning() && !this.doTailwhip && idleCounter > 2 ){
 			this.currentAnimation = animations.get("idle");
 		}
 		
@@ -412,17 +448,18 @@ public class Player {
 //		}
 
 		float speed = (left) ? -800 : 800;
-		if ( Math.abs(velocityX + accelerationX) < Math.abs(maxVelocity)*1.5f  ) {
+		if ( Math.abs(velocityX + accelerationX) < Math.abs(maxVelocity)  ) {
 			this.body.applyForce( new Vec2(speed, 0), this.body.getPosition() );
 		}
 		//*/
-		
-		if(this.running){
-			this.currentAnimation = animations.get("run");
-		} else {
-			this.currentAnimation = animations.get("walk");	
+		if(!groundPounding && !doTailwhip){
+			if(this.running){
+				this.currentAnimation = animations.get("run");
+			} else {
+				this.currentAnimation = animations.get("walk");	
+			}
 		}
-	
+		idleCounter = 0;
 	}
 	
 	public void adjustVelocity(){
@@ -529,8 +566,6 @@ public class Player {
 			
 			this.getBody().setLinearVelocity( new Vec2(distance, body.getLinearVelocity().y) );
 			
-			// TODO tail sollte beim normalen gehen nicht zentriert sein, sondern weiter unten
-			
 			Vec2[] vertsTail = new Vec2[]{
 				new Vec2( -tailWidth * 0.5f + direction, tailHeight * 0.5f ),
 				new Vec2( -tailWidth * 0.5f + direction, -tailHeight * 0.5f ),
@@ -543,11 +578,13 @@ public class Player {
 			
 			this.fixtureDefTail = new FixtureDef();
 			this.fixtureDefTail.shape = this.polygonShapeTail;
-			fixtureDefTail.isSensor=true;
+			this.fixtureDefTail.isSensor = true;
 			
 			this.currentAnimation = animations.get("tailwhip");
 			this.currentAnimation.restart();
 			
+			this.running = true;
+			adjustHitboxes();
 			this.tailwhip();
 			
 			
@@ -570,6 +607,7 @@ public class Player {
 		if(isOnGround() && false){
 			this.getBody().setLinearVelocity( new Vec2(-distance, body.getLinearVelocity().y) );
 		}
+
 		this.body.destroyFixture(this.fixtureTail);
 		
 	}
@@ -722,8 +760,10 @@ public class Player {
 	private void increaseCounters(){
 		++groundPoundCounter;
 		++tailwhipCounter;
-		if(shootingPower < maxShootingPower)
+		if(shootingPower < maxShootingPower){
 			++shootingPower;
+		}
+		++idleCounter;
 	}
 	
 	

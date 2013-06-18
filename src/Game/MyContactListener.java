@@ -1,22 +1,16 @@
 package Game;
 
-import java.io.ObjectInputStream.GetField;
-import java.util.ArrayList;
-
 import org.jbox2d.callbacks.ContactImpulse;
 import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.Body;
-import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.contacts.Contact;
 
 public class MyContactListener implements ContactListener{
 
 	private Game game;
 
-	float minKillingSpeed = 30;
+	float minKillingSpeed = 25;
 	
 	public MyContactListener(Game game) {
 		this.game = game;
@@ -92,18 +86,22 @@ public class MyContactListener implements ContactListener{
 				if ( !enemy.isDead() ){
 					if (enemy.getFixture() == contact.getFixtureA() || enemy.getFixture() == contact.getFixtureB() ){
 						game.getPlayer().die();
+						break;
 					}
 				}
 			}
 		}
 		
+		// enemy + missile
 		for( Enemy enemy : game.getEnemies()){
 			if ( !enemy.isDead() ){
 				for(GameObject dynamicObject : game.getDynamicObjects() ){
 					if (enemy.getFixture() == contact.getFixtureA() || enemy.getFixture() == contact.getFixtureB() ){
 						if (dynamicObject.getFixture() == contact.getFixtureA() || dynamicObject.getFixture() == contact.getFixtureB() ){
-							if (dynamicObject.getBody().getLinearVelocity().x > minKillingSpeed || dynamicObject.getBody().getLinearVelocity().y > minKillingSpeed ){
+							if (Math.abs(dynamicObject.getBody().getLinearVelocity().x) > minKillingSpeed || 
+									Math.abs(dynamicObject.getBody().getLinearVelocity().y) > minKillingSpeed ){
 								enemy.die();
+								break;
 							}
 							
 						}

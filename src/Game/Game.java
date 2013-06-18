@@ -87,9 +87,12 @@ public class Game extends BasicGame {
 		
 		player = new Player(world, 2f, 4f);
 		world.setContactListener(new MyContactListener(this));
+		for(int i=0; i<10; ++i){
 
-//		enemies.add( new EnemyStupidFollower(this, 10f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
-//		enemies.add( new EnemyStupidFollower(this, 15f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
+			enemies.add( new EnemyPrimitive(this, 10*i +10f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
+		}
+		enemies.add( new EnemyStupidFollower(this, 10f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
+		enemies.add( new EnemyStupidFollower(this, 15f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
 		enemies.add( new EnemyStupidFollower(this, 124f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
 		enemies.add( new EnemyPrimitive		(this, 14f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
 		
