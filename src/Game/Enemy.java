@@ -167,10 +167,16 @@ public abstract class Enemy extends GameObjectBox {
 
 	}
 	
-	public void die(){
-		float force = 150;
+	public void throwBack(){
+
+		float force = 15f;
 		float x = (game.getPlayer().movesLeft()) ? -force : force;
-		this.body.applyLinearImpulse(new Vec2 ( x, force), this.body.getWorldCenter());
+		
+		this.body.setLinearVelocity(new Vec2 (x, force) );
+		
+	}
+	
+	public void die(){
 		this.dead=true;
 	}
 	

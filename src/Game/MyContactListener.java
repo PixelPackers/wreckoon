@@ -46,7 +46,7 @@ public class MyContactListener implements ContactListener{
 				if( enemy.getFixture() == contact.getFixtureA() ||
 					enemy.getFixture() == contact.getFixtureB()
 				){
-					enemy.die();
+					enemy.throwBack();
 				}
 			}
 		} 

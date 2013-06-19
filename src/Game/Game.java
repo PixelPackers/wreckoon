@@ -430,6 +430,10 @@ public class Game extends BasicGame {
 		
 		if (input.isKeyPressed(input.KEY_T) ){
 			
+			if(player.shouldntMove()) {
+				return;
+			}
+			
 			if( !player.hasLockedObject() ){
 				
 				player.lockObject(chooseTelekinesisTarget() );
@@ -446,21 +450,21 @@ public class Game extends BasicGame {
 
 		boolean shootkeyDown = false;
 		
-		if (input.isKeyDown( input.KEY_N) ){
+		if (input.isKeyDown( input.KEY_N) ) {
 			shootkeyDown = true;
 		}
 
-		if( player.hasLockedObject() ){
-			if( shootkeyDown){
-				if( !player.isCharging() ){
+		if( player.hasLockedObject() ) {
+			if ( shootkeyDown){
+				if ( !player.isCharging() ) {
 					player.startCharging(); 
 				}
-			} else if( player.isCharging() ) {
+			} else if ( player.isCharging() ) {
 				player.shoot();
 			}
 		}		
 	}
-	public GameObject chooseTelekinesisTarget(){
+	public GameObject chooseTelekinesisTarget() {
 		for (GameObject object : dynamicObjects) {
 			
 			float objectX = object.getBody().getPosition().x;

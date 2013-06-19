@@ -9,7 +9,7 @@ import org.newdawn.slick.geom.Polygon;
 
 public class EnemyStupidFollower extends Enemy {
 
-	private float jumpPower = 15f;
+	private float jumpPower = 12f;
 	
 	public EnemyStupidFollower(Game game, float posX, float posY, float width, float height, float density, float friction, float restitution, String imgPath,
 			BodyType bodyType) throws SlickException {
@@ -33,8 +33,10 @@ public class EnemyStupidFollower extends Enemy {
 			}
 			
 			
-			if(this.isOnWall() && this.isOnGround())
-				this.body.applyForce( new Vec2(this.body.getLinearVelocity().x, jumpPower), this.body.getWorldCenter() );
+			if(this.isOnWall() && this.isOnGround()) {
+//				this.body.applyForce( new Vec2(this.body.getLinearVelocity().x, jumpPower), this.body.getWorldCenter() );
+				this.body.setLinearVelocity( new Vec2(this.body.getLinearVelocity().x, jumpPower) );
+			}
 		}
 	}
 	

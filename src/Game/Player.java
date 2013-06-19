@@ -40,6 +40,7 @@ public class Player {
 	private int idleCounter			= 0;
 	private int dizzyCounter		= 0;
 	private int dizzyIncrease		= -1;
+	private int jumpCounter 		= 0;
 	
 	
 	private float jumpPower = 20f;
@@ -52,6 +53,7 @@ public class Player {
 	private boolean groundPounding = false;
 	private boolean jumpingFromWall = false;
 	private boolean dizzy = false;
+	private boolean dead = false;
 	
 	//XXX ??
 	private float	accelerationX = ACC_WALKING;
@@ -110,7 +112,9 @@ public class Player {
 		SpriteSheet sheetTailwhip	= new SpriteSheet("images/tailwhip.png",	770, 360);
 		SpriteSheet sheetIdle		= new SpriteSheet("images/idle.png", 		454, 575);
 		SpriteSheet sheetGroundpound= new SpriteSheet("images/groundpound.png", 600, 540);
-
+		SpriteSheet sheetDeath		= new SpriteSheet("images/death.png", 730, 320);
+		SpriteSheet sheetWalkJump		= new SpriteSheet("images/jump.png", 675, 575);
+		
 		Animation animationWallJump = new Animation(sheetWallJump, 	100);
 		animationWallJump.setLooping(false);
 		
@@ -120,8 +124,15 @@ public class Player {
 		Animation animationIdle = new Animation(sheetIdle, 	200);
 		animationIdle.setPingPong(true);
 		
-		Animation animationGroundpound = new Animation(sheetGroundpound,	100);
+		Animation animationGroundpound = new Animation(sheetGroundpound, 100);
 		animationGroundpound.setLooping(false);
+		
+		Animation animationDeath= new Animation(sheetDeath, 200);
+		animationDeath.setLooping(false);
+		
+		Animation animationWalkJump = new Animation(sheetWalkJump, 80);
+		animationWalkJump.setLooping(false);
+		
 		
 		animations.put("run", 			new Animation(sheetRun,			100));
 		animations.put("walk", 			new Animation(sheetWalk,		100));
@@ -129,8 +140,10 @@ public class Player {
 		animations.put("tailwhip", 		animationTailwhip);
 		animations.put("idle", 			animationIdle );
 		animations.put("groundpound",	animationGroundpound);
+		animations.put("death", 		animationDeath);
+		animations.put("walkJump",		animationWalkJump);
 		
-		currentAnimation = animations.get("walk");
+//		currentAnimation = animations.get("walk");
 	}
 	
 	public Player(World world, float posX, float posY) throws SlickException {
@@ -184,12 +197,12 @@ public class Player {
 
 		this.secondFixture = this.body.createFixture(secondFixtureDef);
 		
-		// eye phaser
+		// eye laser
 		Vec2[] vertsLaser = new Vec2[]{
 			new Vec2( this.getBody().getPosition() ),
-			new Vec2( this.getBody().getPosition().x, this.getBody().getPosition().y + 1),
-			new Vec2( this.getBody().getPosition().x + 50, this.getBody().getPosition().y + 1),
-			new Vec2( this.getBody().getPosition().x + 50, this.getBody().getPosition().y)
+			new Vec2( this.getBody().getPosition().x,		this.getBody().getPosition().y + 1),
+			new Vec2( this.getBody().getPosition().x + 50,	this.getBody().getPosition().y + 1),
+			new Vec2( this.getBody().getPosition().x + 50,	this.getBody().getPosition().y)
 		};
 
 		this.polygonShapeLaser = new PolygonShape();
@@ -280,6 +293,9 @@ public class Player {
 	
 	public void die() {
 		System.out.println("You just died, loser!");
+		this.currentAnimation = animations.get("death");
+		this.currentAnimation.restart();
+		this.dead = true;
 	}
 	
 	public void draw(Graphics g, boolean debugView){
@@ -426,9 +442,9 @@ public class Player {
 		// FIXME das oder fixed rotation verwenden?
 //		this.body.m_sweep.a = 0;
 		
-		this.floatLockedObject();
+		this.telekinesis();
 
-		if( this.isOnGround() && !this.isRunning() && !this.doTailwhip && idleCounter > 2 ){
+		if( this.isOnGround() && !this.isRunning() && !this.doTailwhip && idleCounter > 2 && !this.dead){
 			this.currentAnimation = animations.get("idle");
 		}
 		
@@ -475,11 +491,11 @@ public class Player {
 			this.body.applyForce( new Vec2(speed, 0), this.body.getPosition() );
 		}
 		//*/
-		if(!groundPounding && !doTailwhip){
+		if(!groundPounding && !doTailwhip && this.isOnGround() && jumpCounter > 5){
 			if(this.running){
 				this.currentAnimation = animations.get("run");
 			} else {
-				this.currentAnimation = animations.get("walk");	
+				this.currentAnimation = animations.get("walk");
 			}
 		}
 		idleCounter = 0;
@@ -520,14 +536,21 @@ public class Player {
 			return;
 		
 		if( !groundPounding && (sensorGroundCollision.isColliding() || leftWallColliding() || rightWallColliding() ) ) {
+
+			jumpCounter = 0;
 			
 			// normal jump / on ground
 			float jumpSpeedX = this.body.getLinearVelocity().x;
 			float jumpSpeedY = this.jumpPower; 
 			
 			if (this.isOnGround()){
-				
-//				this.currentAnimation = animations.get("jump");
+
+				if ( this.isRunning() ) {
+					
+				} else {
+					this.currentAnimation = animations.get("walkJump");
+					this.currentAnimation.restart();
+				}
 				
 			} else {
 
@@ -563,7 +586,7 @@ public class Player {
 			this.groundPounding = true;
 			this.groundPoundCounter = 0;
 			this.dizzyCounter = 0;
-			this.dizzyIncrease = 2; // positive
+			this.dizzyIncrease = 1; // positive
 			
 			this.groundpound();
 			
@@ -663,9 +686,12 @@ public class Player {
 		return sensorBottomRight.isColliding() && sensorTopRight.isColliding();
 	}	
 	
-	// passt der methoden name??
-	public void floatLockedObject(){
+	public void telekinesis(){
 
+		if (this.shouldntMove()) {
+			return;
+		}
+		
 		float 	floatingDistanceX	= 2f;
 		float 	floatingDistanceY	= 2f;
 		
@@ -808,6 +834,7 @@ public class Player {
 		}
 		++idleCounter;
 		dizzyCounter += dizzyIncrease;
+		++jumpCounter;
 	}
 	
 	
@@ -888,8 +915,13 @@ public class Player {
 	}
 
 	public void setLeft ( boolean left){
+		if( this.shouldntMove() ) {
+			return;
+		}
+		
 		this.left = left;
 	}
+	
 	public boolean movesLeft(){
 		return this.left;
 	}
@@ -976,7 +1008,7 @@ public class Player {
 		
 	}
 	
-	private boolean shouldntMove() {
+	public boolean shouldntMove() {
 		return this.isCharging() || this.dizzy;
 	}
 }
