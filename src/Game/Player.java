@@ -22,6 +22,7 @@ public class Player {
 
 	private static final float	TAILWHIP_DISTANCE	= 20f;
 	private static final int	TAILWHIP_TIME		= 110;
+	private static final int 	GROUNDPOUND_AIRTIME = 30;
 //	private final float MAX_VELOCITY_WALKING = 7f;
 //	private final float MAX_VELOCITY_RUNNING = 20f;
 //	private final float ACC_WALKING = 0.5f;
@@ -98,25 +99,31 @@ public class Player {
 	private void initAnimations() throws SlickException {
 		
 		// XXX evtl auch da eine hashmap verwenden?
-		SpriteSheet sheetWalk 		= new SpriteSheet("images/walkcycle.png", 575, 550);
-		SpriteSheet sheetRun 		= new SpriteSheet("images/runcycle.png", 735, 385);
-		SpriteSheet sheetWallJump	= new SpriteSheet("images/walljump.png", 620, 685);
-		SpriteSheet sheetTailwhip	= new SpriteSheet("images/tailwhip.png", 770, 360);
-		SpriteSheet sheetIdle		= new SpriteSheet("images/idle.png", 454, 575);
+		SpriteSheet sheetWalk 		= new SpriteSheet("images/walkcycle.png", 	575, 550);
+		SpriteSheet sheetRun 		= new SpriteSheet("images/runcycle.png", 	735, 385);
+		SpriteSheet sheetWallJump	= new SpriteSheet("images/walljump.png", 	620, 685);
+		SpriteSheet sheetTailwhip	= new SpriteSheet("images/tailwhip.png",	770, 360);
+		SpriteSheet sheetIdle		= new SpriteSheet("images/idle.png", 		454, 575);
+		SpriteSheet sheetGroundpound= new SpriteSheet("images/groundpound.png", 600, 540);
 
 		Animation animationWallJump = new Animation(sheetWallJump, 	100);
 		animationWallJump.setLooping(false);
+		
 		Animation animationTailwhip = new Animation(sheetTailwhip, 	TAILWHIP_TIME);
 		animationTailwhip.setLooping(false);
+
 		Animation animationIdle = new Animation(sheetIdle, 	200);
 		animationIdle.setPingPong(true);
 		
+		Animation animationGroundpound = new Animation(sheetGroundpound,	100);
+		animationGroundpound.setLooping(false);
 		
-		animations.put("run", 		new Animation(sheetRun,		100));
-		animations.put("walk", 		new Animation(sheetWalk,	100));
-		animations.put("wallJump", 	animationWallJump);
-		animations.put("tailwhip", 	animationTailwhip);
-		animations.put("idle", 		animationIdle );
+		animations.put("run", 			new Animation(sheetRun,			100));
+		animations.put("walk", 			new Animation(sheetWalk,		100));
+		animations.put("wallJump", 		animationWallJump);
+		animations.put("tailwhip", 		animationTailwhip);
+		animations.put("idle", 			animationIdle );
+		animations.put("groundpound",	animationGroundpound);
 		
 		currentAnimation = animations.get("walk");
 	}
@@ -382,9 +389,8 @@ public class Player {
 //				this.setRunning(false);
 //			}
 		}
-				
-		if(this.groundPoundCounter > 10 && groundPounding){
-			this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, groundPoundPower));
+		if (this.groundPounding) {
+			this.groundpound();	
 		}
 		
 		// TODO konstante fuer speed
@@ -533,19 +539,33 @@ public class Player {
 		}
 		
 	}
-	public void groundPound(){
+	public void groundpoundInit(){
 		
 		if(groundPoundCounter > 50){
-			groundPounding = true;
 			
+			this.currentAnimation = animations.get("groundpound");
+			this.currentAnimation.restart();
+			
+			this.groundPounding = true;
 			this.groundPoundCounter = 0;
-			this.getBody().setLinearVelocity(new Vec2(0f,0f));
+			
+			this.groundpound();
+			
 		}
 		
-		if(this.isRunning()){
+		if(this.isRunning()) {
 			setRunning(false);
 		}
 		
+	}
+	
+	private void groundpound(){
+		
+		if(this.groundPoundCounter > GROUNDPOUND_AIRTIME ) {
+			this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, groundPoundPower));
+		} else {
+			this.getBody().setLinearVelocity(new Vec2(0f,0f));
+		}
 	}
 	
 	public void tailwhipInit(){
@@ -594,11 +614,11 @@ public class Player {
 			
 		}
 	}
-	public void tailwhip(){
+	private void tailwhip(){
 		this.fixtureTail = this.body.createFixture(this.fixtureDefTail);
 	}
 	
-	public void tailwhipFinalize(){
+	private void tailwhipFinalize(){
 		
 		float distance = TAILWHIP_DISTANCE;
 		

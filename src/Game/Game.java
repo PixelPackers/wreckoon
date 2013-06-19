@@ -299,7 +299,7 @@ public class Game extends BasicGame {
 
 		if (input.isKeyPressed(Input.KEY_DOWN) || input.isKeyPressed(Input.KEY_S)) {
 			 if( !player.isCharging() && !player.isOnWall() && !player.isOnGround()) {
-				player.groundPound();
+				player.groundpoundInit();
 			} else if (player.isOnWall()){
 				if(player.leftWallColliding()){
 					// XXX magic numbers
