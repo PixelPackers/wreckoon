@@ -292,10 +292,12 @@ public class Player {
 	}
 	
 	public void die() {
-		System.out.println("You just died, loser!");
+		
 		this.currentAnimation = animations.get("death");
 		this.currentAnimation.restart();
+		
 		this.dead = true;
+		
 	}
 	
 	public void draw(Graphics g, boolean debugView){

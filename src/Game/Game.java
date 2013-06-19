@@ -48,6 +48,7 @@ public class Game extends BasicGame {
 	private ArrayList<Enemy> 		enemies			= new ArrayList<Enemy>();
 	private ArrayList<Tile>			tiles			= new ArrayList<Tile>();
 	private Player player;
+	private Part part;
 
 	private Image[] trashpile = new Image[5];
 
@@ -97,6 +98,8 @@ public class Game extends BasicGame {
 		enemies.add( new EnemyPrimitive		(this, 14f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
 		
 //		music();
+		
+		part = new Part(world, 0f, 0f);
 		
 	}
 	
@@ -160,10 +163,12 @@ public class Game extends BasicGame {
 			enemy.draw(g, debugView);	
 		}
 		
+		
 		for (Tile tile : tiles) {
 			tile.draw(g, debugView);
 		}
 
+		part.draw();
 		// GUI
 		g.popTransform();
 
