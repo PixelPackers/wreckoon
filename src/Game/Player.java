@@ -38,6 +38,9 @@ public class Player {
 	private int groundPoundCounter	= 0;
 	private int tailwhipCounter		= 0;
 	private int idleCounter			= 0;
+	private int dizzyCounter		= 0;
+	private int dizzyIncrease		= -1;
+	
 	
 	private float jumpPower = 20f;
 	private float wallJumpPowerFactor = 0.3f;
@@ -48,6 +51,8 @@ public class Player {
 	private boolean doTailwhip = false;
 	private boolean groundPounding = false;
 	private boolean jumpingFromWall = false;
+	private boolean dizzy = false;
+	
 	//XXX ??
 	private float	accelerationX = ACC_WALKING;
 	private float	maxVelocity = MAX_VELOCITY_WALKING;
@@ -55,16 +60,16 @@ public class Player {
 
 	private GameObject 	lockedObject = null;
 	private boolean		charging = false;
-	private float		shootingPower = 0f;
-	private float 		maxShootingPower = 50f;
+	private float		shootingPower 		= 0f;
+	private float 		maxShootingPower 	= 50f;
 	private Vec2 		lockedPlayerPosition;
 	private	Vec2 		shootingDirection = new Vec2(1,1);
 	
 	private float		maxPlayerRotation = 10f;
 	private World		world;
 	
-	private float width = 1f;
-	private float height = 2f;
+	private float width		= 1f;
+	private float height	= 2f;
 	private PolygonShape firstPolygonShape 		= new PolygonShape();
 	private PolygonShape secondPolygonShape 	= new PolygonShape();
 	
@@ -400,11 +405,20 @@ public class Player {
 		
 //		if(getSensorGroundCollision().isColliding() && this.body.getLinearVelocity().y < 0f){
 		if(getSensorGroundCollision().isColliding()){
-			this.groundPounding = false;
+			if(groundPounding){
+				this.groundPounding = false;
+				dizzyIncrease = -1;
+			}
 			this.jumpingFromWall = false;
 		}
 		
 
+		
+		if(dizzyCounter > 0){
+			this.dizzy = true;
+		} else {
+			this.dizzy = false;
+		}
 //		this.adjustHitboxes();
 		
 		increaseCounters();
@@ -422,7 +436,7 @@ public class Player {
 
 	public void accelerate() {
 		
-		if(this.isCharging())
+		if( shouldntMove() )
 			return;
 		
 		float velocityX 	= this.body.getLinearVelocity().x;
@@ -470,7 +484,7 @@ public class Player {
 		}
 		idleCounter = 0;
 	}
-	
+
 	public void adjustVelocity(){
 
 		if( this.isRunning() ){
@@ -502,7 +516,7 @@ public class Player {
 
 	public void jump(){
 
-		if(this.isCharging())
+		if( this.shouldntMove() )
 			return;
 		
 		if( !groundPounding && (sensorGroundCollision.isColliding() || leftWallColliding() || rightWallColliding() ) ) {
@@ -548,6 +562,8 @@ public class Player {
 			
 			this.groundPounding = true;
 			this.groundPoundCounter = 0;
+			this.dizzyCounter = 0;
+			this.dizzyIncrease = 2; // positive
 			
 			this.groundpound();
 			
@@ -570,7 +586,11 @@ public class Player {
 	
 	public void tailwhipInit(){
  
-		if( !this.doTailwhip && !this.groundPounding ){
+		if (this.shouldntMove()) {
+			return;
+		}
+		
+		if ( !this.doTailwhip && !this.groundPounding ) {
 			
 			
 			this.doTailwhip = true;
@@ -787,6 +807,7 @@ public class Player {
 			++shootingPower;
 		}
 		++idleCounter;
+		dizzyCounter += dizzyIncrease;
 	}
 	
 	
@@ -953,5 +974,9 @@ public class Player {
 			return firstFixture;
 		}
 		
+	}
+	
+	private boolean shouldntMove() {
+		return this.isCharging() || this.dizzy;
 	}
 }
