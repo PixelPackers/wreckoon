@@ -79,15 +79,23 @@ public class MyContactListener implements ContactListener{
 			}
 		}
 		
-		// player + enemy contact --> die()
+//		 player contat
 		if( game.getPlayer().getFixture() == contact.getFixtureA() || game.getPlayer().getFixture() == contact.getFixtureB() ){
 		
+//			+ enemy contact
 			for( Enemy enemy : game.getEnemies()){
 				if ( !enemy.isDead() ){
 					if (enemy.getFixture() == contact.getFixtureA() || enemy.getFixture() == contact.getFixtureB() ){
 						game.getPlayer().die();
 						break;
 					}
+				}
+			}
+			
+//			+ item
+			for (Part part : game.getParts()){
+				if(part.getFixture() == contact.getFixtureA() || part.getFixture() == contact.getFixtureB() ){
+					part.collected();
 				}
 			}
 		}

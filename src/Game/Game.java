@@ -48,7 +48,7 @@ public class Game extends BasicGame {
 	private ArrayList<Enemy> 		enemies			= new ArrayList<Enemy>();
 	private ArrayList<Tile>			tiles			= new ArrayList<Tile>();
 	private Player player;
-	private Part part;
+	private ArrayList<Part>			parts			= new ArrayList<Part>();
 
 	private Image[] trashpile = new Image[5];
 
@@ -99,7 +99,7 @@ public class Game extends BasicGame {
 		
 //		music();
 		
-		part = new Part(world, 0f, 0f);
+		parts.add( new Part(world, this, 10f, 0f) );
 		
 	}
 	
@@ -168,7 +168,9 @@ public class Game extends BasicGame {
 			tile.draw(g, debugView);
 		}
 
-		part.draw();
+		for (Part part : parts){
+			part.draw();
+		}
 		// GUI
 		g.popTransform();
 
@@ -251,7 +253,8 @@ public class Game extends BasicGame {
 		/// XXX MAGIC NUMBERS
 		/// max gegenlenken
 		float minCounterSteerSpeed = (!player.isJumpingFromWall() ) ? -5 : 5; 
-		float slowDownForce = 20;
+		float slowDownForce = 20f;
+		float slowDownThreshold = 0.5f;
 		
 		if (input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
 			if( player.isCharging() ){
@@ -273,7 +276,7 @@ public class Game extends BasicGame {
 		} else {
 			// control slippery
 			// TODO evtl herausheben und in der update die bewegungsrichtung überprüfen dh das für links und rechts dasselbe funkt und verwendet wird
-			if(player.getBody().getLinearVelocity().x < 0 && player.isOnGround()) {
+			if(player.getBody().getLinearVelocity().x < -slowDownThreshold && player.isOnGround()) {
 				player.getBody().applyLinearImpulse(new Vec2(slowDownForce,0), player.getBody().getPosition());
 			}
 		}
@@ -297,7 +300,7 @@ public class Game extends BasicGame {
 //				}
 			}
 		}  else {
-			if(player.getBody().getLinearVelocity().x > 0 && player.isOnGround()) {
+			if(player.getBody().getLinearVelocity().x > slowDownThreshold && player.isOnGround()) {
 				player.getBody().applyLinearImpulse(new Vec2(-slowDownForce,0), player.getBody().getPosition());
 			}
 		}
@@ -497,11 +500,13 @@ public class Game extends BasicGame {
 		return dynamicObjects;
 	}
 	
-	private void music() throws SlickException {
-		Music music = new Music("audio/Part 1_ Loop _Lang.wav");
-		music.play();
-		music.loop();
+
+	public ArrayList<Part> getParts() {
+		return parts;
 	}
 
+	public void getRidOfPart(Part part) {
+//		this.parts.remove(part);		
+	}
 	
 }

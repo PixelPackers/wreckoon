@@ -197,6 +197,11 @@ public class Player {
 
 		this.secondFixture = this.body.createFixture(secondFixtureDef);
 		
+		// wheels
+//		this
+		// 2 kreise die sich rotieren lassen am player fixen, an jeweiliger hitbox orientieren
+		
+		
 		// eye laser
 		Vec2[] vertsLaser = new Vec2[]{
 			new Vec2( this.getBody().getPosition() ),
