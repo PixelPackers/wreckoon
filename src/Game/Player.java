@@ -231,7 +231,7 @@ public class Player {
 		
 		this.fixtureDefLaser = new FixtureDef();
 		this.fixtureDefLaser.shape = this.polygonShapeLaser;
-		fixtureDefLaser.isSensor=true;
+		fixtureDefLaser.isSensor = true;
 		
 		this.fixtureLaser = this.body.createFixture(this.fixtureDefLaser);
 //		this.body.destroyFixture(this.fixtureLaser);
@@ -345,9 +345,7 @@ public class Player {
 		currentAnimation.draw( position.x + drawWidth*0.5f,
 				-position.y - drawHeight*0.5f - 0.5f, // -0.5f --> sonst wuerde sprite in den boden hinein stehen 
 				-drawWidth, 
-				drawHeight );	
-		
-		
+				drawHeight);	
 	}
 	
 	public void drawOutline(Graphics g) {
