@@ -1,6 +1,7 @@
 package Game;
 
 import org.jbox2d.collision.shapes.CircleShape;
+import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
@@ -22,9 +23,14 @@ public class Part {
 	private Image image = new Image("images/part.png");
 	private boolean collected = false;
 	
-	Body body;
-	Fixture fixture;
-	FixtureDef fixtureDef = new FixtureDef();
+	private float floatingHeight = 0f;
+	private float floatingSpeed = 0.02f;
+	private int i = 0;
+	
+	
+	private Body body;
+	private Fixture fixture;
+	private FixtureDef fixtureDef = new FixtureDef();
 	
 	public Part(World world, Game game, float x, float y) throws SlickException{
 		
@@ -76,6 +82,7 @@ public class Part {
 //		this.drawImage();
 //		this.drawOutline(g);
 		
+		update();		
 	}
 	
 	public void drawImage(){
@@ -85,7 +92,14 @@ public class Part {
 	}
 	
 	public void drawOutline(Graphics g){
-		g.drawArc(this.x - this.radius*0.5f, -this.y - this.radius*0.5f, this.radius, this.radius, 0f, 360f);
+		g.drawArc(this.body.getPosition().x - this.radius*0.5f, -this.body.getPosition().y - this.radius*0.5f, this.radius, this.radius, 0f, 360f);
+	}
+	
+	public void update(){
+
+		this.floatingHeight = (float) (this.floatingSpeed * Math.sin( Math.toRadians( ++i%360f ) ));
+		this.body.setTransform( new Vec2 (this.body.getPosition().x, this.body.getPosition().y + this.floatingHeight), 0);
+
 	}
 	
 	public Body getBody() {

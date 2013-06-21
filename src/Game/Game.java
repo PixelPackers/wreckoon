@@ -89,7 +89,7 @@ public class Game extends BasicGame {
 			}
 		}
 		
-		player = new Player(world, 2f, 4f);
+		player = new Player(world, 20f, 30f);
 		world.setContactListener(new MyContactListener(this));
 //		for(int i=0; i<10; ++i){
 //
@@ -104,9 +104,7 @@ public class Game extends BasicGame {
 		
 		house = new House(world, 0, 0);
 
-		parts.add( new Part(world, this, 10f, 0f) );
-		parts.add( new Part(world, this, 30f, -5f) );
-		parts.add( new Part(world, this, 50f, -7f) );
+		parts.add( new Part(world, this, 60f, 45f) );
 		
 		
 		
@@ -197,6 +195,7 @@ public class Game extends BasicGame {
 
 		g.drawString("ShootingDirection: " + player.getShootingDirection(), 200, 10);
 		g.drawString("ShootingPower: " + player.getShootingPower(), 200, 30);
+		g.drawString("pos: " + player.getBody().getPosition(), 200, 50);
 		
 
 	}
