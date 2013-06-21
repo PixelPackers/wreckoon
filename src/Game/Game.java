@@ -36,24 +36,26 @@ public class Game extends BasicGame {
 	 private static boolean fullScreen = true;
 	 //*/
 	
-	private boolean debugView = true;
+	private static boolean debugView = true;
 	
-	private float zoom = 30f;
-	private final float ZOOM_STEP = 1f;
+	private static float zoom = 30f;
+	private static final float ZOOM_STEP = 1f;
 	
-	private World world;
+	private static World world;
 
-	private ArrayList<GameObject> 	staticObjects 	= new ArrayList<GameObject>();
-	private ArrayList<GameObject> 	dynamicObjects 	= new ArrayList<GameObject>();
-	private ArrayList<Enemy> 		enemies			= new ArrayList<Enemy>();
-	private ArrayList<Tile>			tiles			= new ArrayList<Tile>();
-	private Player 					player;
-	private ArrayList<Part>			parts			= new ArrayList<Part>();
+	private static ArrayList<GameObject> 	staticObjects 	= new ArrayList<GameObject>();
+	private static ArrayList<GameObject> 	dynamicObjects 	= new ArrayList<GameObject>();
+	private static ArrayList<Enemy> 		enemies			= new ArrayList<Enemy>();
+	private static ArrayList<Tile>			tiles			= new ArrayList<Tile>();
+	private static Player 					player;
+	private static ArrayList<Part>			parts			= new ArrayList<Part>();
 
-	private Image[] trashpile = new Image[5];
+	private static House house;
+	
+	private static Image[] trashpile = new Image[5];
 
-	private Camera cam = new Camera(0, screenHeight);
-	private Level level;
+	private static Camera cam = new Camera(0, screenHeight);
+	private static Level level;
 
 	public Game() {
 		super("The Raccooning");
@@ -89,20 +91,24 @@ public class Game extends BasicGame {
 		
 		player = new Player(world, 2f, 4f);
 		world.setContactListener(new MyContactListener(this));
-		for(int i=0; i<10; ++i){
-
-			enemies.add( new EnemyPrimitive(this, 10*i +10f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
-		}
-		enemies.add( new EnemyStupidFollower(this, 10f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
-		enemies.add( new EnemyStupidFollower(this, 15f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
-		enemies.add( new EnemyStupidFollower(this, 124f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
-		enemies.add( new EnemyPrimitive		(this, 14f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
+//		for(int i=0; i<10; ++i){
+//
+//			enemies.add( new EnemyPrimitive(this, 10*i +10f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
+//		}
+//		enemies.add( new EnemyStupidFollower(this, 10f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
+//		enemies.add( new EnemyStupidFollower(this, 15f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
+//		enemies.add( new EnemyStupidFollower(this, 124f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
+//		enemies.add( new EnemyPrimitive		(this, 14f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
 		
 //		music();
+		
+		house = new House(world, 0, 0);
 
 		parts.add( new Part(world, this, 10f, 0f) );
 		parts.add( new Part(world, this, 30f, -5f) );
 		parts.add( new Part(world, this, 50f, -7f) );
+		
+		
 		
 	}
 	
@@ -142,6 +148,8 @@ public class Game extends BasicGame {
 
 		g.translate(cam.getX() * zoom + screenWidth / 2f, cam.getY() * zoom + screenHeight * 2f / 3f);
 		g.scale(zoom, zoom);
+		
+		house.draw(g, debugView);
 
 		for (GameObject staticObj : staticObjects) {
 			staticObj.draw(g, debugView);
@@ -174,6 +182,9 @@ public class Game extends BasicGame {
 		for (Part part : parts){
 			part.draw(g, debugView);
 		}
+		
+		house.drawFront(g, debugView);
+		
 		// GUI
 		g.popTransform();
 
@@ -209,37 +220,37 @@ public class Game extends BasicGame {
 
 	public void drawBackground(Graphics g) {
 		// FIXME clean this crap up.
-		if(!debugView){
-			g.pushTransform();
-			g.translate(cam.getX() * 0.475f * zoom + screenWidth / 2f, cam.getY() * 0.475f * zoom + screenHeight * 2f / 3f);
-			g.scale(zoom, zoom);
-			trashpile[2].draw(13, -18, 40f, 20f);
-			g.popTransform();
-	
-			g.pushTransform();
-			g.translate(cam.getX() * 0.575f * zoom + screenWidth / 2f, cam.getY() * 0.575f * zoom + screenHeight * 2f / 3f);
-			g.scale(zoom, zoom);
-			trashpile[4].draw(6, -18, 40f, 20f);
-			g.popTransform();
-	
-			g.pushTransform();
-			g.translate(cam.getX() * 0.675f * zoom + screenWidth / 2f, cam.getY() * 0.675f * zoom + screenHeight * 2f / 3f);
-			g.scale(zoom, zoom);
-			trashpile[3].draw(23, -18, 40f, 20f);
-			g.popTransform();
-	
-			g.pushTransform();
-			g.translate(cam.getX() * 0.75f * zoom + screenWidth / 2f, cam.getY() * 0.75f * zoom + screenHeight * 2f / 3f);
-			g.scale(zoom, zoom);
-			trashpile[0].draw(-7, -29, 30f, 15f);
-			g.popTransform();
-	
-			g.pushTransform();
-			g.translate(cam.getX() * 0.875f * zoom + screenWidth / 2f, cam.getY() * 0.875f * zoom + screenHeight * 2f / 3f);
-			g.scale(zoom, zoom);
-			trashpile[1].draw(15, -18, 40f, 20f);
-			g.popTransform();
-		}
+//		if(!debugView){
+//			g.pushTransform();
+//			g.translate(cam.getX() * 0.475f * zoom + screenWidth / 2f, cam.getY() * 0.475f * zoom + screenHeight * 2f / 3f);
+//			g.scale(zoom, zoom);
+//			trashpile[2].draw(13, -18, 40f, 20f);
+//			g.popTransform();
+//	
+//			g.pushTransform();
+//			g.translate(cam.getX() * 0.575f * zoom + screenWidth / 2f, cam.getY() * 0.575f * zoom + screenHeight * 2f / 3f);
+//			g.scale(zoom, zoom);
+//			trashpile[4].draw(6, -18, 40f, 20f);
+//			g.popTransform();
+//	
+//			g.pushTransform();
+//			g.translate(cam.getX() * 0.675f * zoom + screenWidth / 2f, cam.getY() * 0.675f * zoom + screenHeight * 2f / 3f);
+//			g.scale(zoom, zoom);
+//			trashpile[3].draw(23, -18, 40f, 20f);
+//			g.popTransform();
+//	
+//			g.pushTransform();
+//			g.translate(cam.getX() * 0.75f * zoom + screenWidth / 2f, cam.getY() * 0.75f * zoom + screenHeight * 2f / 3f);
+//			g.scale(zoom, zoom);
+//			trashpile[0].draw(-7, -29, 30f, 15f);
+//			g.popTransform();
+//	
+//			g.pushTransform();
+//			g.translate(cam.getX() * 0.875f * zoom + screenWidth / 2f, cam.getY() * 0.875f * zoom + screenHeight * 2f / 3f);
+//			g.scale(zoom, zoom);
+//			trashpile[1].draw(15, -18, 40f, 20f);
+//			g.popTransform();
+//		}
 	}
 	
 	public void processInput(GameContainer gc) throws SlickException{
