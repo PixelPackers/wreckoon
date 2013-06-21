@@ -147,7 +147,7 @@ public class Player {
 		animations.put("death", 		animationDeath);
 		animations.put("walkJump",		animationWalkJump);
 		
-//		currentAnimation = animations.get("walk");
+		currentAnimation = animations.get("idle");
 	}
 	
 	public Player(World world, float posX, float posY) throws SlickException {
