@@ -22,9 +22,8 @@ public class MyContactListener implements ContactListener{
 		// player sensors
 		for( MySensor sensor : game.getPlayer().getSensorList() ){
 			
-			if (contact.getFixtureA() == sensor.getFixture() ||
-				contact.getFixtureB() == sensor.getFixture()
-			){
+			if ( ( contact.getFixtureA() == sensor.getFixture() && !contact.getFixtureB().isSensor() ) 
+			|| ( contact.getFixtureB() == sensor.getFixture() && !contact.getFixtureA().isSensor() ) ) {
 				sensor.increaseCollidingCounter();
 			}
 		}
@@ -71,20 +70,19 @@ public class MyContactListener implements ContactListener{
 		// enemies sensors
 		for( Enemy enemy : game.getEnemies()){
 			for( MySensor sensor : enemy.getSensorList() ){	
-				if (contact.getFixtureA() == sensor.getFixture()||
-					contact.getFixtureB() == sensor.getFixture()
-				){
+				if ( ( contact.getFixtureA() == sensor.getFixture() && !contact.getFixtureB().isSensor() ) 
+				|| ( contact.getFixtureB() == sensor.getFixture() && !contact.getFixtureA().isSensor() ) ) {
 					sensor.increaseCollidingCounter();
 				}
 			}
 		}
 		
-//		 player contat
+//		 player contact
 		if( game.getPlayer().getFixture() == contact.getFixtureA() || game.getPlayer().getFixture() == contact.getFixtureB() ){
 		
 //			+ enemy contact
 			for( Enemy enemy : game.getEnemies()){
-				if ( !enemy.isDead() ){
+				if ( !enemy.isDead() && !game.getPlayer().isGroundPounding() ){
 					if (enemy.getFixture() == contact.getFixtureA() || enemy.getFixture() == contact.getFixtureB() ){
 						game.getPlayer().die();
 						break;
@@ -94,8 +92,10 @@ public class MyContactListener implements ContactListener{
 			
 //			+ item
 			for (Part part : game.getParts()){
-				if(part.getFixture() == contact.getFixtureA() || part.getFixture() == contact.getFixtureB() ){
-					part.collected();
+				if(!part.isCollected()){
+					if(part.getFixture() == contact.getFixtureA() || part.getFixture() == contact.getFixtureB() ){
+						part.collect();
+					}
 				}
 			}
 		}
@@ -110,8 +110,7 @@ public class MyContactListener implements ContactListener{
 									Math.abs(dynamicObject.getBody().getLinearVelocity().y) > minKillingSpeed ){
 								enemy.die();
 								break;
-							}
-							
+							}	
 						}
 					}
 				}
@@ -123,18 +122,16 @@ public class MyContactListener implements ContactListener{
 	public void endContact(Contact contact) {
 			
 		for( MySensor sensor : game.getPlayer().getSensorList() ){	
-			if (contact.getFixtureA() == sensor.getFixture()||
-				contact.getFixtureB() == sensor.getFixture()
-			){
+			if ( ( contact.getFixtureA() == sensor.getFixture() && !contact.getFixtureB().isSensor() ) 
+			|| ( contact.getFixtureB() == sensor.getFixture() && !contact.getFixtureA().isSensor() ) ) {
 				sensor.decreaseCollidingCounter();
 			}
 		}
 
 		for( Enemy enemy : game.getEnemies()){
 			for( MySensor sensor : enemy.getSensorList() ){	
-				if (contact.getFixtureA() == sensor.getFixture()||
-					contact.getFixtureB() == sensor.getFixture()
-				){
+				if ( ( contact.getFixtureA() == sensor.getFixture() && !contact.getFixtureB().isSensor() ) 
+				|| ( contact.getFixtureB() == sensor.getFixture() && !contact.getFixtureA().isSensor() ) ) {
 					sensor.decreaseCollidingCounter();
 				}
 			}

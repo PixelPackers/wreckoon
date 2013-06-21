@@ -26,10 +26,10 @@ import com.google.gson.Gson;
 public class Game extends BasicGame {
 
 //	 /*/
-	private static int screenWidth = 800;
-	private static int screenHeight = 600;
+	private static int screenWidth = 1600;
+	private static int screenHeight = 900;
 	private static boolean fullScreen = false;
-	
+	private static boolean DEFAULT_RUNNING = true;
 	/*/
 	 private static int screenWidth = 1920;
 	 private static int screenHeight = 1080;
@@ -47,7 +47,7 @@ public class Game extends BasicGame {
 	private ArrayList<GameObject> 	dynamicObjects 	= new ArrayList<GameObject>();
 	private ArrayList<Enemy> 		enemies			= new ArrayList<Enemy>();
 	private ArrayList<Tile>			tiles			= new ArrayList<Tile>();
-	private Player player;
+	private Player 					player;
 	private ArrayList<Part>			parts			= new ArrayList<Part>();
 
 	private Image[] trashpile = new Image[5];
@@ -61,6 +61,7 @@ public class Game extends BasicGame {
 
 	@Override
 	public void init(GameContainer gc) throws SlickException {
+//		MusicManager.getInstance().bgMusic();
 		
 		for (int i = 0; i <= 4; ++i) {
 			trashpile[i] = new Image("images/background" + (i + 1) + ".png");
@@ -98,8 +99,10 @@ public class Game extends BasicGame {
 		enemies.add( new EnemyPrimitive		(this, 14f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
 		
 //		music();
-		
+
 		parts.add( new Part(world, this, 10f, 0f) );
+		parts.add( new Part(world, this, 30f, -5f) );
+		parts.add( new Part(world, this, 50f, -7f) );
 		
 	}
 	
@@ -169,7 +172,7 @@ public class Game extends BasicGame {
 		}
 
 		for (Part part : parts){
-			part.draw();
+			part.draw(g, debugView);
 		}
 		// GUI
 		g.popTransform();
@@ -252,7 +255,8 @@ public class Game extends BasicGame {
 		
 		/// XXX MAGIC NUMBERS
 		/// max gegenlenken
-		float minCounterSteerSpeed = (!player.isJumpingFromWall() ) ? -5 : 5; 
+		float minCounterSteerSpeed = (!player.isJumpingFromWall() ) ? -5 : 5;
+		// FIXME set this to 420 to see the bug... only works in one direction
 		float slowDownForce = 20f;
 		float slowDownThreshold = 0.5f;
 		
@@ -276,6 +280,7 @@ public class Game extends BasicGame {
 		} else {
 			// control slippery
 			// TODO evtl herausheben und in der update die bewegungsrichtung überprüfen dh das für links und rechts dasselbe funkt und verwendet wird
+
 			if(player.getBody().getLinearVelocity().x < -slowDownThreshold && player.isOnGround()) {
 				player.getBody().applyLinearImpulse(new Vec2(slowDownForce,0), player.getBody().getPosition());
 			}
@@ -417,14 +422,14 @@ public class Game extends BasicGame {
 		// TODO crappy, weils keine keyUp() methode gibt. die reihenfolge muss auch so erhalten bleiben, sonsts is immer false
 		if(!input.isKeyDown(input.KEY_LSHIFT) && !input.isKeyDown(input.KEY_RSHIFT)){
 //			if (player.isOnGround() ){
-				player.setRunning(false);
+				player.setRunning(DEFAULT_RUNNING);
 //			}
 		}
 		if (input.isKeyDown(input.KEY_LSHIFT) || input.isKeyDown(input.KEY_RSHIFT)){
 			if (player.isOnGround() && player.getBody().getLinearVelocity().x != 0){
-				player.setRunning(true);
+				player.setRunning(!DEFAULT_RUNNING);
 			} else if(player.isOnWall()){
-				player.setRunning(true);
+				player.setRunning(!DEFAULT_RUNNING);
 //				XXX wenn das einkommentiert is, rutscht er wenn er im sprint modus is
 //				player.switchHitboxes();
 			}

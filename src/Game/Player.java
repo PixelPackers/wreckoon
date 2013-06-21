@@ -3,6 +3,7 @@ package Game;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -82,6 +83,9 @@ public class Player {
 	private FixtureDef 	firstFixtureDef 	= new FixtureDef();
 	private FixtureDef	secondFixtureDef	= new FixtureDef();
 
+	private FixtureDef	firstfixtureDefWheel = new FixtureDef();
+	private Fixture 	firstFixtureWheel;
+
 	private Fixture		fixtureTail 		= new Fixture();
 	private FixtureDef	fixtureDefTail 		= new FixtureDef();
 	private PolygonShape polygonShapeTail	= new PolygonShape();
@@ -106,7 +110,7 @@ public class Player {
 	private void initAnimations() throws SlickException {
 		
 		// XXX evtl auch da eine hashmap verwenden?
-		SpriteSheet sheetWalk 		= new SpriteSheet("images/walkcycle.png", 	575, 550);
+		SpriteSheet sheetWalk 		= new SpriteSheet("images/walkcycle.png", 	600, 575);
 		SpriteSheet sheetRun 		= new SpriteSheet("images/runcycle.png", 	735, 385);
 		SpriteSheet sheetWallJump	= new SpriteSheet("images/walljump.png", 	620, 685);
 		SpriteSheet sheetTailwhip	= new SpriteSheet("images/tailwhip.png",	770, 360);
@@ -176,6 +180,18 @@ public class Player {
 		// FIXME das oder body.sweep verwenden?
 		this.body.setFixedRotation(true);
 //		this.body.setLinearDamping(0.7f);
+		
+		// wheel
+		/// XXX GAY GAY GAY
+		CircleShape circleShape = new CircleShape();
+		circleShape.m_radius = 0.5f;
+		
+		this.firstfixtureDefWheel.shape = circleShape;
+		this.firstFixtureWheel = this.body.createFixture(this.firstfixtureDefWheel);
+		
+		
+		
+		
 		
 		// second hitbox
 		Vec2[] vertsSensor = new Vec2[]{
@@ -312,8 +328,6 @@ public class Player {
 			this.drawImage();
 		}
 		
-		
-
 		// sprite testing
 //		this.drawImage();
 //		this.drawOutline(g);
@@ -326,18 +340,13 @@ public class Player {
 		// XXX MAGIC NUMBERS
 		float drawWidth =  currentAnimation.getWidth() / 150; 
 		float drawHeight = currentAnimation.getHeight() / 150;
+		drawWidth= (left) ? drawWidth: -drawWidth;
 		
-		if(left){
-			currentAnimation.draw( position.x + drawWidth*0.5f,
-					-position.y-drawHeight*0.5f -0.5f, // -0.5f --> sonst wuerde sprite in den boden hinein stehen 
-					-drawWidth, 
-					drawHeight );	
-		} else {
-			currentAnimation.draw( position.x - drawWidth*0.5f,
-					-position.y-drawHeight*0.5f -0.5f, // -0.5f --> sonst wuerde sprite in den boden hinein stehen 
-					drawWidth, 
-					drawHeight );
-		}
+		currentAnimation.draw( position.x + drawWidth*0.5f,
+				-position.y - drawHeight*0.5f - 0.5f, // -0.5f --> sonst wuerde sprite in den boden hinein stehen 
+				-drawWidth, 
+				drawHeight );	
+		
 		
 	}
 	
