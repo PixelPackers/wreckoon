@@ -460,8 +460,12 @@ public class Player {
 		
 		this.telekinesis();
 
-		if( this.isOnGround() && !this.isRunning() && !this.doTailwhip && idleCounter > 2 && !this.dead){
+		if( this.isOnGround() /*&& !this.isRunning() */&& !this.doTailwhip && idleCounter > 2 && !this.dead){
 			this.currentAnimation = animations.get("idle");
+		}
+		
+		if (this.isJumpingFromWall() && this.currentAnimation.isStopped()){
+			this.currentAnimation = animations.get("runJump");
 		}
 		
 	}
