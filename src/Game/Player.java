@@ -117,7 +117,8 @@ public class Player {
 		SpriteSheet sheetIdle		= new SpriteSheet("images/idle.png", 		454, 575);
 		SpriteSheet sheetGroundpound= new SpriteSheet("images/groundpound.png", 600, 540);
 		SpriteSheet sheetDeath		= new SpriteSheet("images/death.png", 730, 320);
-		SpriteSheet sheetWalkJump		= new SpriteSheet("images/jump.png", 675, 575);
+		SpriteSheet sheetWalkJump	= new SpriteSheet("images/jump.png", 675, 575);
+		SpriteSheet sheetRunJump	= new SpriteSheet("images/flycycle.png", 735, 385);
 		
 		Animation animationWallJump = new Animation(sheetWallJump, 	100);
 		animationWallJump.setLooping(false);
@@ -146,6 +147,7 @@ public class Player {
 		animations.put("groundpound",	animationGroundpound);
 		animations.put("death", 		animationDeath);
 		animations.put("walkJump",		animationWalkJump);
+		animations.put("runJump",		new Animation(sheetRunJump, 	100));
 		
 		currentAnimation = animations.get("idle");
 	}
@@ -560,7 +562,7 @@ public class Player {
 			if (this.isOnGround()){
 
 				if ( this.isRunning() ) {
-					
+					this.currentAnimation = animations.get("runJump");
 				} else {
 					this.currentAnimation = animations.get("walkJump");
 					this.currentAnimation.restart();
@@ -627,7 +629,7 @@ public class Player {
 			return;
 		}
 		
-		if ( !this.doTailwhip && !this.groundPounding ) {
+		if ( !this.doTailwhip && !this.groundPounding /* && this.isOnGround()*/ ) {
 			
 			
 			this.doTailwhip = true;
@@ -1023,6 +1025,8 @@ public class Player {
 	}
 	
 	public boolean shouldntMove() {
-		return this.isCharging() || this.dizzy;
+		return this.dizzy;
+//		mit charging funkt telekinese ziel steuerung nicht mehr...
+//		return this.isCharging() || this.dizzy;
 	}
 }

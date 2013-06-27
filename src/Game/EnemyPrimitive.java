@@ -2,6 +2,7 @@ package Game;
 
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
+import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
 public class EnemyPrimitive extends Enemy{
@@ -14,10 +15,13 @@ public class EnemyPrimitive extends Enemy{
 	private int		updateCounter	= 0;
 	private boolean	idle			= false;
 	
+	
 	public EnemyPrimitive(Game game, float posX, float posY, float width, float height, float density, float friction, float restitution, String imgPath,
 			BodyType bodyType) throws SlickException {
 		super(game, posX, posY, width, height, density, friction, restitution, imgPath, bodyType);
 
+
+		this.img = new Image("images/dumbpig.png");
 		this.body.setFixedRotation(true);
 	}
 
