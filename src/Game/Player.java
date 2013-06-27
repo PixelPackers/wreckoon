@@ -55,6 +55,7 @@ public class Player {
 	private boolean jumpingFromWall = false;
 	private boolean dizzy = false;
 	private boolean dead = false;
+	private boolean biting = false;
 	
 	//XXX ??
 	private float	accelerationX = ACC_WALKING;
@@ -116,9 +117,10 @@ public class Player {
 		SpriteSheet sheetTailwhip	= new SpriteSheet("images/tailwhip.png",	770, 360);
 		SpriteSheet sheetIdle		= new SpriteSheet("images/idle.png", 		454, 575);
 		SpriteSheet sheetGroundpound= new SpriteSheet("images/groundpound.png", 600, 540);
-		SpriteSheet sheetDeath		= new SpriteSheet("images/death.png", 730, 320);
-		SpriteSheet sheetWalkJump	= new SpriteSheet("images/jump.png", 675, 575);
-		SpriteSheet sheetRunJump	= new SpriteSheet("images/flycycle.png", 735, 385);
+		SpriteSheet sheetDeath		= new SpriteSheet("images/death.png", 		730, 320);
+		SpriteSheet sheetWalkJump	= new SpriteSheet("images/jump.png", 		675, 575);
+		SpriteSheet sheetRunJump	= new SpriteSheet("images/flycycle.png", 	735, 385);
+		SpriteSheet sheetBite		= new SpriteSheet("images/bite.png", 		454, 575);
 		
 		Animation animationWallJump = new Animation(sheetWallJump, 	100);
 		animationWallJump.setLooping(false);
@@ -134,9 +136,12 @@ public class Player {
 		
 		Animation animationDeath= new Animation(sheetDeath, 200);
 		animationDeath.setLooping(false);
-		
+
 		Animation animationWalkJump = new Animation(sheetWalkJump, 80);
 		animationWalkJump.setLooping(false);
+
+		Animation animationBite = new Animation(sheetBite, 100);
+		animationBite.setLooping(false);
 		
 		
 		animations.put("run", 			new Animation(sheetRun,			100));
@@ -148,6 +153,7 @@ public class Player {
 		animations.put("death", 		animationDeath);
 		animations.put("walkJump",		animationWalkJump);
 		animations.put("runJump",		new Animation(sheetRunJump, 	100));
+		animations.put("bite",			animationBite);
 		
 		currentAnimation = animations.get("idle");
 	}
@@ -234,10 +240,7 @@ public class Player {
 		this.fixtureDefLaser = new FixtureDef();
 		this.fixtureDefLaser.shape = this.polygonShapeLaser;
 		fixtureDefLaser.isSensor = true;
-		
-		this.fixtureLaser = this.body.createFixture(this.fixtureDefLaser);
-//		this.body.destroyFixture(this.fixtureLaser);
-	
+			
 		this.createSensors();
 		this.adjustHitboxes();		
 	}
@@ -460,7 +463,7 @@ public class Player {
 		
 		this.telekinesis();
 
-		if( this.isOnGround() /*&& !this.isRunning() */&& !this.doTailwhip && idleCounter > 2 && !this.dead){
+		if( this.isOnGround() /*&& !this.isRunning() */&& !this.doTailwhip && idleCounter > 2 && !this.dead && !this.biting){
 			this.currentAnimation = animations.get("idle");
 		}
 		
@@ -844,6 +847,26 @@ public class Player {
 		
 		this.releaseObject();
 		this.setCharging(false);
+	}
+	
+	// laser
+	public void createLaser(){
+
+		this.fixtureLaser = this.body.createFixture(this.fixtureDefLaser);
+		
+	}
+	
+	public void destroyLaser(){
+
+		this.body.destroyFixture(this.fixtureLaser);
+		
+	}
+	
+	public void bite(){
+		this.biting = !this.biting;
+		System.out.println("bite");
+		this.currentAnimation = animations.get("bite");
+		this.currentAnimation.restart();
 	}
 	
 	private void increaseCounters(){

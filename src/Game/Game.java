@@ -479,7 +479,18 @@ public class Game extends BasicGame {
 			} else if ( player.isCharging() ) {
 				player.shoot();
 			}
-		}		
+		}	
+		
+		if(input.isKeyPressed(input.KEY_J)){
+			player.createLaser();
+		}
+		if(input.isKeyPressed(input.KEY_K)){
+			player.destroyLaser();
+		}
+
+		if(input.isKeyPressed(input.KEY_P)){
+			player.bite();
+		}
 	}
 	public GameObject chooseTelekinesisTarget() {
 		for (GameObject object : dynamicObjects) {
