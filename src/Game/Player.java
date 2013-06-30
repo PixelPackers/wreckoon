@@ -133,6 +133,7 @@ public class Player {
 		SpriteSheet sheetDeath		= new SpriteSheet("images/death.png", 		730, 320);					// 3
 		SpriteSheet sheetDeathAir	= new SpriteSheet("images/deathair.png", 		730, 320);
 		SpriteSheet sheetWalkJump	= new SpriteSheet("images/jump.png", 		675, 575);
+		SpriteSheet sheetWalkJumpAir= new SpriteSheet("images/jumpair.png", 		675, 575);
 		SpriteSheet sheetRunJump	= new SpriteSheet("images/flycycle.png", 	735, 385);
 		SpriteSheet sheetBite		= new SpriteSheet("images/bite.png", 		454, 575);					// 4
 		SpriteSheet sheetShock		= new SpriteSheet("images/shock.png", 		454, 575);
@@ -177,6 +178,7 @@ public class Player {
 		animations.put("deathAir", 		new Animation(sheetDeathAir,	 150));
 		
 		animations.put("walkJump",		animationWalkJump);
+		animations.put("walkJumpAir",	new Animation(sheetWalkJumpAir, 100));
 		animations.put("runJump",		new Animation(sheetRunJump, 	100));
 		animations.put("bite",			animationBite);
 		animations.put("shock",			new Animation(sheetShock, 	100));
@@ -502,6 +504,10 @@ public class Player {
 
 		if( this.isOnGround() /*&& !this.isRunning() */&& !this.doTailwhip && idleCounter > 2 && !this.dead && !this.biting){
 			this.currentAnimation = animations.get("idle");
+		}
+		
+		if( !this.running && !this.isOnGround() && this.currentAnimation.isStopped() ) {
+			this.currentAnimation = animations.get("walkJumpAir");
 		}
 		
 		if (this.isJumpingFromWall() && this.currentAnimation.isStopped()){
