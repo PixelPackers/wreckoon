@@ -137,7 +137,7 @@ public class Player {
 		SpriteSheet sheetRunJump	= new SpriteSheet("images/flycycle.png", 	735, 385);
 		SpriteSheet sheetBite		= new SpriteSheet("images/bite.png", 		454, 575);					// 4
 		SpriteSheet sheetShock		= new SpriteSheet("images/shock.png", 		454, 575);
-		SpriteSheet sheetLaser		= new SpriteSheet("images/lasercycle.png", 		454, 575);		 		// 5
+		SpriteSheet sheetLaser		= new SpriteSheet("images/lasercycle.png", 		600, 540);		 		// 5
 		
 		Animation animationWallJump = new Animation(sheetWallJump, 	70);
 		animationWallJump.setLooping(false);
@@ -182,6 +182,7 @@ public class Player {
 		animations.put("runJump",		new Animation(sheetRunJump, 	100));
 		animations.put("bite",			animationBite);
 		animations.put("shock",			new Animation(sheetShock, 	100));
+		animations.put("laser",			new Animation(sheetLaser, 	100));
 		
 		currentAnimation = animations.get("idle");
 	}
@@ -556,7 +557,10 @@ public class Player {
 				this.currentAnimation = animations.get("idle");
 			}
 		}
-		
+
+		if (this.laserActive && this.currentAnimation.isStopped() ) {
+			this.currentAnimation = animations.get("laser");
+		}
 	}
 
 	public void accelerate() {
@@ -956,6 +960,8 @@ public class Player {
 				this.fixtureLaser = this.body.createFixture(this.fixtureDefLaser);
 			}
 			
+			this.currentAnimation = animations.get("groundpound");
+			this.currentAnimation.restart();
 		}
 		
 	}
