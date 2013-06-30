@@ -36,7 +36,7 @@ public class Game extends BasicGame {
 	 private static boolean fullScreen = true;
 	 //*/
 	
-	private static boolean debugView = true;
+	private static boolean debugView = false;
 	
 	private static float zoom = 30f;
 	private static final float ZOOM_STEP = 1f;

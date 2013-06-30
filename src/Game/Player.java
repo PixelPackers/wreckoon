@@ -3,6 +3,7 @@ package Game;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.jbox2d.callbacks.RayCastCallback;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
@@ -24,6 +25,7 @@ public class Player {
 	private static final float	TAILWHIP_DISTANCE	= 20f;
 	private static final int	TAILWHIP_TIME		= 110;
 	private static final int 	GROUNDPOUND_AIRTIME = 30;
+	private static final int 	LASER_DURATION 		= 200;
 //	private final float MAX_VELOCITY_WALKING = 7f;
 //	private final float MAX_VELOCITY_RUNNING = 20f;
 //	private final float ACC_WALKING = 0.5f;
@@ -40,22 +42,24 @@ public class Player {
 	private int tailwhipCounter		= 0;
 	private int idleCounter			= 0;
 	private int dizzyCounter		= 0;
-	private int dizzyIncrease		= -1;
+	private int dizzyIncrease		=-1;
 	private int jumpCounter 		= 0;
+	private int laserCounter 		= 0;
 	
 	
-	private float jumpPower = 20f;
-	private float wallJumpPowerFactor = 0.3f;
-	private float groundPoundPower = -50f;
+	private float jumpPower				= 20f;
+	private float wallJumpPowerFactor	= 0.3f;
+	private float groundPoundPower		= -50f;
 
-	private boolean left = false;
-	private boolean running = false;
-	private boolean doTailwhip = false;
-	private boolean groundPounding = false;
-	private boolean jumpingFromWall = false;
-	private boolean dizzy = false;
-	private boolean dead = false;
-	private boolean biting = false;
+	private boolean left			= false;
+	private boolean running			= false;
+	private boolean doTailwhip		= false;
+	private boolean groundPounding	= false;
+	private boolean jumpingFromWall	= false;
+	private boolean dizzy			= false;
+	private boolean dead			= false;
+	private boolean biting			= false;
+	private boolean laserActive		= false;
 	
 	//XXX ??
 	private float	accelerationX = ACC_WALKING;
@@ -95,12 +99,15 @@ public class Player {
 	private Fixture		fixtureLaser 		= new Fixture();
 	private FixtureDef	fixtureDefLaser 	= new FixtureDef();
 	private PolygonShape polygonShapeLaser	= new PolygonShape();
+	private Vec2 		laserStartingPosition;
 	
 	private MySensor 	sensorTopLeft;
 	private MySensor 	sensorTopRight;
 	private MySensor	sensorBottomLeft;
 	private MySensor 	sensorBottomRight;
 	private MySensor	sensorGroundCollision;
+	
+
 
 	private ArrayList<MySensor> sensorList			= new ArrayList<MySensor>();
 	private Image 		img;
@@ -114,15 +121,21 @@ public class Player {
 		SpriteSheet sheetWalk 		= new SpriteSheet("images/walkcycle.png", 	600, 575);
 		SpriteSheet sheetRun 		= new SpriteSheet("images/runcycle.png", 	735, 385);
 		SpriteSheet sheetWallJump	= new SpriteSheet("images/walljump.png", 	620, 685);
+		SpriteSheet sheetWallIdle	= new SpriteSheet("images/wallidle.png", 	620, 685);
 		SpriteSheet sheetTailwhip	= new SpriteSheet("images/tailwhip.png",	770, 360);
 		SpriteSheet sheetIdle		= new SpriteSheet("images/idle.png", 		454, 575);
-		SpriteSheet sheetGroundpound= new SpriteSheet("images/groundpound.png", 600, 540);
-		SpriteSheet sheetDeath		= new SpriteSheet("images/death.png", 		730, 320);
+		SpriteSheet sheetGroundpoundRoll	= new SpriteSheet("images/groundpoundroll.png", 600, 540);
+		SpriteSheet sheetGroundpoundAir		= new SpriteSheet("images/groundpoundair.png", 600, 540);
+		SpriteSheet sheetGroundpoundImpact	= new SpriteSheet("images/groundpoundimpact.png", 600, 540);
+		SpriteSheet sheetDeath		= new SpriteSheet("images/death.png", 		730, 320);					// 3
+		SpriteSheet sheetDeathAir	= new SpriteSheet("images/deathair.png", 		730, 320);
 		SpriteSheet sheetWalkJump	= new SpriteSheet("images/jump.png", 		675, 575);
 		SpriteSheet sheetRunJump	= new SpriteSheet("images/flycycle.png", 	735, 385);
-		SpriteSheet sheetBite		= new SpriteSheet("images/bite.png", 		454, 575);
+		SpriteSheet sheetBite		= new SpriteSheet("images/bite.png", 		454, 575);					// 4
+		SpriteSheet sheetShock		= new SpriteSheet("images/shock.png", 		454, 575);
+		SpriteSheet sheetLaser		= new SpriteSheet("images/lasercycle.png", 		454, 575);		 		// 5
 		
-		Animation animationWallJump = new Animation(sheetWallJump, 	100);
+		Animation animationWallJump = new Animation(sheetWallJump, 	70);
 		animationWallJump.setLooping(false);
 		
 		Animation animationTailwhip = new Animation(sheetTailwhip, 	TAILWHIP_TIME);
@@ -130,9 +143,13 @@ public class Player {
 
 		Animation animationIdle = new Animation(sheetIdle, 	200);
 		animationIdle.setPingPong(true);
-		
-		Animation animationGroundpound = new Animation(sheetGroundpound, 100);
-		animationGroundpound.setLooping(false);
+
+		Animation animationGroundpoundRoll = new Animation(sheetGroundpoundRoll, 100);
+		animationGroundpoundRoll.setLooping(false);
+		Animation animationGroundpoundAir = new Animation(sheetGroundpoundAir, 50);
+//		animationGroundpoundRoll.setLooping(false);
+		Animation animationGroundpoundImpact = new Animation(sheetGroundpoundImpact, 80);
+//		animationGroundpoundImpact.setLooping(false);
 		
 		Animation animationDeath= new Animation(sheetDeath, 200);
 		animationDeath.setLooping(false);
@@ -147,9 +164,12 @@ public class Player {
 		animations.put("run", 			new Animation(sheetRun,			100));
 		animations.put("walk", 			new Animation(sheetWalk,		100));
 		animations.put("wallJump", 		animationWallJump);
+		animations.put("wallIdle", 		new Animation (sheetWallIdle, 200));
 		animations.put("tailwhip", 		animationTailwhip);
 		animations.put("idle", 			animationIdle );
-		animations.put("groundpound",	animationGroundpound);
+		animations.put("groundpound",		animationGroundpoundRoll);
+		animations.put("groundpoundAir",	animationGroundpoundAir);
+		animations.put("groundpoundImpact",	animationGroundpoundImpact);
 		animations.put("death", 		animationDeath);
 		animations.put("walkJump",		animationWalkJump);
 		animations.put("runJump",		new Animation(sheetRunJump, 	100));
@@ -397,22 +417,34 @@ public class Player {
 			g.draw(polygonToDraw);
 		}
 		
-		// augenlaser
+		// laser
 
-		Polygon polygonToDraw = new Polygon();
-		Vec2[] verts = this.polygonShapeLaser.getVertices();
-		
-		for (int i=0; i< this.polygonShapeLaser.m_vertexCount; ++i) {
-			Vec2 vert = verts[i];
-			Vec2 worldPoint = this.body.getWorldPoint(vert);
-			polygonToDraw.addPoint(worldPoint.x, -worldPoint.y);
+		if (this.fixtureLaser != null) {
+			Polygon polygonToDraw = new Polygon();
+			Vec2[] verts = this.polygonShapeLaser.getVertices();
+			
+			for (int i=0; i< this.polygonShapeLaser.m_vertexCount; ++i) {
+				Vec2 vert = verts[i];
+				
+				// FIXME magic numbers bzw player konstruktor start position
+				Vec2 worldPoint = this.body.getWorldPoint(vert.sub( new Vec2(20f,30f) ));
+				polygonToDraw.addPoint(worldPoint.x, -worldPoint.y);
+			}
+			
+			g.draw(polygonToDraw);
 		}
-		
-		g.draw(polygonToDraw);
 		
 	}
 	
 	public void update() {
+		
+		// TODO WORK IN PROGESS
+		if ( this.laserActive ){
+			this.body.setTransform(this.laserStartingPosition, this.body.getAngle());
+//			floating funkt nicht wie gewollt
+			this.body.setLinearVelocity(new Vec2(0,1) );
+		}
+		
 		// XXX evtl da checken, welche hitbox ausrichtung angebracht is
 				
 		
@@ -469,6 +501,25 @@ public class Player {
 		
 		if (this.isJumpingFromWall() && this.currentAnimation.isStopped()){
 			this.currentAnimation = animations.get("runJump");
+			this.jumpingFromWall = false;
+		}
+		
+		if (this.isGroundPounding() && !this.isOnGround() && this.currentAnimation.isStopped()) {
+			this.currentAnimation = animations.get("groundpoundAir");
+//			this.currentAnimation.restart();
+		}
+		
+		if (this.isOnGround() && this.dizzy){
+			this.currentAnimation = animations.get("groundpoundImpact");
+//			this.currentAnimation.restart();
+		}
+
+		if (this.isOnWall() && !this.isJumpingFromWall() && !this.isOnGround() ) {
+			this.currentAnimation = animations.get("wallIdle");
+		}
+		
+		if(this.fixtureLaser != null && laserCounter > LASER_DURATION ){
+			destroyLaser();
 		}
 		
 	}
@@ -852,14 +903,36 @@ public class Player {
 	// laser
 	public void createLaser(){
 
-		this.fixtureLaser = this.body.createFixture(this.fixtureDefLaser);
+		if ( !this.laserActive){
+			
+			this.laserActive = true;
+			
+			// save position where laser was activated
+			this.laserStartingPosition = this.body.getPosition();
+			System.out.println(this.laserStartingPosition);
+			
+//			TODO WORK IN PROGRESS
+//			lock player in air
+//			disable movement
+		
+			laserCounter = 0;
+	
+			if (this.fixtureLaser == null) {
+				this.fixtureLaser = this.body.createFixture(this.fixtureDefLaser);
+			}
+			
+		}
 		
 	}
 	
 	public void destroyLaser(){
 
-		this.body.destroyFixture(this.fixtureLaser);
-		
+		if (this.fixtureLaser != null ) {
+			this.body.destroyFixture(this.fixtureLaser);
+			this.fixtureLaser = null;
+		}
+
+		this.laserActive = false;
 	}
 	
 	public void bite(){
@@ -868,6 +941,13 @@ public class Player {
 		this.currentAnimation = animations.get("bite");
 		this.currentAnimation.restart();
 	}
+	
+	
+	
+	
+	
+	
+	
 	
 	private void increaseCounters(){
 		++groundPoundCounter;
@@ -878,6 +958,7 @@ public class Player {
 		++idleCounter;
 		dizzyCounter += dizzyIncrease;
 		++jumpCounter;
+		++laserCounter;
 	}
 	
 	
