@@ -26,6 +26,7 @@ public class Player {
 	private static final int	TAILWHIP_TIME		= 110;
 	private static final int 	GROUNDPOUND_AIRTIME = 30;
 	private static final int 	LASER_DURATION 		= 200;
+	private static final int 	SHOCK_DURATION		= 200;
 //	private final float MAX_VELOCITY_WALKING = 7f;
 //	private final float MAX_VELOCITY_RUNNING = 20f;
 //	private final float ACC_WALKING = 0.5f;
@@ -45,6 +46,7 @@ public class Player {
 	private int dizzyIncrease		=-1;
 	private int jumpCounter 		= 0;
 	private int laserCounter 		= 0;
+	private int biteCounter 		= 0;
 	
 	
 	private float jumpPower				= 20f;
@@ -58,6 +60,7 @@ public class Player {
 	private boolean jumpingFromWall	= false;
 	private boolean dizzy			= false;
 	private boolean dead			= false;
+	private boolean deadAndOnGround	= false;	
 	private boolean biting			= false;
 	private boolean laserActive		= false;
 	
@@ -164,16 +167,19 @@ public class Player {
 		animations.put("run", 			new Animation(sheetRun,			100));
 		animations.put("walk", 			new Animation(sheetWalk,		100));
 		animations.put("wallJump", 		animationWallJump);
-		animations.put("wallIdle", 		new Animation (sheetWallIdle, 200));
+		animations.put("wallIdle", 		new Animation (sheetWallIdle, 	200));
 		animations.put("tailwhip", 		animationTailwhip);
 		animations.put("idle", 			animationIdle );
 		animations.put("groundpound",		animationGroundpoundRoll);
 		animations.put("groundpoundAir",	animationGroundpoundAir);
 		animations.put("groundpoundImpact",	animationGroundpoundImpact);
 		animations.put("death", 		animationDeath);
+		animations.put("deathAir", 		new Animation(sheetDeathAir,	 150));
+		
 		animations.put("walkJump",		animationWalkJump);
 		animations.put("runJump",		new Animation(sheetRunJump, 	100));
 		animations.put("bite",			animationBite);
+		animations.put("shock",			new Animation(sheetShock, 	100));
 		
 		currentAnimation = animations.get("idle");
 	}
@@ -339,10 +345,9 @@ public class Player {
 	
 	public void die() {
 		
-		this.currentAnimation = animations.get("death");
-		this.currentAnimation.restart();
-		
+		this.currentAnimation = animations.get("deathAir");
 		this.dead = true;
+		this.deadAndOnGround = false;
 		
 	}
 	
@@ -504,6 +509,12 @@ public class Player {
 			this.jumpingFromWall = false;
 		}
 		
+//		FIXME BUG wenn man sich nur fallen lässt, wechselt er nicht in die flug idle
+//		und das alles so aufzählen is crap
+//		if(!this.isOnGround() && !this.isJumpingFromWall() && !this.groundPounding && !this.dead) {
+//			this.currentAnimation = animations.get("runJump");
+//		}
+		
 		if (this.isGroundPounding() && !this.isOnGround() && this.currentAnimation.isStopped()) {
 			this.currentAnimation = animations.get("groundpoundAir");
 //			this.currentAnimation.restart();
@@ -518,8 +529,26 @@ public class Player {
 			this.currentAnimation = animations.get("wallIdle");
 		}
 		
+		if (this.dead && this.isOnGround() ) {
+			
+			if ( !this.deadAndOnGround ) {
+				this.deadAndOnGround = true;
+				
+				this.currentAnimation = animations.get("death");
+				this.currentAnimation.restart();
+			}
+		}
+		
 		if(this.fixtureLaser != null && laserCounter > LASER_DURATION ){
 			destroyLaser();
+		}
+		
+		if (this.biting && this.currentAnimation.isStopped() ) {
+			this.currentAnimation = animations.get("shock");
+			if(biteCounter > SHOCK_DURATION ) {
+				this.biting = false;
+				this.currentAnimation = animations.get("idle");
+			}
 		}
 		
 	}
@@ -936,8 +965,9 @@ public class Player {
 	}
 	
 	public void bite(){
-		this.biting = !this.biting;
-		System.out.println("bite");
+		this.biting = true;
+		this.biteCounter = 0;
+		
 		this.currentAnimation = animations.get("bite");
 		this.currentAnimation.restart();
 	}
@@ -959,6 +989,7 @@ public class Player {
 		dizzyCounter += dizzyIncrease;
 		++jumpCounter;
 		++laserCounter;
+		++biteCounter;
 	}
 	
 	

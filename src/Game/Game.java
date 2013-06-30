@@ -491,6 +491,10 @@ public class Game extends BasicGame {
 		if(input.isKeyPressed(input.KEY_P)){
 			player.bite();
 		}
+		
+		if(input.isKeyPressed(input.KEY_L)){
+			player.die();
+		}
 	}
 	public GameObject chooseTelekinesisTarget() {
 		for (GameObject object : dynamicObjects) {
