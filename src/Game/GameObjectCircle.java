@@ -17,7 +17,7 @@ public class GameObjectCircle extends GameObject {
 
 		CircleShape circleShape = new CircleShape();
 		circleShape.m_radius = radius;
-		fixtureDef.shape = circleShape;
+		this.getFixtureDef().shape = circleShape;
 		this.radius = radius;
 		
 
@@ -26,13 +26,13 @@ public class GameObjectCircle extends GameObject {
 	}
 
 	public void drawImage(){
-		Vec2 position = this.body.getPosition();
-		float angle = this.body.getAngle();
-		img.setRotation(-(float) Math.toDegrees(angle));
-		img.draw(position.x - this.radius, -position.y - this.radius, this.radius*2, this.radius*2);
+		Vec2 position = this.getBody().getPosition();
+		float angle = this.getBody().getAngle();
+		this.getImage().setRotation(-(float) Math.toDegrees(angle));
+		this.getImage().draw(position.x - this.radius, -position.y - this.radius, this.radius*2, this.radius*2);
 	}
 	public void drawOutline(Graphics g) {
-		Vec2 pos = this.body.getPosition();
+		Vec2 pos = this.getBody().getPosition();
 		g.drawArc(pos.x - this.radius, -pos.y - this.radius, this.radius*2, this.radius*2, 0f, 360f);
 	}
 

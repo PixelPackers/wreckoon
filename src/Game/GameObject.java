@@ -12,15 +12,20 @@ import org.newdawn.slick.SlickException;
 
 public abstract class GameObject {
 
-	protected Body 			body;
-	protected BodyDef 		bodyDef;
-	protected FixtureDef 	fixtureDef;
-	protected Fixture 		fixture;
+	private Body 			body;
+	private BodyDef 		bodyDef;
+	private FixtureDef 	fixtureDef;
+	private Fixture 		fixture;
 
-	protected Image 		img;
-
+	private Image 		img;
+	
 	public GameObject(World world, float posX, float posY, float density, float friction, float restitution, String imgPath, BodyType bodyType)
 			throws SlickException {
+		this(world, posX, posY, density, friction, restitution, imgPath, bodyType, false);
+	}
+
+	public GameObject(World world, float posX, float posY, float density, float friction, float restitution, String imgPath, BodyType bodyType,
+			boolean isSensor) throws SlickException {
 		this.bodyDef = new BodyDef();
 		this.bodyDef.type = bodyType;
 		this.bodyDef.position.set(posX, posY);
@@ -29,6 +34,7 @@ public abstract class GameObject {
 		this.fixtureDef.density = density;
 		this.fixtureDef.friction = friction;
 		this.fixtureDef.restitution = restitution;
+		this.fixtureDef.isSensor = isSensor;
 
 		if(imgPath != null)
 			this.img = new Image(imgPath);
@@ -52,7 +58,26 @@ public abstract class GameObject {
 	public Body getBody() {
 		return body;
 	}
+	
+	public BodyDef getBodyDef() {
+		return bodyDef;
+	}
+
+	public FixtureDef getFixtureDef() {
+		return fixtureDef;
+	}
+
 	public Fixture getFixture() {
 		return fixture;
 	}
+	
+	public Image getImage() {
+		return this.img;
+	}
+
+	public void setImage(Image img) {
+		this.img = img;
+	}
+	
+	
 }

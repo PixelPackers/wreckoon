@@ -73,7 +73,7 @@ public abstract class Enemy extends GameObjectBox {
 		fixtureDefSensor.shape = sensorPolygonShape;
 		fixtureDefSensor.isSensor=true;
 
-		sensorList.add(new MySensor(this.body.createFixture(fixtureDefSensor), sensorPolygonShape ) );
+		sensorList.add(new MySensor(this.getBody().createFixture(fixtureDefSensor), sensorPolygonShape ) );
 		}
 		{
 		// right sensor
@@ -91,7 +91,7 @@ public abstract class Enemy extends GameObjectBox {
 		fixtureDefSensor.shape = sensorPolygonShape;
 		fixtureDefSensor.isSensor=true;
 
-		sensorList.add(new MySensor(this.body.createFixture(fixtureDefSensor), sensorPolygonShape ) );
+		sensorList.add(new MySensor(this.getBody().createFixture(fixtureDefSensor), sensorPolygonShape ) );
 		}
 		// ground collision
 		float groundCollisionSensorHeight=0.2f;
@@ -110,7 +110,7 @@ public abstract class Enemy extends GameObjectBox {
 		fixtureDefSensor.shape = sensorPolygonShape;
 		fixtureDefSensor.isSensor=true;
 		
-		this.sensorGroundCollision = new MySensor( this.body.createFixture(fixtureDefSensor), sensorPolygonShape );
+		this.sensorGroundCollision = new MySensor( this.getBody().createFixture(fixtureDefSensor), sensorPolygonShape );
 		sensorList.add(sensorGroundCollision);
 		
 
@@ -125,7 +125,7 @@ public abstract class Enemy extends GameObjectBox {
 		Vec2[] verts = this.polygonShape.getVertices();
 		for (int i=0; i< this.polygonShape.m_vertexCount; ++i) {
 			Vec2 vert = verts[i];
-			Vec2 worldPoint = this.body.getWorldPoint(vert);
+			Vec2 worldPoint = this.getBody().getWorldPoint(vert);
 			polygonToDraw.addPoint(worldPoint.x, -worldPoint.y);
 		}
 		
@@ -137,7 +137,7 @@ public abstract class Enemy extends GameObjectBox {
 		
 		// draw sensors
 		for (MySensor mySensor : sensorList){
-			mySensor.draw(g, this.body);
+			mySensor.draw(g, this.getBody());
 		}
 	}
 
@@ -194,12 +194,12 @@ public abstract class Enemy extends GameObjectBox {
 		float force = 15f;
 		float x = (game.getPlayer().movesLeft()) ? -force : force;
 		
-		this.body.setLinearVelocity(new Vec2 (x, force) );
+		this.getBody().setLinearVelocity(new Vec2 (x, force) );
 		
 	}
 	
 	public void die(){
-		this.dead=true;
+		this.dead = true;
 	}
 	
 	public boolean isDead() {

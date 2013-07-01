@@ -16,8 +16,8 @@ public class EnemyStupidFollower extends Enemy {
 			BodyType bodyType) throws SlickException {
 		super(game, posX, posY, width, height, density, friction, restitution, imgPath, bodyType);
 		
-		this.body.setFixedRotation(true);
-		img = new Image("images/smartpig.png");
+		this.getBody().setFixedRotation(true);
+		this.setImage(new Image("images/smartpig.png"));
 		
 	}
 	
@@ -34,12 +34,12 @@ public class EnemyStupidFollower extends Enemy {
 			
 			if(this.isOnGround()){
 	//			this.body.setLinearVelocity(new Vec2(x, this.body.getLinearVelocity().y) );
-				this.body.applyLinearImpulse( new Vec2(x, this.body.getLinearVelocity().y), this.body.getWorldCenter());
+				this.getBody().applyLinearImpulse( new Vec2(x, this.getBody().getLinearVelocity().y), this.getBody().getWorldCenter());
 			}
 			
 			if(this.isOnWall() && this.isOnGround()) {
 //				this.body.applyForce( new Vec2(this.body.getLinearVelocity().x, jumpPower), this.body.getWorldCenter() );
-				this.body.setLinearVelocity( new Vec2(this.body.getLinearVelocity().x, jumpPower) );
+				this.getBody().setLinearVelocity( new Vec2(this.getBody().getLinearVelocity().x, jumpPower) );
 			}
 		}
 	}

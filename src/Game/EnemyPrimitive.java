@@ -22,8 +22,8 @@ public class EnemyPrimitive extends Enemy{
 		super(game, posX, posY, width, height, density, friction, restitution, imgPath, bodyType);
 
 
-		this.img = new Image("images/dumbpig.png");
-		this.body.setFixedRotation(true);
+		this.setImage(new Image("images/dumbpig.png"));
+		this.getBody().setFixedRotation(true);
 	}
 
 	@Override
@@ -31,7 +31,7 @@ public class EnemyPrimitive extends Enemy{
 		if ( !isDead() ){ 
 		
 			if(this.isOnGround() && !idle){
-				this.body.setLinearVelocity(new Vec2(speed, this.body.getLinearVelocity().y) );
+				this.getBody().setLinearVelocity(new Vec2(speed, this.getBody().getLinearVelocity().y) );
 //				this.body.applyLinearImpulse( new Vec2(speed, this.body.getLinearVelocity().y), this.body.getWorldCenter());
 			}
 			
