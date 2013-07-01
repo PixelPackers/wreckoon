@@ -78,16 +78,10 @@ public class Part {
 			this.drawImage();
 		}
 		
-		// sprite testing
-//		this.drawImage();
-//		this.drawOutline(g);
-		
 		update();		
 	}
 	
 	public void drawImage(){
-		// TODO linie herum zeichnen, damit man sieht wie groß einfluss bereich
-		// TODO + halbe größe usw... eh klar...
 		image.draw(this.body.getPosition().x - radius, -this.body.getPosition().y -radius, radius*2f, radius*2f);
 	}
 	
@@ -97,6 +91,7 @@ public class Part {
 	
 	public void update(){
 
+		// make floating movement
 		this.floatingHeight = (float) (this.floatingSpeed * Math.sin( Math.toRadians( ++i%360f ) ));
 		this.body.setTransform( new Vec2 (this.body.getPosition().x, this.body.getPosition().y + this.floatingHeight), 0);
 

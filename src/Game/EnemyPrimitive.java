@@ -10,8 +10,9 @@ public class EnemyPrimitive extends Enemy{
 	// units are update cycles
 	private final static int DIRECTION_SWITCH_MIN_TIME 	= 25;
 	private final static int IDLE_WAITING_TIME 			= 100;
-	
-	private float	speed			= -5;
+
+	private float	maxSpeed		= 5;
+	private float	speed			= -maxSpeed;
 	private int		updateCounter	= 0;
 	private boolean	idle			= false;
 	
@@ -41,14 +42,20 @@ public class EnemyPrimitive extends Enemy{
 			}
 			
 			if ( idle && updateCounter > IDLE_WAITING_TIME){
-
-				speed = -speed;
+				this.left = !this.left;  
+				speed = (left) ? -maxSpeed : maxSpeed;
 				this.idle = false;
 				updateCounter=0;
 			}
 		}
 		
 		++updateCounter;
+	}
+
+	@Override
+	protected void initAnimations() throws SlickException {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

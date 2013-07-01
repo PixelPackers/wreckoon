@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import org.jbox2d.callbacks.RayCastCallback;
 import org.jbox2d.collision.shapes.CircleShape;
+import org.jbox2d.collision.shapes.MassData;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -47,6 +48,7 @@ public class Player {
 	private int jumpCounter 		= 0;
 	private int laserCounter 		= 0;
 	private int biteCounter 		= 0;
+	private int floatingCounter 	= 0;
 	
 	
 	private float jumpPower				= 20f;
@@ -69,12 +71,14 @@ public class Player {
 	private float	maxVelocity = MAX_VELOCITY_WALKING;
 	
 
-	private GameObject 	lockedObject = null;
-	private boolean		charging = false;
-	private float		shootingPower 		= 0f;
-	private float 		maxShootingPower 	= 50f;
+	private GameObject 	lockedObject			= null;
+	private boolean		charging				= false;
+	private float		shootingPower 			= 0f;
+	private float 		maxShootingPower 		= 50f;
 	private Vec2 		lockedPlayerPosition;
-	private	Vec2 		shootingDirection = new Vec2(1,1);
+	private	Vec2 		shootingDirection		= new Vec2(1,1);
+	private float 		floatingDistanceX		= 3f;
+	private float 		floatingDistanceY		= 3f;
 	
 	private float		maxPlayerRotation = 10f;
 	private World		world;
@@ -109,7 +113,6 @@ public class Player {
 	private MySensor	sensorBottomLeft;
 	private MySensor 	sensorBottomRight;
 	private MySensor	sensorGroundCollision;
-	
 
 
 	private ArrayList<MySensor> sensorList			= new ArrayList<MySensor>();
@@ -289,8 +292,8 @@ public class Player {
 			height = this.width;
 		}
 		// wall collision sensors
-		float sensorSizeWidth	= width  * 0.125f;
-		float sensorSizeHeight	= height * 0.1f;
+		float sensorSizeWidth	= 0.05f; // width  * 0.125f;
+		float sensorSizeHeight	= 0.05f; // height * 0.1f;
 		float default_xSpace = width*0.5f;
 		float default_ySpace = height*0.45f;
 		float xSpace = default_xSpace;
@@ -320,7 +323,7 @@ public class Player {
 		}
 		
 		// ground collision
-		float groundCollisionSensorHeight=0.2f;
+		float groundCollisionSensorHeight=0.25f;
 		
 		Vec2[] vertsGroundSensor = new Vec2[]{
 			new Vec2(-width * 0.45f, -height * 0.5f - groundCollisionSensorHeight),
@@ -355,15 +358,15 @@ public class Player {
 	}
 	
 	public void draw(Graphics g, boolean debugView){
-		if (debugView || this.img == null) {
-			this.drawOutline(g);
-		} else { 
-			this.drawImage();
-		}
+//		if (debugView || this.img == null) {
+//			this.drawOutline(g);
+//		} else { 
+//			this.drawImage();
+//		}
 		
 		// sprite testing
-//		this.drawImage();
-//		this.drawOutline(g);
+		this.drawImage();
+		this.drawOutline(g);
 		
 	}
 	
@@ -371,8 +374,8 @@ public class Player {
 		Vec2 position	= this.body.getPosition();
 		
 		// XXX MAGIC NUMBERS
-		float drawWidth =  currentAnimation.getWidth() / 150; 
-		float drawHeight = currentAnimation.getHeight() / 150;
+		float drawWidth =  currentAnimation.getWidth() / 150f; 
+		float drawHeight = currentAnimation.getHeight() / 150f;
 		drawWidth= (left) ? drawWidth: -drawWidth;
 		
 		currentAnimation.draw( position.x + drawWidth*0.5f,
@@ -446,11 +449,10 @@ public class Player {
 	
 	public void update() {
 		
-		// TODO WORK IN PROGESS
+		// float in air while shooting laser
 		if ( this.laserActive ){
 			this.body.setTransform(this.laserStartingPosition, this.body.getAngle());
-//			floating funkt nicht wie gewollt
-			this.body.setLinearVelocity(new Vec2(0,1) );
+			this.body.setLinearVelocity(new Vec2(0,0.5f) );
 		}
 		
 		// XXX evtl da checken, welche hitbox ausrichtung angebracht is
@@ -459,22 +461,23 @@ public class Player {
 		// abwaerts bewegung an wand
 		if( this.isOnWall() ){
 			if(this.body.getLinearVelocity().y < 0){
-//				if( (this.leftWallColliding() && this.body.getLinearVelocity().x < 0 ) || (this.rightWallColliding() && this.body.getLinearVelocity().x > 0 )){
-//					this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, 1f));	
-//				}	else {
-//					this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, -2f));
-//				}
+				if( (this.leftWallColliding() && this.body.getLinearVelocity().x < 0f ) || (this.rightWallColliding() && this.body.getLinearVelocity().x > 0f )){
+					this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, 1f));	
+				}	else {
+					this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, -2f));
+				}
 			}
 //			if( !this.isOnGround()){
 //				this.setRunning(false);
 //			}
 		}
+		
 		if (this.groundPounding) {
 			this.groundpound();	
 		}
 		
 		// TODO konstante fuer speed
-		if( this.tailwhipCounter > 20 && this.doTailwhip ){
+		if( this.tailwhipCounter > 20f && this.doTailwhip ){
 			this.tailwhipFinalize();
 		}
 		
@@ -503,7 +506,7 @@ public class Player {
 		
 		this.telekinesis();
 
-		if( this.isOnGround() /*&& !this.isRunning() */&& !this.doTailwhip && idleCounter > 2 && !this.dead && !this.biting){
+		if( this.isOnGround() /*&& !this.isRunning() */&& !this.doTailwhip && idleCounter > 2 && !this.dead && !this.biting) {
 			this.currentAnimation = animations.get("idle");
 		}
 		
@@ -511,16 +514,19 @@ public class Player {
 			this.currentAnimation = animations.get("walkJumpAir");
 		}
 		
-		if (this.isJumpingFromWall() && this.currentAnimation.isStopped()){
+		if (this.isJumpingFromWall() && this.currentAnimation.isStopped()) {
 			this.currentAnimation = animations.get("runJump");
 			this.jumpingFromWall = false;
 		}
 		
-//		FIXME BUG wenn man sich nur fallen lässt, wechselt er nicht in die flug idle
-//		und das alles so aufzählen is crap
-//		if(!this.isOnGround() && !this.isJumpingFromWall() && !this.groundPounding && !this.dead) {
-//			this.currentAnimation = animations.get("runJump");
-//		}
+		if (this.currentAnimation == animations.get("wallIdle") && !this.isOnWall()) {
+			this.jumpingFromWall = false;
+			this.currentAnimation = animations.get("runJump");
+		}
+		
+		if(!this.isOnGround() && !this.isJumpingFromWall() && !this.groundPounding && !this.dead && !this.laserActive) {
+			this.currentAnimation = animations.get("runJump");
+		}
 		
 		if (this.isGroundPounding() && !this.isOnGround() && this.currentAnimation.isStopped()) {
 			this.currentAnimation = animations.get("groundpoundAir");
@@ -565,8 +571,8 @@ public class Player {
 
 	public void accelerate() {
 		
-		if( shouldntMove() )
-			return;
+//		if( shouldntMove() )
+//			return;
 		
 		float velocityX 	= this.body.getLinearVelocity().x;
 		float velocityY 	= this.body.getLinearVelocity().y;
@@ -599,6 +605,7 @@ public class Player {
 //			this.body.applyLinearImpulse(new Vec2(speed, 0), this.body.getPosition());
 //		}
 
+		// third approach
 		float speed = (left) ? -800 : 800;
 		if ( Math.abs(velocityX + accelerationX) < Math.abs(maxVelocity)  ) {
 			this.body.applyForce( new Vec2(speed, 0), this.body.getPosition() );
@@ -624,6 +631,7 @@ public class Player {
 			accelerationX 	= ACC_WALKING;
 			maxVelocity		= MAX_VELOCITY_WALKING;
 		}
+		
 	}
 	
 	public void adjustHitboxes(){
@@ -805,8 +813,6 @@ public class Player {
 			return;
 		}
 		
-		float 	floatingDistanceX	= 2f;
-		float 	floatingDistanceY	= 2f;
 		
 		if( !this.isCharging() ) {
 			
@@ -828,7 +834,7 @@ public class Player {
 			
 			Vec2 placement = this.shootingDirection.clone();
 			placement.normalize();
-			placement = placement.mul(3f);
+			placement = placement.mul( (float)Math.sqrt(floatingDistanceX*floatingDistanceX + floatingDistanceY*floatingDistanceY));
 			
 			//*
 			lockedObject.getBody().setTransform(new Vec2(
@@ -852,68 +858,23 @@ public class Player {
 
 		float	lockObjX			= lockedObject.getBody().getPosition().x;
 		float	lockObjY			= lockedObject.getBody().getPosition().y;
-	
-		/* braucht ma alles nicht bzw nur fï¿½r speed, der grad auskommentiert is
-		float	distanceX	=	Math.abs( lockObjX ) - Math.abs( this.getBody().getPosition().x ) ;
-		float	distanceY	=	Math.abs( lockObjY ) - Math.abs( this.getBody().getPosition().y ) ;
-
-		// minimal distance
-		if(distanceX < 0.5f){
-			distanceX=0.5f;
-		}//*/
 		
-		// XXX
 		// float speed = 0.5f * 1f/Math.abs(distanceX);
 		float speed = MAX_VELOCITY_RUNNING;
 		
-		float toleranceX = 1f;
+		float toleranceX = 0.5f;
 		
 		if(lockObjX + toleranceX < targetX)
 			lockedObject.getBody().setLinearVelocity( new Vec2( speed, lockedObject.getBody().m_linearVelocity.y ));
 		else if(lockObjX - toleranceX > targetX) 
 			lockedObject.getBody().setLinearVelocity( new Vec2(-speed,lockedObject.getBody().m_linearVelocity.y ));
-		else // within tolerance
-			lockedObject.getBody().setLinearVelocity( new Vec2(lockedObject.getBody().m_linearVelocity.x*0.5f,lockedObject.getBody().m_linearVelocity.y ));
-			
+		else { // within tolerance
+//			lockedObject.getBody().setLinearVelocity( new Vec2(lockedObject.getBody().m_linearVelocity.x*0.5f, lockedObject.getBody().m_linearVelocity.y ));
+			lockedObject.getBody().setLinearVelocity( new Vec2(lockedObject.getBody().m_linearVelocity.x*0.5f, 0 ));
+		}	
 		
-		// XXX telekinesis work in progress
-		float toleranceY= 0f;
-		if(lockObjY + toleranceY < targetY){ // should move up
-//			lockedObject.getBody().setLinearVelocity( new Vec2( lockedObject.getBody().m_linearVelocity.x, speed
-//					-( this.world.getGravity().y) 
-//					));			
-
-			float max = 2f;
-			float slowDownFactor = 1.4f;
-			float distanceFactor = Math.abs(targetX - lockedObject.getBody().getLinearVelocity().y);
-			distanceFactor = (float) Math.sqrt(distanceFactor) * slowDownFactor;
-
-//			System.out.print(distanceFactor + "    ");
-			distanceFactor = (distanceFactor > max) ? max : distanceFactor;
-//			System.out.println(distanceFactor);
-			
-			Vec2 antiGravity = this.world.getGravity().clone();
-			antiGravity = antiGravity.mul(distanceFactor * lockedObject.getBody().getMass()).negate();
-//			lockedObject.getBody().applyLinearImpulse(antiGravity, lockedObject.getBody().getWorldCenter());
-			lockedObject.getBody().applyForce(antiGravity, lockedObject.getBody().getWorldCenter());
-			
-		} else if(lockObjY - toleranceY > targetY) { // should move down 
-			// let gravity do the work...
-//			lockedObject.getBody().setLinearVelocity( new Vec2( lockedObject.getBody().m_linearVelocity.x, -speed ));
-		}	else { // within tolerance
-			
-		}
-		// balloon example...
-//		lockedObject.getBody().applyForce(this.world.getGravity().negate().mul(lockedObject.getBody().getMass()), lockedObject.getBody().getWorldCenter()	);
-		
-		
-		// XXX is setting object to target position (no transition animation)
-//		lockedObject.getBody().setTransform(new Vec2(targetX, targetY), 0);
-//		lockedObject.getBody().setTransform(new Vec2(lockObjX, targetY), 0);
-		
-		
-		// XXX ANTIGRAVITY remove every force in any direction --> float / stay in place
-//		lockedObject.getBody().setLinearVelocity(new Vec2(0,0));
+		lockObjY = targetY 	+ (float) ( Math.sin( Math.toRadians( ++floatingCounter % 360f ) ));
+		lockedObject.getBody().setTransform(new Vec2(lockObjX, lockObjY), 0);
 		
 	}
 	
@@ -1176,7 +1137,7 @@ public class Player {
 	}
 	
 	public boolean shouldntMove() {
-		return this.dizzy;
+		return this.dizzy && false;
 //		mit charging funkt telekinese ziel steuerung nicht mehr...
 //		return this.isCharging() || this.dizzy;
 	}

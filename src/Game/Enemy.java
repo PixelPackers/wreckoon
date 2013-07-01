@@ -1,12 +1,14 @@
 package Game;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
+import org.newdawn.slick.Animation;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
@@ -17,13 +19,17 @@ public abstract class Enemy extends GameObjectBox {
 	protected Game game;
 	protected float width;
 	protected float height;
-	
+
 	private boolean dead = false;
+	protected boolean left = false;
 	
 	protected ArrayList<MySensor> sensorList = new ArrayList<MySensor>();
 	protected MySensor 	sensorLeft;
 	protected MySensor 	sensorRight;
 	protected MySensor	sensorGroundCollision;
+	
+	private Animation a;
+	private Animation currentAnimation;
 
 	public Enemy(Game game, float posX, float posY, float width, float height, float density, float friction, float restitution, String imgPath,
 			BodyType bodyType) throws SlickException {
@@ -35,6 +41,8 @@ public abstract class Enemy extends GameObjectBox {
 		
 		createSensors();
 	}
+	
+	protected abstract void initAnimations() throws SlickException;
 	
 	private void createSensors() {
 
@@ -133,6 +141,20 @@ public abstract class Enemy extends GameObjectBox {
 		}
 	}
 
+//	public void drawImage(){
+//		Vec2 position	= this.body.getPosition();
+//		
+//		// XXX MAGIC NUMBERS
+//		float drawWidth =  currentAnimation.getWidth() / 150; 
+//		float drawHeight = currentAnimation.getHeight() / 150;
+//		drawWidth= (left) ? drawWidth: -drawWidth;
+//		
+//		currentAnimation.draw( position.x + drawWidth*0.5f,
+//				-position.y - drawHeight*0.5f - 0.5f, // -0.5f --> sonst wuerde sprite in den boden hinein stehen 
+//				-drawWidth, 
+//				drawHeight);	
+//	}
+	
 	public boolean isOnGround(){
 		return this.sensorGroundCollision.isColliding();
 	}

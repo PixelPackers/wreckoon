@@ -43,5 +43,11 @@ public class EnemyStupidFollower extends Enemy {
 			}
 		}
 	}
+
+	@Override
+	protected void initAnimations() throws SlickException {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

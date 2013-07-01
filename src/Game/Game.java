@@ -196,6 +196,11 @@ public class Game extends BasicGame {
 		g.drawString("pos: " + player.getBody().getPosition(), 200, 50);
 		
 
+		// warum funkt fill mit pattern nicht? 
+		Image pattern = new Image ("images/washer.png", 1);
+		g.fillRect(10, -10, 21, 21, pattern, 102, 102 );
+		
+
 	}
 
 	public static void main(String[] args) throws SlickException {
@@ -394,7 +399,7 @@ public class Game extends BasicGame {
 		}
 		if (input.isKeyDown(Input.KEY_C)) {
 			float max_size = 0.5f;
-			float min_size = 0.05f;
+			float min_size = 0.5f;
 			float size = (float) Math.random() * max_size + min_size;
 
 			CircleShape c = new CircleShape();
