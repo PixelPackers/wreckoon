@@ -49,6 +49,7 @@ public class Game extends BasicGame {
 	private static ArrayList<Tile>			tiles			= new ArrayList<Tile>();
 	private static Player 					player;
 	private static ArrayList<Part>			parts			= new ArrayList<Part>();
+	private static ArrayList<SteelBeam>		steelBeams		= new ArrayList<SteelBeam>();
 
 	private static House house;
 	
@@ -89,7 +90,8 @@ public class Game extends BasicGame {
 			}
 		}
 		
-		player = new Player(world, 20f, 30f);
+//		player = new Player(world, 20f, 30f);
+		player = new Player(world, 100f, 0f);
 		world.setContactListener(new MyContactListener(this));
 		for(int i=0; i<10; ++i){
 
@@ -104,8 +106,10 @@ public class Game extends BasicGame {
 
 		parts.add( new Part(world, this, 60f, 45f) );
 		
-		
-		
+//		dynamicObjects.add(new GameObjectBox(world, 10f, 10f, 10f, 1f, 0.5f, 0.5f, 0.5f, null, BodyType.DYNAMIC));
+		steelBeams.add(new SteelBeam(world, 120f, 20f, 31f, 8f, 1.5f));
+		steelBeams.add(new SteelBeam(world, 100f, 24f, 31f, 8f, 1.5f));
+		steelBeams.add(new SteelBeam(world, 140f, 40f, 31f, 8f, 1.5f));
 	}
 	
 	private String readFile( String file ) throws IOException {
@@ -177,6 +181,10 @@ public class Game extends BasicGame {
 
 		for (Part part : parts){
 			part.draw(g, debugView);
+		}
+		
+		for (SteelBeam sb : steelBeams) {
+			sb.draw(g, debugView);
 		}
 		
 		house.drawFront(g, debugView);

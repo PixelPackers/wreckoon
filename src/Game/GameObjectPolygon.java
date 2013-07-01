@@ -14,11 +14,16 @@ public class GameObjectPolygon extends GameObject {
 
 	public GameObjectPolygon(World world, float posX, float posY, Vec2[] verts, float density, float friction, float restitution, String imgPath,
 			BodyType bodyType) throws SlickException {
-		super(world, posX, posY, density, friction, restitution, imgPath, bodyType);
+		this(world, posX, posY, verts, density, friction, restitution, imgPath, bodyType, false);
+	}
+	
+	public GameObjectPolygon(World world, float posX, float posY, Vec2[] verts, float density, float friction, float restitution, String imgPath,
+			BodyType bodyType, boolean isSensor) throws SlickException {
+		super(world, posX, posY, density, friction, restitution, imgPath, bodyType, isSensor);
 
 		this.polygonShape = new PolygonShape();
 		this.polygonShape.set(verts, verts.length);
-		this.fixtureDef.shape = polygonShape;
+		this.getFixtureDef().shape = polygonShape;
 		
 //		AABB aabb = this.body.getFixtureList().m_aabb;
 //		this.width = aabb.lowerBound.x - aabb.upperBound.x;
@@ -30,10 +35,10 @@ public class GameObjectPolygon extends GameObject {
 	}
 
 	public void drawImage() {
-		Vec2 position = this.body.getPosition();
-		float angle = this.body.getAngle();
-		img.setRotation(-(float) Math.toDegrees(angle));
-		img.draw(position.x, -position.y, 10, 10);
+		Vec2 position = this.getBody().getPosition();
+		float angle = this.getBody().getAngle();
+		this.getImage().setRotation(-(float) Math.toDegrees(angle));
+		this.getImage().draw(position.x, -position.y, 10, 10);
 	}
 
 	@Override
@@ -43,7 +48,7 @@ public class GameObjectPolygon extends GameObject {
 		Vec2[] verts = this.polygonShape.getVertices();
 		for (int i=0; i< this.polygonShape.m_vertexCount; ++i) {
 			Vec2 vert = verts[i];
-			Vec2 worldPoint = this.body.getWorldPoint(vert);
+			Vec2 worldPoint = this.getBody().getWorldPoint(vert);
 			polygonToDraw.addPoint(worldPoint.x, -worldPoint.y);
 		}
 		g.draw(polygonToDraw);

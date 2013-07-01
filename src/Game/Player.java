@@ -131,13 +131,13 @@ public class Player {
 		SpriteSheet sheetGroundpoundAir		= new SpriteSheet("images/groundpoundair.png", 600, 540);
 		SpriteSheet sheetGroundpoundImpact	= new SpriteSheet("images/groundpoundimpact.png", 600, 540);
 		SpriteSheet sheetDeath		= new SpriteSheet("images/death.png", 		730, 320);					// 3
-		SpriteSheet sheetDeathAir	= new SpriteSheet("images/deathair.png", 		730, 320);
+		SpriteSheet sheetDeathAir	= new SpriteSheet("images/deathair.png", 	730, 320);
 		SpriteSheet sheetWalkJump	= new SpriteSheet("images/jump.png", 		675, 575);
-		SpriteSheet sheetWalkJumpAir= new SpriteSheet("images/jumpair.png", 		675, 575);
+		SpriteSheet sheetWalkJumpAir= new SpriteSheet("images/jumpair.png", 	675, 575);
 		SpriteSheet sheetRunJump	= new SpriteSheet("images/flycycle.png", 	735, 385);
 		SpriteSheet sheetBite		= new SpriteSheet("images/bite.png", 		454, 575);					// 4
 		SpriteSheet sheetShock		= new SpriteSheet("images/shock.png", 		454, 575);
-		SpriteSheet sheetLaser		= new SpriteSheet("images/lasercycle.png", 		600, 540);		 		// 5
+		SpriteSheet sheetLaser		= new SpriteSheet("images/lasercycle.png", 	600, 540);		 		// 5
 		
 		Animation animationWallJump = new Animation(sheetWallJump, 	70);
 		animationWallJump.setLooping(false);
@@ -444,6 +444,10 @@ public class Player {
 		
 	}
 	
+	public float curveValue(float dest, float current, float smoothness) {
+		return current + (dest - current) / smoothness;
+	}
+	
 	public void update() {
 		
 		// TODO WORK IN PROGESS
@@ -499,7 +503,7 @@ public class Player {
 		increaseCounters();
 		
 		// FIXME das oder fixed rotation verwenden?
-//		this.body.m_sweep.a = 0;
+		//this.body.m_sweep.a = 0;
 		
 		this.telekinesis();
 
@@ -600,9 +604,18 @@ public class Player {
 //		}
 
 		float speed = (left) ? -800 : 800;
-		if ( Math.abs(velocityX + accelerationX) < Math.abs(maxVelocity)  ) {
-			this.body.applyForce( new Vec2(speed, 0), this.body.getPosition() );
+//		if ( Math.abs(velocityX + accelerationX) < Math.abs(maxVelocity)  ) {
+//			this.body.applyForce( new Vec2(speed, 0), this.body.getPosition() );
+//		}
+		
+		if (velocityX + accelerationX <= maxVelocity &&
+				velocityX - accelerationX >= -maxVelocity) {
+			//this.body.applyForce(new Vec2(speed, 0), this.body.getPosition());
 		}
+		this.body.applyForce(new Vec2(speed, 0), this.body.getPosition());
+		if (velocityX > maxVelocity) this.body.setLinearVelocity(new Vec2(maxVelocity, velocityY));
+		if (velocityX < -maxVelocity) this.body.setLinearVelocity(new Vec2(-maxVelocity, velocityY));
+		
 		//*/
 		if(!groundPounding && !doTailwhip && this.isOnGround() && jumpCounter > 5){
 			if(this.running){
