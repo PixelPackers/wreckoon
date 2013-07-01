@@ -17,9 +17,7 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
-import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.SpriteSheet;
 
 import com.google.gson.Gson;
 
@@ -57,6 +55,8 @@ public class Game extends BasicGame {
 
 	private static Camera cam = new Camera(0, screenHeight);
 	private static Level level;
+	
+	private static Xbox360Controller xbox;
 
 	public Game() {
 		super("The Raccooning");
@@ -65,6 +65,8 @@ public class Game extends BasicGame {
 	@Override
 	public void init(GameContainer gc) throws SlickException {
 //		MusicManager.getInstance().bgMusic();
+		
+		xbox = new Xbox360Controller();
 		
 		for (int i = 0; i <= 4; ++i) {
 			trashpile[i] = new Image("images/background" + (i + 1) + ".png");
@@ -266,7 +268,7 @@ public class Game extends BasicGame {
 	public void processInput(GameContainer gc) throws SlickException{
 		Input input = gc.getInput();
 
-		if (input.isKeyPressed(Input.KEY_SPACE) || input.isKeyPressed(Input.KEY_W) || input.isKeyPressed(Input.KEY_UP)) {
+		if (xbox.isButtonADown() || input.isKeyPressed(Input.KEY_SPACE) || input.isKeyPressed(Input.KEY_W) || input.isKeyPressed(Input.KEY_UP)) {
 			
 			 if( !player.isCharging() ) {
 				player.jump();
@@ -281,7 +283,7 @@ public class Game extends BasicGame {
 		float slowDownForce = 20f;
 		float slowDownThreshold = 0.5f;
 		
-		if (input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
+		if (xbox.isLeftThumbTiltedLeft() || input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
 			if( player.isCharging() ){
 //				player.getShootingDirection().x -= 1;
 				player.increaseShootingDirection(-1, 0);
@@ -307,7 +309,7 @@ public class Game extends BasicGame {
 			}
 		}
 
-		if (input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D)) {
+		if (xbox.isLeftThumbTiltedRight() || input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D)) {
 
 			if(player.isCharging()){
 //				player.getShootingDirection().x += 1;
@@ -331,7 +333,7 @@ public class Game extends BasicGame {
 			}
 		}
 
-		if (input.isKeyPressed(Input.KEY_DOWN) || input.isKeyPressed(Input.KEY_S)) {
+		if (xbox.isButtonBDown() || input.isKeyPressed(Input.KEY_DOWN) || input.isKeyPressed(Input.KEY_S)) {
 			 if( !player.isCharging() && !player.isOnWall() && !player.isOnGround()) {
 				player.groundpoundInit();
 			} else if (player.isOnWall()){
@@ -344,14 +346,14 @@ public class Game extends BasicGame {
 			}
 		}
 		
-		if (input.isKeyDown(Input.KEY_SPACE) || input.isKeyDown(Input.KEY_W) || input.isKeyDown(Input.KEY_UP)) {
+		if (xbox.isButtonADown() || input.isKeyDown(Input.KEY_SPACE) || input.isKeyDown(Input.KEY_W) || input.isKeyDown(Input.KEY_UP)) {
 			if( player.isCharging() ){
 //				player.getShootingDirection().y += 1;
 				player.increaseShootingDirection(0, 1);
 			} 
 		}
 		
-		if (input.isKeyDown(Input.KEY_DOWN) || input.isKeyDown(Input.KEY_S)) {
+		if (xbox.isLeftThumbTiltedDown() || input.isKeyDown(Input.KEY_DOWN) || input.isKeyDown(Input.KEY_S)) {
 			if( player.isCharging() ){
 //				player.getShootingDirection().y -= 1;
 				player.increaseShootingDirection(0, -1);
@@ -441,12 +443,12 @@ public class Game extends BasicGame {
 		
 		
 		// TODO crappy, weils keine keyUp() methode gibt. die reihenfolge muss auch so erhalten bleiben, sonsts is immer false
-		if(!input.isKeyDown(input.KEY_LSHIFT) && !input.isKeyDown(input.KEY_RSHIFT)){
+		if(!xbox.isButtonLeftShoulderDown() && !input.isKeyDown(input.KEY_LSHIFT) && !input.isKeyDown(input.KEY_RSHIFT)){
 //			if (player.isOnGround() ){
 				player.setRunning(DEFAULT_RUNNING);
 //			}
 		}
-		if (input.isKeyDown(input.KEY_LSHIFT) || input.isKeyDown(input.KEY_RSHIFT)){
+		if (xbox.isButtonLeftShoulderDown() || input.isKeyDown(input.KEY_LSHIFT) || input.isKeyDown(input.KEY_RSHIFT)){
 			if (player.isOnGround() && player.getBody().getLinearVelocity().x != 0){
 				player.setRunning(!DEFAULT_RUNNING);
 			} else if(player.isOnWall()){
@@ -457,17 +459,16 @@ public class Game extends BasicGame {
 			
 		}
 		
-
-		if (input.isKeyDown(input.KEY_H) ){
+		if (xbox.isButtonXDown() || input.isKeyDown(input.KEY_H) ){
 			player.tailwhipInit();
 		}
 		
-		if (input.isKeyPressed(input.KEY_T) ){
-						
+		if (xbox.isButtonYDown() || input.isKeyPressed(input.KEY_T) ){
+			
 			if( !player.hasLockedObject() ){
 				
 				player.lockObject(chooseTelekinesisTarget() );
-				
+			
 			} else if(player.isCharging()) {
 				GameObject locked = player.getLockedObject();
 				player.shoot();
@@ -476,7 +477,6 @@ public class Game extends BasicGame {
 				player.releaseObject();
 			}	
 		}
-
 
 		boolean shootkeyDown = false;
 		
@@ -508,7 +508,10 @@ public class Game extends BasicGame {
 		if(input.isKeyPressed(input.KEY_L)){
 			player.die();
 		}
+		
+		xbox.resetStates();
 	}
+	
 	public GameObject chooseTelekinesisTarget() {
 		for (GameObject object : dynamicObjects) {
 			
