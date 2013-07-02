@@ -11,7 +11,7 @@ public class EnemyPrimitive extends Enemy{
 	private final static int DIRECTION_SWITCH_MIN_TIME 	= 25;
 	private final static int IDLE_WAITING_TIME 			= 100;
 
-	private float	maxSpeed		= 5;
+	private float	maxSpeed		= 1.25f;
 	private float	speed			= -maxSpeed;
 	private int		updateCounter	= 0;
 	private boolean	idle			= false;

@@ -1,10 +1,15 @@
 package Game;
 
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class Level {
 
+	@SuppressWarnings("unused")
 	private float version = 1.0f;
 	private Block[][] blocks;
+	private ArrayList<BackgroundObject> backgroundObjects;
+	private ArrayList<ZoomArea> zoomAreas;
 	
 	public Level(int width, int height) {
 		this.blocks = new Block[width][height];
@@ -13,6 +18,45 @@ public class Level {
 				this.blocks[x][y] = new Block();
 			}
 		}
+	}
+	
+	public ArrayList<ZoomArea> getZoomAreas() {
+		return zoomAreas;
+	}
+	
+	public void addZoomArea(ZoomArea za) {
+		if (zoomAreas == null) {
+			zoomAreas = new ArrayList<ZoomArea>();
+		}
+		zoomAreas.add(za);
+	}
+	
+	public void removeZoomArea(ZoomArea za) {
+		zoomAreas.remove(za);
+	}
+	
+	public boolean containsZoomArea(ZoomArea za) {
+		return zoomAreas.contains(za);
+	}
+	
+	public ArrayList<BackgroundObject> getBackgroundObjects() {
+		return backgroundObjects;
+	}
+	
+	public void addBackgroundObject(BackgroundObject bo) {
+		if (backgroundObjects == null) {
+			backgroundObjects = new ArrayList<BackgroundObject>();
+		}
+		backgroundObjects.add(bo);
+		Collections.sort(backgroundObjects);
+	}
+	
+	public void removeBackgroundObject(BackgroundObject bo) {
+		backgroundObjects.remove(bo);
+	}
+	
+	public boolean containsBackgroundObject(BackgroundObject bo) {
+		return backgroundObjects.contains(bo);
 	}
 	
 	public void setBlock(int x, int y, int brush, int angle, boolean flipped) {

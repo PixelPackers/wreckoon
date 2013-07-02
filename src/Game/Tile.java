@@ -29,6 +29,7 @@ public class Tile {
 	
 	private static SpriteSheet img;
 	
+	private static final float TILE_SIZE = 1f;
 	
 	public Tile (World world, float x, float y, int type, int angle, boolean flipped) throws SlickException {
 	
@@ -570,8 +571,8 @@ public class Tile {
 				fixtures.add(verts);
 				break;
 			}
-		float factor = 4;
-		return multiplyFixtures(fixtures, factor);
+//		return multiplyFixtures(fixtures, TILE_SIZE);
+		return fixtures;
 	}
 	
 	
@@ -606,7 +607,7 @@ public class Tile {
 		//Image image = Tile.img.getSubImage(this.type % 12, this.type / 12).getFlippedCopy(flipped, false);
 		Image image = Tile.img.getSubImage((this.type % 12) * 512 + 2, (this.type / 12) * 512 + 2, 508, 508).getFlippedCopy(flipped, false);
 		image.setRotation(-angle);
-		image.draw(this.x - 2, -this.y - 2, 4, 4);
+		image.draw(this.x - TILE_SIZE * 0.5f, -this.y - TILE_SIZE * 0.5f, TILE_SIZE, TILE_SIZE);
 	}
 
 	public void drawOutline(Graphics g) {

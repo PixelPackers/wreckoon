@@ -10,7 +10,7 @@ import org.newdawn.slick.geom.Polygon;
 
 public class EnemyStupidFollower extends Enemy {
 
-	private float jumpPower = 12f;
+	private float jumpPower = 3f;
 	
 	public EnemyStupidFollower(Game game, float posX, float posY, float width, float height, float density, float friction, float restitution, String imgPath,
 			BodyType bodyType) throws SlickException {
@@ -25,7 +25,7 @@ public class EnemyStupidFollower extends Enemy {
 		
 		if (!isDead() ){ 
 			Player player = this.game.getPlayer();
-			float speed = 5;
+			float speed = 1.25f;
 			float x = speed;
 			
 			if(player.getBody().getPosition().x	< this.getBody().getPosition().x){
@@ -33,8 +33,8 @@ public class EnemyStupidFollower extends Enemy {
 			}
 			
 			if(this.isOnGround()){
-	//			this.body.setLinearVelocity(new Vec2(x, this.body.getLinearVelocity().y) );
-				this.getBody().applyLinearImpulse( new Vec2(x, this.getBody().getLinearVelocity().y), this.getBody().getWorldCenter());
+				this.getBody().setLinearVelocity(new Vec2(x, this.getBody().getLinearVelocity().y) );
+//				this.getBody().applyLinearImpulse( new Vec2(x, 0*this.getBody().getLinearVelocity().y), this.getBody().getWorldCenter());
 			}
 			
 			if(this.isOnWall() && this.isOnGround()) {

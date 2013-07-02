@@ -23,7 +23,7 @@ import org.newdawn.slick.geom.Polygon;
 
 public class Player {
 
-	private static final float	TAILWHIP_DISTANCE	= 20f;
+	private static final float	TAILWHIP_DISTANCE	= 20f * 0.25f;
 	private static final int	TAILWHIP_TIME		= 110;
 	private static final int 	GROUNDPOUND_AIRTIME = 30;
 	private static final int 	LASER_DURATION 		= 200;
@@ -34,10 +34,10 @@ public class Player {
 //	private final float ACC_RUNNING = 0.75f;
 //	
 	// XXX more friction test
-	private final float MAX_VELOCITY_WALKING = 7f;
-	private final float MAX_VELOCITY_RUNNING = 20f;
-	private final float ACC_WALKING = 1.5f;
-	private final float ACC_RUNNING = 1.75f;
+	private final float MAX_VELOCITY_WALKING = 7f * 0.25f;
+	private final float MAX_VELOCITY_RUNNING = 20f * 0.25f;
+	private final float ACC_WALKING = 1.5f * 0.25f;
+	private final float ACC_RUNNING = 1.75f * 0.25f;
 	private final float playerFriction = 1f;
 	
 	private int groundPoundCounter	= 0;
@@ -51,9 +51,9 @@ public class Player {
 	private int floatingCounter 	= 0;
 	
 	
-	private float jumpPower				= 20f;
+	private float jumpPower				= 10f;
 	private float wallJumpPowerFactor	= 0.3f;
-	private float groundPoundPower		= -50f;
+	private float groundPoundPower		= -50f * 0.25f;
 
 	private boolean left			= false;
 	private boolean running			= false;
@@ -74,17 +74,17 @@ public class Player {
 	private GameObject 	lockedObject			= null;
 	private boolean		charging				= false;
 	private float		shootingPower 			= 0f;
-	private float 		maxShootingPower 		= 50f;
+	private float 		maxShootingPower 		= 50f * 0.25f;
 	private Vec2 		lockedPlayerPosition;
 	private	Vec2 		shootingDirection		= new Vec2(1,1);
-	private float 		floatingDistanceX		= 3f;
-	private float 		floatingDistanceY		= 3f;
+	private float 		floatingDistanceX		= 3f * 0.25f;
+	private float 		floatingDistanceY		= 3f * 0.25f;
 	
 	private float		maxPlayerRotation = 10f;
 	private World		world;
 	
-	private float width		= 1f;
-	private float height	= 2f;
+	private float width		= 1f * 0.25f;
+	private float height	= 2f * 0.25f;
 	private PolygonShape firstPolygonShape 		= new PolygonShape();
 	private PolygonShape secondPolygonShape 	= new PolygonShape();
 	
@@ -223,11 +223,11 @@ public class Player {
 		
 		// wheel
 		/// XXX GAY GAY GAY
-		CircleShape circleShape = new CircleShape();
-		circleShape.m_radius = 0.5f;
-		
-		this.firstfixtureDefWheel.shape = circleShape;
-		this.firstFixtureWheel = this.body.createFixture(this.firstfixtureDefWheel);
+//		CircleShape circleShape = new CircleShape();
+//		circleShape.m_radius = 0.5f;
+//		
+//		this.firstfixtureDefWheel.shape = circleShape;
+//		this.firstFixtureWheel = this.body.createFixture(this.firstfixtureDefWheel);
 		
 		
 		
@@ -292,8 +292,8 @@ public class Player {
 			height = this.width;
 		}
 		// wall collision sensors
-		float sensorSizeWidth	= 0.05f; // width  * 0.125f;
-		float sensorSizeHeight	= 0.05f; // height * 0.1f;
+		float sensorSizeWidth	= width  * 0.125f;
+		float sensorSizeHeight	= height * 0.1f;
 		float default_xSpace = width*0.5f;
 		float default_ySpace = height*0.45f;
 		float xSpace = default_xSpace;
@@ -323,7 +323,7 @@ public class Player {
 		}
 		
 		// ground collision
-		float groundCollisionSensorHeight=0.25f;
+		float groundCollisionSensorHeight=0.25f * 0.25f;
 		
 		Vec2[] vertsGroundSensor = new Vec2[]{
 			new Vec2(-width * 0.45f, -height * 0.5f - groundCollisionSensorHeight),
@@ -378,10 +378,10 @@ public class Player {
 		float drawHeight = currentAnimation.getHeight() / 150f;
 		drawWidth= (left) ? drawWidth: -drawWidth;
 		
-		currentAnimation.draw( position.x + drawWidth*0.5f,
-				-position.y - drawHeight*0.5f - 0.5f, // -0.5f --> sonst wuerde sprite in den boden hinein stehen 
-				-drawWidth, 
-				drawHeight);	
+//		currentAnimation.draw( position.x + drawWidth*0.5f,
+//				-position.y - drawHeight*0.5f - 0.5f, // -0.5f --> sonst wuerde sprite in den boden hinein stehen 
+//				-drawWidth, 
+//				drawHeight);	
 	}
 	
 	public void drawOutline(Graphics g) {
@@ -462,19 +462,19 @@ public class Player {
 		// XXX evtl da checken, welche hitbox ausrichtung angebracht is
 				
 		
-		// abwaerts bewegung an wand
-		if( this.isOnWall() ){
-			if(this.body.getLinearVelocity().y < 0){
-				if( (this.leftWallColliding() && this.body.getLinearVelocity().x < 0f ) || (this.rightWallColliding() && this.body.getLinearVelocity().x > 0f )){
-					this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, 1f));	
-				}	else {
-					this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, -2f));
-				}
-			}
-//			if( !this.isOnGround()){
-//				this.setRunning(false);
+//		// abwaerts bewegung an wand
+//		if( this.isOnWall() ){
+//			if(this.body.getLinearVelocity().y < 0){
+//				if( (this.leftWallColliding() && this.body.getLinearVelocity().x < 0f ) || (this.rightWallColliding() && this.body.getLinearVelocity().x > 0f )){
+//					this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, 1f));	
+//				}	else {
+//					this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, -2f));
+//				}
 //			}
-		}
+////			if( !this.isOnGround()){
+////				this.setRunning(false);
+////			}
+//		}
 		
 		if (this.groundPounding) {
 			this.groundpound();	
@@ -610,7 +610,7 @@ public class Player {
 //		}
 
 		// third approach
-		float speed = (left) ? -800 : 800;
+		float speed = (left) ? -50 : 50;
 //		if ( Math.abs(velocityX + accelerationX) < Math.abs(maxVelocity)  ) {
 //			this.body.applyForce( new Vec2(speed, 0), this.body.getPosition() );
 //		}

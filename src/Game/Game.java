@@ -23,21 +23,21 @@ import com.google.gson.Gson;
 
 public class Game extends BasicGame {
 
-//	 /*/
+//	/*/
 	private static int screenWidth = 1600;
 	private static int screenHeight = 900;
 	private static boolean fullScreen = false;
 	private static boolean DEFAULT_RUNNING = true;
 	/*/
-	 private static int screenWidth = 1920;
-	 private static int screenHeight = 1080;
-	 private static boolean fullScreen = true;
-	 //*/
+	private static int screenWidth = 1920;
+	private static int screenHeight = 1080;
+	private static boolean fullScreen = true;
+	//*/
 	
 	private static boolean debugView = false;
 	
-	private static float zoom = 30f;
-	private static final float ZOOM_STEP = 1f;
+	private static float zoom = 128f;
+	private static final float ZOOM_STEP = 4f;
 	
 	private static World world;
 
@@ -47,16 +47,18 @@ public class Game extends BasicGame {
 	private static ArrayList<Tile>			tiles			= new ArrayList<Tile>();
 	private static Player 					player;
 	private static ArrayList<Part>			parts			= new ArrayList<Part>();
-	private static ArrayList<SteelBeam>		steelBeams		= new ArrayList<SteelBeam>();
+	private static ArrayList<Girder>		girders			= new ArrayList<Girder>();
+	
 
 	private static House house;
-	
-	private static Image[] trashpile = new Image[5];
-
-	private static Camera cam = new Camera(0, screenHeight);
+	private static Camera cam = new Camera(0, 0);
 	private static Level level;
 	
 	private static Xbox360Controller xbox;
+	
+	private Color backgroundColor = new Color(112, 149, 163);
+	private float BACKGROUND_SCALE = 0.008f;
+	private static Image[] trashpile = new Image[5];
 
 	public Game() {
 		super("The Raccooning");
@@ -72,7 +74,7 @@ public class Game extends BasicGame {
 			trashpile[i] = new Image("images/background" + (i + 1) + ".png");
 		}
 		
-		world = new World(new Vec2(0f, -30f), false);
+		world = new World(new Vec2(0f, -20f), false);
 		
 		// load the level
 		try {
@@ -82,36 +84,37 @@ public class Game extends BasicGame {
 			e.printStackTrace();
 		}
 		
+		house = new House(world, 0f, 0f);
+		
+		// create the tiles
 		for (int x = 0; x < level.getWidth(); ++x) {
 			for (int y = 0; y < level.getHeight(); ++y) {
 				Block b = level.getBlock(x, y);
 				if (b.getType() > 0) {
-					Tile newTile = new Tile(world, x * 4, -y * 4, b.getType(), -b.getAngle(), b.isFlipped());
+					Tile newTile = new Tile(world, x, -y, b.getType(), -b.getAngle(), b.isFlipped());
 					tiles.add(newTile);
 				}
 			}
 		}
 		
-//		player = new Player(world, 20f, 30f);
-		player = new Player(world, 100f, 0f);
+		parts.add(new Part(world, this, 60f, 45f));
+		
+		girders.add(new Girder(world, 30f,  5f, 7.75f));
+		girders.add(new Girder(world, 25f,  6f, 7.75f));
+		girders.add(new Girder(world, 35f, 10f, 7.75f));
+		
+		player = new Player(world, 5f, 7.5f);
+//		player = new Player(world, 25f, 0f);
 		world.setContactListener(new MyContactListener(this));
-		for(int i=0; i<10; ++i){
-
-			enemies.add( new EnemyPrimitive(this, 10*i +10f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
-		}
-		enemies.add( new EnemyStupidFollower(this, 10f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
-		enemies.add( new EnemyStupidFollower(this, 15f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
-		enemies.add( new EnemyStupidFollower(this, 124f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
-		enemies.add( new EnemyPrimitive		(this, 14f, 5f, 2f, 2f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
+//		for(int i=0; i<10; ++i){
+//
+//			enemies.add( new EnemyPrimitive(this, 10*i +10f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
+//		}
+//		enemies.add(new EnemyStupidFollower(this,  10f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+//		enemies.add(new EnemyStupidFollower(this,  15f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+//		enemies.add(new EnemyStupidFollower(this, 124f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+//		enemies.add(new EnemyPrimitive     (this,  14f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
 		
-		house = new House(world, 0, 0);
-
-		parts.add( new Part(world, this, 60f, 45f) );
-		
-//		dynamicObjects.add(new GameObjectBox(world, 10f, 10f, 10f, 1f, 0.5f, 0.5f, 0.5f, null, BodyType.DYNAMIC));
-		steelBeams.add(new SteelBeam(world, 120f, 20f, 31f, 8f, 1.5f));
-		steelBeams.add(new SteelBeam(world, 100f, 24f, 31f, 8f, 1.5f));
-		steelBeams.add(new SteelBeam(world, 140f, 40f, 31f, 8f, 1.5f));
 	}
 	
 	private String readFile( String file ) throws IOException {
@@ -144,10 +147,12 @@ public class Game extends BasicGame {
 	@Override
 	public void render(GameContainer gc, Graphics g) throws SlickException {
 		
-		g.setBackground(Color.gray);
+		g.setBackground(backgroundColor );
+		
+		drawBackgroundObjects(g);
+		drawZoomAreas(g);
+		
 		g.pushTransform();
-		drawBackground(g);
-
 		g.translate(cam.getX() * zoom + screenWidth / 2f, cam.getY() * zoom + screenHeight * 2f / 3f);
 		g.scale(zoom, zoom);
 		
@@ -185,7 +190,7 @@ public class Game extends BasicGame {
 			part.draw(g, debugView);
 		}
 		
-		for (SteelBeam sb : steelBeams) {
+		for (Girder sb : girders) {
 			sb.draw(g, debugView);
 		}
 		
@@ -228,41 +233,36 @@ public class Game extends BasicGame {
 	
 	
 	
-	
+	private void drawZoomAreas(Graphics g) {
+		if (level.getZoomAreas() != null) {
+			for (ZoomArea za : level.getZoomAreas()) {
+				g.pushTransform();
+				g.translate(cam.getX() * zoom + screenWidth / 2, cam.getY() * zoom + screenHeight * 2 / 3);
+				g.scale(zoom, zoom);
+				g.drawRect(za.getX1(), za.getY1(), za.getWidth(), za.getHeight());
+				g.popTransform();
+			}
+		}
+	}
 
-	public void drawBackground(Graphics g) {
-		// FIXME clean this crap up.
-//		if(!debugView){
-//			g.pushTransform();
-//			g.translate(cam.getX() * 0.475f * zoom + screenWidth / 2f, cam.getY() * 0.475f * zoom + screenHeight * 2f / 3f);
-//			g.scale(zoom, zoom);
-//			trashpile[2].draw(13, -18, 40f, 20f);
-//			g.popTransform();
-//	
-//			g.pushTransform();
-//			g.translate(cam.getX() * 0.575f * zoom + screenWidth / 2f, cam.getY() * 0.575f * zoom + screenHeight * 2f / 3f);
-//			g.scale(zoom, zoom);
-//			trashpile[4].draw(6, -18, 40f, 20f);
-//			g.popTransform();
-//	
-//			g.pushTransform();
-//			g.translate(cam.getX() * 0.675f * zoom + screenWidth / 2f, cam.getY() * 0.675f * zoom + screenHeight * 2f / 3f);
-//			g.scale(zoom, zoom);
-//			trashpile[3].draw(23, -18, 40f, 20f);
-//			g.popTransform();
-//	
-//			g.pushTransform();
-//			g.translate(cam.getX() * 0.75f * zoom + screenWidth / 2f, cam.getY() * 0.75f * zoom + screenHeight * 2f / 3f);
-//			g.scale(zoom, zoom);
-//			trashpile[0].draw(-7, -29, 30f, 15f);
-//			g.popTransform();
-//	
-//			g.pushTransform();
-//			g.translate(cam.getX() * 0.875f * zoom + screenWidth / 2f, cam.getY() * 0.875f * zoom + screenHeight * 2f / 3f);
-//			g.scale(zoom, zoom);
-//			trashpile[1].draw(15, -18, 40f, 20f);
-//			g.popTransform();
-//		}
+	private void drawBackgroundObjects(Graphics g) {
+		if (level.getBackgroundObjects() != null) {
+			for (BackgroundObject bo : level.getBackgroundObjects()) {
+				g.pushTransform();
+				g.translate(cam.getX() * zoom * bo.getZ() + screenWidth / 2, cam.getY() * zoom * bo.getZ() + screenHeight * 2 / 3);
+				g.scale(zoom * bo.getZ(), zoom * bo.getZ());
+				
+				Image tmp = trashpile[bo.getType()];
+				tmp = tmp.getFlippedCopy(bo.isFlipped(), false);
+				tmp.setImageColor(1f - bo.getZ() + backgroundColor.r * bo.getZ(),
+						1f - bo.getZ() + backgroundColor.g * bo.getZ(),
+						1f - bo.getZ() + backgroundColor.b * bo.getZ());
+				tmp.draw(bo.getX() - tmp.getWidth() * BACKGROUND_SCALE / 2,
+						 bo.getY() - tmp.getHeight() * BACKGROUND_SCALE / 2,
+						 tmp.getWidth() * BACKGROUND_SCALE, tmp.getHeight() * BACKGROUND_SCALE);
+				g.popTransform();
+			}
+		}
 	}
 	
 	public void processInput(GameContainer gc) throws SlickException{
@@ -280,7 +280,7 @@ public class Game extends BasicGame {
 		/// max gegenlenken
 		float minCounterSteerSpeed = (!player.isJumpingFromWall() ) ? -5 : 5;
 		// FIXME set this to 420 to see the bug... only works in one direction
-		float slowDownForce = 20f;
+		float slowDownForce = 5f;
 		float slowDownThreshold = 0.5f;
 		
 		if (xbox.isLeftThumbTiltedLeft() || input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
@@ -334,16 +334,17 @@ public class Game extends BasicGame {
 		}
 
 		if (xbox.isButtonBDown() || input.isKeyPressed(Input.KEY_DOWN) || input.isKeyPressed(Input.KEY_S)) {
-			 if( !player.isCharging() && !player.isOnWall() && !player.isOnGround()) {
+			if( !player.isCharging() && !player.isOnGround()) {
 				player.groundpoundInit();
-			} else if (player.isOnWall()){
-				if(player.leftWallColliding()){
-					// XXX magic numbers
-					player.getBody().setLinearVelocity(new Vec2(3,0));
-				} else if(player.rightWallColliding()){
-					player.getBody().setLinearVelocity(new Vec2(-3,0));
-				}
 			}
+//			} else if (player.isOnWall()){
+//				if(player.leftWallColliding()){
+//					// XXX magic numbers
+//					player.getBody().setLinearVelocity(new Vec2(3,0));
+//				} else if(player.rightWallColliding()){
+//					player.getBody().setLinearVelocity(new Vec2(-3,0));
+//				}
+//			}
 		}
 		
 		if (xbox.isButtonADown() || input.isKeyDown(Input.KEY_SPACE) || input.isKeyDown(Input.KEY_W) || input.isKeyDown(Input.KEY_UP)) {
@@ -443,12 +444,12 @@ public class Game extends BasicGame {
 		
 		
 		// TODO crappy, weils keine keyUp() methode gibt. die reihenfolge muss auch so erhalten bleiben, sonsts is immer false
-		if(!xbox.isButtonLeftShoulderDown() && !input.isKeyDown(input.KEY_LSHIFT) && !input.isKeyDown(input.KEY_RSHIFT)){
+		if(!xbox.isLeftTriggerDown() && !input.isKeyDown(input.KEY_LSHIFT) && !input.isKeyDown(input.KEY_RSHIFT)){
 //			if (player.isOnGround() ){
 				player.setRunning(DEFAULT_RUNNING);
 //			}
 		}
-		if (xbox.isButtonLeftShoulderDown() || input.isKeyDown(input.KEY_LSHIFT) || input.isKeyDown(input.KEY_RSHIFT)){
+		if (xbox.isLeftTriggerDown() || input.isKeyDown(input.KEY_LSHIFT) || input.isKeyDown(input.KEY_RSHIFT)){
 			if (player.isOnGround() && player.getBody().getLinearVelocity().x != 0){
 				player.setRunning(!DEFAULT_RUNNING);
 			} else if(player.isOnWall()){

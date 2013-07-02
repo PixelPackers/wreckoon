@@ -17,7 +17,7 @@ import org.newdawn.slick.geom.Polygon;
 
 public class House {
 
-	private static final float FACTOR = 60f;
+	private static final float FACTOR = 15f;
 	
 	private World	world;
 	private Body 	body;
@@ -44,7 +44,7 @@ public class House {
 		this.washy = new Image("images/washy.png");
 		washy.setCenterOfRotation(washy.getWidth()/2, washy.getHeight()/2);
 		
-		BodyDef bodyDef = new BodyDef(); 
+		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyType.STATIC;
 		bodyDef.position.set(x, y);
 		
@@ -56,8 +56,7 @@ public class House {
 		FixtureDef fixtureDef	= new FixtureDef();
 		fixtureDef.restitution	= 0f;
 		
-		for(Vec2[] verts : arrayList){
-
+		for (Vec2[] verts : arrayList) {
 			PolygonShape polygonShape = new PolygonShape();
 			polygonShape.set(verts, verts.length);
 			fixtureDef.shape		= polygonShape;
@@ -87,12 +86,14 @@ public class House {
 		verts[2] = new Vec2(FACTOR * 0.2015873f, FACTOR * 0.2809524f);
 		verts[3] = new Vec2(FACTOR * 0.0f, FACTOR * 0.2814815f);
 		fixtures.add(verts);
-		verts = new Vec2[4];
-		verts[0] = new Vec2(FACTOR * 0.6195767f, FACTOR * 0.26719576f);
-		verts[1] = new Vec2(FACTOR * 0.61851853f, FACTOR * 0.28042328f);
-		verts[2] = new Vec2(FACTOR * 0.60952383f, FACTOR * 0.28042328f);
-		verts[3] = new Vec2(FACTOR * 0.2015873f, FACTOR * 0.2809524f);
-		fixtures.add(verts);
+		
+//		verts = new Vec2[4];
+//		verts[0] = new Vec2(FACTOR * 0.2015873f, FACTOR * 0.2809524f);
+//		verts[1] = new Vec2(FACTOR * 0.6195767f, FACTOR * 0.26719576f);
+//		verts[2] = new Vec2(FACTOR * 0.6195767f, FACTOR * 0.28042328f);
+//		verts[3] = new Vec2(FACTOR * 0.60952383f, FACTOR * 0.28042328f);
+//		fixtures.add(verts);
+		
 		verts = new Vec2[4];
 		verts[0] = new Vec2(FACTOR * 0.60952383f, FACTOR * 0.28042328f);
 		verts[1] = new Vec2(FACTOR * 0.60952383f, FACTOR * 0.2936508f);

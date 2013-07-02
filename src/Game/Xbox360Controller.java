@@ -6,7 +6,8 @@ import ch.aplu.xboxcontroller.XboxControllerAdapter;
 public class Xbox360Controller extends XboxController {
 
 	private static final double THUMBSTICK_DEADZONE = 0.2d;
-	private static final double TRIGGER_DEADZONE = 0.5d;
+	private static final double TRIGGER_DEADZONE = 0.2d;
+	private static final double TRIGGER_PRESSED_VALUE = 0.7d; 
 	
 	public enum DPad {
 		
@@ -115,17 +116,45 @@ public class Xbox360Controller extends XboxController {
 	private class Trigger {
 		
 		private double value;
+		
+		private boolean down = false;
+		private boolean pressed = false;
+		private boolean up = false;
 
 		public double getValue() {
 			return value;
 		}
 		
-		public void setValue(double value) {
+		public void listen(double value) {
 			this.value = value;
+			if (this.pressed) {
+				if (this.value <= TRIGGER_PRESSED_VALUE) {
+					this.pressed = false;
+					this.up = true;
+				}
+			} else {
+				if (this.value > TRIGGER_PRESSED_VALUE) {
+					this.pressed = true;
+					this.down = true;
+				}
+			}
+		}
+		
+		public boolean isDown() {
+			return this.down;
 		}
 		
 		public boolean isPressed() {
-			return value > TRIGGER_DEADZONE;
+			return this.pressed || this.down;
+		}
+		
+		public boolean isUp() {
+			return this.up;
+		}
+		
+		public void resetStates() {
+			this.down = false;
+			this.up = false;
 		}
 		
 	}
@@ -141,10 +170,10 @@ public class Xbox360Controller extends XboxController {
 	private Button buttonLeftShoulder = new Button();
 	private Button buttonRightShoulder = new Button();
 	
-	private Thumbstick leftThumbstick = new Thumbstick();
-	private Thumbstick rightThumbstick = new Thumbstick();
-	private Trigger leftTrigger = new Trigger();
-	private Trigger rightTrigger = new Trigger();
+	private Thumbstick thumbstickLeft = new Thumbstick();
+	private Thumbstick thumbstickRight = new Thumbstick();
+	private Trigger triggerLeft = new Trigger();
+	private Trigger triggerRight = new Trigger();
 
 	public Xbox360Controller() {
 		setLeftThumbDeadZone(THUMBSTICK_DEADZONE);
@@ -165,12 +194,12 @@ public class Xbox360Controller extends XboxController {
 			public void dpad(int direction, boolean pressed) {
 				
 			}
-			public void leftThumbDirection(double direction) { leftThumbstick.setDirection(direction); }
-			public void leftThumbMagnitude(double magnitude) { leftThumbstick.setMagnitude(magnitude); }
-			public void rightThumbDirection(double direction) { rightThumbstick.setDirection(direction); }
-			public void rightThumbMagnitude(double magnitude) { rightThumbstick.setMagnitude(magnitude); }
-			public void leftTrigger(double value) { leftTrigger.setValue(value); }
-			public void rightTrigger(double value) { rightTrigger.setValue(value); }
+			public void leftThumbDirection(double direction) { thumbstickLeft.setDirection(direction); }
+			public void leftThumbMagnitude(double magnitude) { thumbstickLeft.setMagnitude(magnitude); }
+			public void rightThumbDirection(double direction) { thumbstickRight.setDirection(direction); }
+			public void rightThumbMagnitude(double magnitude) { thumbstickRight.setMagnitude(magnitude); }
+			public void leftTrigger(double value) { triggerLeft.listen(value); }
+			public void rightTrigger(double value) { triggerRight.listen(value); }
 		});
 	}
 	
@@ -185,6 +214,8 @@ public class Xbox360Controller extends XboxController {
 		buttonRightThumbstick.resetStates();
 		buttonLeftShoulder.resetStates();
 		buttonRightShoulder.resetStates();
+		triggerLeft.resetStates();
+		triggerRight.resetStates();
 	}
 	
 	public boolean isButtonADown() { return buttonA.isDown(); }
@@ -220,21 +251,29 @@ public class Xbox360Controller extends XboxController {
 	public boolean isButtonLeftShoulderUp() { return buttonLeftShoulder.isUp(); }
 	public boolean isButtonRightShoulderUp() { return buttonRightShoulder.isUp(); }
 
-	public double getLeftThumbMagnitude() { return leftThumbstick.getMagnitude(); }
-	public double getLeftThumbDirection() { return leftThumbstick.getDirection(); }
-	public boolean isLeftThumbTiltedLeft() { return leftThumbstick.isTiltedLeft(); }
-	public boolean isLeftThumbTiltedRight() { return leftThumbstick.isTiltedRight(); }
-	public boolean isLeftThumbTiltedUp() { return leftThumbstick.isTiltedUp(); }
-	public boolean isLeftThumbTiltedDown() { return leftThumbstick.isTiltedDown(); }
+	public double getLeftThumbMagnitude() { return thumbstickLeft.getMagnitude(); }
+	public double getLeftThumbDirection() { return thumbstickLeft.getDirection(); }
+	public boolean isLeftThumbTiltedLeft() { return thumbstickLeft.isTiltedLeft(); }
+	public boolean isLeftThumbTiltedRight() { return thumbstickLeft.isTiltedRight(); }
+	public boolean isLeftThumbTiltedUp() { return thumbstickLeft.isTiltedUp(); }
+	public boolean isLeftThumbTiltedDown() { return thumbstickLeft.isTiltedDown(); }
 	
-	public double getRightThumbMagnitude() { return rightThumbstick.getMagnitude(); }
-	public double getRightThumbDirection() { return rightThumbstick.getDirection(); }
-	public boolean isRightThumbTiltedLeft() { return rightThumbstick.isTiltedLeft(); }
-	public boolean isRightThumbTiltedRight() { return rightThumbstick.isTiltedRight(); }
-	public boolean isRightThumbTiltedUp() { return rightThumbstick.isTiltedUp(); }
-	public boolean isRightThumbTiltedDown() { return rightThumbstick.isTiltedDown(); }
+	public double getRightThumbMagnitude() { return thumbstickRight.getMagnitude(); }
+	public double getRightThumbDirection() { return thumbstickRight.getDirection(); }
+	public boolean isRightThumbTiltedLeft() { return thumbstickRight.isTiltedLeft(); }
+	public boolean isRightThumbTiltedRight() { return thumbstickRight.isTiltedRight(); }
+	public boolean isRightThumbTiltedUp() { return thumbstickRight.isTiltedUp(); }
+	public boolean isRightThumbTiltedDown() { return thumbstickRight.isTiltedDown(); }
 	
-	public boolean isRightTriggerPressed() { return rightTrigger.isPressed(); }
-	public boolean isLeftTriggerPressed() { return leftTrigger.isPressed(); }
+	public boolean isRightTriggerDown() { return triggerRight.isDown(); }
+	public boolean isLeftTriggerDown() { return triggerLeft.isDown(); }
 	
+	public boolean isRightTriggerPressed() { return triggerRight.isPressed(); }
+	public boolean isLeftTriggerPressed() { return triggerLeft.isPressed(); }
+	
+	public boolean isRightTriggerUp() { return triggerRight.isUp(); }
+	public boolean isLeftTriggerUp() { return triggerLeft.isUp(); }
+	
+	public double getLeftTriggerValue() { return triggerLeft.getValue(); }
+	public double getRightTriggerValue() { return triggerRight.getValue(); }
 }
