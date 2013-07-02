@@ -23,6 +23,8 @@ public abstract class Enemy extends GameObjectBox {
 	private boolean dead = false;
 	protected boolean left = false;
 	
+	private float conveyorSpeed = 0f;
+	
 	protected ArrayList<MySensor> sensorList = new ArrayList<MySensor>();
 	protected MySensor 	sensorLeft;
 	protected MySensor 	sensorRight;
@@ -206,5 +208,13 @@ public abstract class Enemy extends GameObjectBox {
 		return dead;
 	}
 	
-	public abstract void update();
+	public void setConveyorSpeed(float conveyorSpeed) {
+		this.conveyorSpeed = conveyorSpeed;
+	}
+	
+	public void update() {
+		if(this.conveyorSpeed != 0){
+			this.getBody().setLinearVelocity( new Vec2(getBody().getLinearVelocity().x + conveyorSpeed, getBody().getLinearVelocity().y) );
+		}
+	}
 }

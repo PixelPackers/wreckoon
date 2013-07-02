@@ -24,6 +24,7 @@ public class EnemyStupidFollower extends Enemy {
 	}
 	
 	public void update(){
+		super.update();
 		
 		if (!isDead() ){ 
 			Player player = this.game.getPlayer();

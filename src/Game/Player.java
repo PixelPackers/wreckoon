@@ -84,6 +84,8 @@ public class Player {
 	private float 		floatingDistanceX		= 3f * 0.25f;
 	private float 		floatingDistanceY		= 3f * 0.25f;
 	
+	private float 		conveyorSpeed			= 0f;
+	
 	private float		maxPlayerRotation = 10f;
 	private World		world;
 	
@@ -366,8 +368,6 @@ public class Player {
 		this.dead = true;
 		this.deadAndOnGround = false;
 		
-		System.out.println("player died");
-		
 	}
 	
 	public void draw(Graphics g, boolean debugView){
@@ -467,16 +467,18 @@ public class Player {
 	public void update() {
 		
 		// slow down player if no directionmovment button is pressed
-		float slowDownForce = 0.5f;
-		float slowDownThreshold = 0.15f;
-		// left
-		if(this.getBody().getLinearVelocity().x < -slowDownThreshold && this.isOnGround() && !this.movementButtonIsDown ) {
-			this.getBody().applyLinearImpulse(new Vec2(slowDownForce,0), this.getBody().getPosition());
-		} else
-		
-		// right
-		if(this.getBody().getLinearVelocity().x > slowDownThreshold && this.isOnGround()  && !this.movementButtonIsDown) {
-			this.getBody().applyLinearImpulse(new Vec2(-slowDownForce,0), this.getBody().getPosition());
+		if( this.conveyorSpeed == 0 && !this.movementButtonIsDown){
+			float slowDownForce = 0.5f;
+			float slowDownThreshold = 0.15f;
+			// left
+			if(this.getBody().getLinearVelocity().x < -slowDownThreshold && this.isOnGround() ) {
+				this.getBody().applyLinearImpulse(new Vec2(slowDownForce,0), this.getBody().getPosition());
+			} else
+			
+			// right
+			if(this.getBody().getLinearVelocity().x > slowDownThreshold && this.isOnGround() ) {
+				this.getBody().applyLinearImpulse(new Vec2(-slowDownForce,0), this.getBody().getPosition());
+			}
 		}
 		
 		// float in air while shooting laser
@@ -596,6 +598,12 @@ public class Player {
 
 		if (this.laserActive && this.currentAnimation.isStopped() ) {
 			this.currentAnimation = animations.get("laser");
+		}
+		
+		
+		if(this.conveyorSpeed != 0){
+//			this.body.applyLinearImpulse(new Vec2(conveyorSpeed,0), this.body.getPosition());
+			this.body.setLinearVelocity( new Vec2(body.getLinearVelocity().x + conveyorSpeed, body.getLinearVelocity().y) );
 		}
 	}
 
@@ -942,16 +950,14 @@ public class Player {
 	// laser
 	public void createLaser(){
 
-		if ( !this.laserActive){
+	if (!this.laserActive && this.laserAble) {
 			
 			this.laserActive = true;
 			
 			// save position where laser was activated
 			this.laserStartingPosition = this.body.getPosition();
-			System.out.println(this.laserStartingPosition);
 			
 //			TODO WORK IN PROGRESS
-//			lock player in air
 //			disable movement
 		
 			laserCounter = 0;
@@ -974,14 +980,19 @@ public class Player {
 		}
 
 		this.laserActive = false;
+		this.laserAble = false;
+
 	}
 	
+
 	public void bite(){
-		this.biting = true;
-		this.biteCounter = 0;
-		
-		this.currentAnimation = animations.get("bite");
-		this.currentAnimation.restart();
+		if(!this.biting && this.ableToGetLaser){
+			this.biting = true;
+			this.biteCounter = 0;
+			
+			this.currentAnimation = animations.get("bite");
+			this.currentAnimation.restart();
+		}
 	}
 	
 	
@@ -1191,5 +1202,8 @@ public class Player {
 	
 	public void setAbleToGetLaser(boolean ableToGetLaser) {
 		this.ableToGetLaser = ableToGetLaser;
+	}
+	public void setConveyorSpeed(float conveyorSpeed) {
+		this.conveyorSpeed = conveyorSpeed;
 	}
 }

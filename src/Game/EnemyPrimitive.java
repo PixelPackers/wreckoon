@@ -30,6 +30,8 @@ public class EnemyPrimitive extends Enemy{
 
 	@Override
 	public void update() {
+		super.update();
+
 		if ( !isDead() ){ 
 		
 			if(this.isOnGround() && !idle){

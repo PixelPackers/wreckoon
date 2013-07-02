@@ -50,6 +50,7 @@ public class Game extends BasicGame {
 	private static ArrayList<Girder>		girders			= new ArrayList<Girder>();
 	private static Generator 				generator;
 	private static ArrayList<Spikes>		spikes			= new ArrayList<Spikes>();
+	private static ArrayList<Conveyor>		conveyor 		= new ArrayList<Conveyor>();
 	
 
 	private static House house;
@@ -108,6 +109,9 @@ public class Game extends BasicGame {
 		generator = new Generator(world, 15f, 4.5f, 5f*0.25f, 6f*0.25f);
 		
 		spikes.add(new Spikes(world, 10, 0, 5, 1));
+		
+		conveyor.add(new Conveyor(world, 7f, 4f, 11f, 0.1f, 0.5f, 0.5f, 0.5f));
+		
 		player = new Player(world, 5f, 7.5f);
 //		player = new Player(world, 25f, 0f);
 		world.setContactListener(new MyContactListener(this));
@@ -203,6 +207,10 @@ public class Game extends BasicGame {
 		
 		for (Spikes s : spikes){
 			s.draw(g, debugView);
+		}
+		
+		for (Conveyor c : conveyor){
+			c.draw(g, debugView);
 		}
 		
 		house.drawFront(g, debugView);
@@ -556,5 +564,9 @@ public class Game extends BasicGame {
 	
 	public static ArrayList<Spikes> getSpikes() {
 		return spikes;
+	}
+	
+	public static ArrayList<Conveyor> getConveyor() {
+		return conveyor;
 	}
 }

@@ -132,8 +132,17 @@ public class MyContactListener implements ContactListener{
 				if (spike.getFixture() == contact.getFixtureA() || spike.getFixture() == contact.getFixtureB() ) {
 					game.getPlayer().die();
 				}
-				
 			}
+			
+			
+//			+ conveyor
+			for (Conveyor conveyor : game.getConveyor() ){
+				if (conveyor.getFixture() == contact.getFixtureA() || conveyor.getFixture() == contact.getFixtureB() ) {
+					game.getPlayer().setConveyorSpeed(conveyor.getSpeed());
+				}
+				break;
+			}
+			
 		}
 		
 		// enemy
@@ -164,7 +173,15 @@ public class MyContactListener implements ContactListener{
 					
 				}
 				
-				
+			} // not dead end
+			
+//			+ conveyor
+			for (Conveyor conveyor : game.getConveyor() ){
+				if (enemy.getFixture() == contact.getFixtureA() || enemy.getFixture() == contact.getFixtureB() ){
+					if (conveyor.getFixture() == contact.getFixtureA() || conveyor.getFixture() == contact.getFixtureB() ) {
+						enemy.setConveyorSpeed(conveyor.getSpeed());
+					}						
+				}
 			}
 		}
 	}
@@ -192,11 +209,34 @@ public class MyContactListener implements ContactListener{
 //		 player contact
 		if( game.getPlayer().getFixture() == contact.getFixtureA() || game.getPlayer().getFixture() == contact.getFixtureB() ){
 						
-//				+ generator
+//			+ generator
 			if(game.getGenerator().getFixture() == contact.getFixtureA() || game.getGenerator().getFixture() == contact.getFixtureB() ){
 				game.getPlayer().setAbleToGetLaser(false);
 			}
+			
+//			+ conveyor
+			for (Conveyor conveyor : game.getConveyor() ){
+				if (conveyor.getFixture() == contact.getFixtureA() || conveyor.getFixture() == contact.getFixtureB() ) {
+					game.getPlayer().setConveyorSpeed(0);
+				}
+				break;
+			}
 		}
+		
+		
+		
+		// enemy
+		for( Enemy enemy : game.getEnemies()){									
+//			+ conveyor
+			for (Conveyor conveyor : game.getConveyor() ){
+				if (enemy.getFixture() == contact.getFixtureA() || enemy.getFixture() == contact.getFixtureB() ){
+					if (conveyor.getFixture() == contact.getFixtureA() || conveyor.getFixture() == contact.getFixtureB() ) {
+						enemy.setConveyorSpeed( 0 );
+					}						
+				}
+			}	
+		}
+		
 	}
 	
 	@Override	public void postSolve(Contact contact, ContactImpulse contactImpulse) {}
