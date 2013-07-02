@@ -100,7 +100,7 @@ public class Game extends BasicGame {
 			}
 		}
 		
-		parts.add(new Part(world, this, 60f, 45f));
+		parts.add(new Part(world, this, 15f, 11.25f));
 		
 		girders.add(new Girder(world, 30f,  5f, 7.75f));
 		girders.add(new Girder(world, 25f,  6f, 7.75f));
@@ -569,4 +569,5 @@ public class Game extends BasicGame {
 	public static ArrayList<Conveyor> getConveyor() {
 		return conveyor;
 	}
+	
 }

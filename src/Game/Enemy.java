@@ -200,10 +200,18 @@ public abstract class Enemy extends GameObjectBox {
 		
 	}
 	
-	public void die(){
+	public void die() {
+
+		boltExplosion();
 		this.dead = true;
 	}
 	
+	private void boltExplosion() {
+
+		System.out.println("bolts erstellen");
+		
+	}
+
 	public boolean isDead() {
 		return dead;
 	}

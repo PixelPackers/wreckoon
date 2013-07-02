@@ -15,7 +15,7 @@ import org.newdawn.slick.SlickException;
 
 public class Part {
 
-	private static final float radius = 2;
+	private static final float radius = 0.5f;
 	private World world;
 	private Game game;
 	private float x;
@@ -24,7 +24,7 @@ public class Part {
 	private boolean collected = false;
 	
 	private float floatingHeight = 0f;
-	private float floatingSpeed = 0.02f;
+	private float floatingSpeed = 0.005f;
 	private int i = 0;
 	
 	
@@ -49,7 +49,7 @@ public class Part {
 		bodyDef.type = BodyType.STATIC;
 //		bodyDef.type = BodyType.DYNAMIC;
 		bodyDef.position.set(x,y);
-		
+
 		this.body = world.createBody(bodyDef);
 		this.fixture = this.body.createFixture(fixtureDef);
 	}
