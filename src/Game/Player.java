@@ -65,6 +65,10 @@ public class Player {
 	private boolean deadAndOnGround	= false;	
 	private boolean biting			= false;
 	private boolean laserActive		= false;
+	private boolean ableToGetLaser	= false;
+	private boolean laserAble		= false;
+	
+	private boolean movementButtonIsDown = false;
 	
 	//XXX ??
 	private float	accelerationX = ACC_WALKING;
@@ -259,11 +263,16 @@ public class Player {
 		
 		
 		// eye laser
+		float laserLength = 10f;
+		float laserHeight = 1f;
+		float spaceX = 0;
+		float spaceY = 0;
+		
 		Vec2[] vertsLaser = new Vec2[]{
-			new Vec2( this.getBody().getPosition() ),
-			new Vec2( this.getBody().getPosition().x,		this.getBody().getPosition().y + 1),
-			new Vec2( this.getBody().getPosition().x + 50,	this.getBody().getPosition().y + 1),
-			new Vec2( this.getBody().getPosition().x + 50,	this.getBody().getPosition().y)
+			new Vec2( spaceX, 				spaceY ),
+			new Vec2( spaceX,				spaceY + laserHeight),
+			new Vec2( spaceX + laserLength,	spaceY + laserHeight),
+			new Vec2( spaceX + laserLength,	spaceY)
 		};
 
 		this.polygonShapeLaser = new PolygonShape();
@@ -272,6 +281,8 @@ public class Player {
 		this.fixtureDefLaser = new FixtureDef();
 		this.fixtureDefLaser.shape = this.polygonShapeLaser;
 		fixtureDefLaser.isSensor = true;
+		destroyLaser();
+
 			
 		this.createSensors();
 		this.adjustHitboxes();		
@@ -438,7 +449,7 @@ public class Player {
 				Vec2 vert = verts[i];
 				
 				// FIXME magic numbers bzw player konstruktor start position
-				Vec2 worldPoint = this.body.getWorldPoint(vert.sub( new Vec2(20f,30f) ));
+				Vec2 worldPoint = this.body.getWorldPoint(vert);
 				polygonToDraw.addPoint(worldPoint.x, -worldPoint.y);
 			}
 			
@@ -452,6 +463,19 @@ public class Player {
 	}
 	
 	public void update() {
+		
+		// slow down player if no directionmovment button is pressed
+		float slowDownForce = 0.5f;
+		float slowDownThreshold = 0.15f;
+		// left
+		if(this.getBody().getLinearVelocity().x < -slowDownThreshold && this.isOnGround() && !this.movementButtonIsDown ) {
+			this.getBody().applyLinearImpulse(new Vec2(slowDownForce,0), this.getBody().getPosition());
+		} else
+		
+		// right
+		if(this.getBody().getLinearVelocity().x > slowDownThreshold && this.isOnGround()  && !this.movementButtonIsDown) {
+			this.getBody().applyLinearImpulse(new Vec2(-slowDownForce,0), this.getBody().getPosition());
+		}
 		
 		// float in air while shooting laser
 		if ( this.laserActive ){
@@ -1149,9 +1173,21 @@ public class Player {
 		
 	}
 	
+	public Fixture getFixtureLaser() {
+		return fixtureLaser;
+	}
+	
 	public boolean shouldntMove() {
 		return this.dizzy && false;
 //		mit charging funkt telekinese ziel steuerung nicht mehr...
 //		return this.isCharging() || this.dizzy;
+	}
+	
+	public void setMovementButtonIsDown(boolean movementButtonIsDown) {
+		this.movementButtonIsDown = movementButtonIsDown;
+	}
+	
+	public void setAbleToGetLaser(boolean ableToGetLaser) {
+		this.ableToGetLaser = ableToGetLaser;
 	}
 }

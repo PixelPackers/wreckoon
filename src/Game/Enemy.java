@@ -27,9 +27,9 @@ public abstract class Enemy extends GameObjectBox {
 	protected MySensor 	sensorLeft;
 	protected MySensor 	sensorRight;
 	protected MySensor	sensorGroundCollision;
-	
-	private Animation a;
-	private Animation currentAnimation;
+
+	protected HashMap<String, Animation> animations = new HashMap<String, Animation>();
+	protected Animation currentAnimation;
 
 	public Enemy(Game game, float posX, float posY, float width, float height, float density, float friction, float restitution, String imgPath,
 			BodyType bodyType) throws SlickException {

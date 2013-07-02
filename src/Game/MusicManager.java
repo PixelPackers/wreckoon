@@ -1,5 +1,8 @@
 package Game;
 
+import java.util.HashMap;
+
+import org.newdawn.slick.Animation;
 import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
@@ -15,6 +18,10 @@ public class MusicManager {
 	// XXX hashmap? evtl extra sfx und music getrennt
 	private Sound itemCollected;
 	private Sound bgMusic;
+	
+	private HashMap<sfx, Animation> animations = new HashMap<sfx, Animation>();
+	
+	enum sfx{ JUMP, TAILWHIP }
 	
 	private MusicManager() {
 		

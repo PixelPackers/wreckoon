@@ -2,8 +2,10 @@ package Game;
 
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
+import org.newdawn.slick.Animation;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.SpriteSheet;
 
 public class EnemyPrimitive extends Enemy{
 
@@ -54,8 +56,23 @@ public class EnemyPrimitive extends Enemy{
 
 	@Override
 	protected void initAnimations() throws SlickException {
-		// TODO Auto-generated method stub
+
+		SpriteSheet sheetWalk = new SpriteSheet("images/walkcycle.png", 	600, 575);
+		SpriteSheet sheetIdle = new SpriteSheet("images/walkcycle.png", 	600, 575);
+		SpriteSheet sheetDie  = new SpriteSheet("images/walkcycle.png", 	600, 575);
 		
+		Animation animationWalk = new Animation(sheetWalk, 80);
+		
+		Animation animationIdle= new Animation(sheetIdle, 80);
+		animationIdle.setLooping(false);
+		
+		Animation animationDie= new Animation(sheetDie, 80);
+		animationDie.setLooping(false);
+
+		animations.put("walk", animationWalk);
+		animations.put("idle", animationIdle);
+		animations.put("die", animationDie);
+	
 	}
 
 }

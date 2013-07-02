@@ -50,6 +50,29 @@ public class MyContactListener implements ContactListener{
 			}
 		} 
 		
+		// eye laser
+		if (	contact.getFixtureA() == game.getPlayer().getFixtureLaser()
+			|| 	contact.getFixtureB() == game.getPlayer().getFixtureLaser() ) {
+			
+			for( Enemy enemy : game.getEnemies()){
+				if( enemy.getFixture() == contact.getFixtureA() ||
+					enemy.getFixture() == contact.getFixtureB()
+				){
+					enemy.throwBack();
+					enemy.die();
+				}
+			}
+			
+			for (GameObject gameObject : game.getDynamicObjects()){
+				if (	gameObject.getBody().getFixtureList() == contact.getFixtureB() 
+					||	gameObject.getBody().getFixtureList() == contact.getFixtureA()){
+					
+					gameObject.getBody().setLinearVelocity( new Vec2(0,120) );
+//							break;
+				}
+			}
+		}
+		
 		// groundpounding
 		if(game.getPlayer().isGroundPounding() ){
 
@@ -137,6 +160,15 @@ public class MyContactListener implements ContactListener{
 			}
 		}
 	
+
+//		 player contact
+		if( game.getPlayer().getFixture() == contact.getFixtureA() || game.getPlayer().getFixture() == contact.getFixtureB() ){
+						
+//				+ generator
+			if(game.getGenerator().getFixture() == contact.getFixtureA() || game.getGenerator().getFixture() == contact.getFixtureB() ){
+				game.getPlayer().setAbleToGetLaser(false);
+			}
+		}
 	}
 	
 	@Override	public void postSolve(Contact contact, ContactImpulse contactImpulse) {}

@@ -48,6 +48,7 @@ public class Game extends BasicGame {
 	private static Player 					player;
 	private static ArrayList<Part>			parts			= new ArrayList<Part>();
 	private static ArrayList<Girder>		girders			= new ArrayList<Girder>();
+	private static Generator 				generator;
 	
 
 	private static House house;
@@ -102,6 +103,8 @@ public class Game extends BasicGame {
 		girders.add(new Girder(world, 30f,  5f, 7.75f));
 		girders.add(new Girder(world, 25f,  6f, 7.75f));
 		girders.add(new Girder(world, 35f, 10f, 7.75f));
+
+		generator = new Generator(world, 15f, 4.5f, 5f*0.25f, 6f*0.25f);
 		
 		player = new Player(world, 5f, 7.5f);
 //		player = new Player(world, 25f, 0f);
@@ -157,6 +160,8 @@ public class Game extends BasicGame {
 		g.scale(zoom, zoom);
 		
 		house.draw(g, debugView);
+		
+		generator.draw(g, debugView);
 
 		for (GameObject staticObj : staticObjects) {
 			staticObj.draw(g, debugView);
@@ -300,14 +305,7 @@ public class Game extends BasicGame {
 //					player.setLeft(false);					
 //				}
 			}
-		} else {
-			// control slippery
-			// TODO evtl herausheben und in der update die bewegungsrichtung überprüfen dh das für links und rechts dasselbe funkt und verwendet wird
-
-			if(player.getBody().getLinearVelocity().x < -slowDownThreshold && player.isOnGround()) {
-				player.getBody().applyLinearImpulse(new Vec2(slowDownForce,0), player.getBody().getPosition());
-			}
-		}
+		} 
 
 		if (xbox.isLeftThumbTiltedRight() || input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D)) {
 
@@ -327,11 +325,7 @@ public class Game extends BasicGame {
 //					player.setLeft(true);					
 //				}
 			}
-		}  else {
-			if(player.getBody().getLinearVelocity().x > slowDownThreshold && player.isOnGround()) {
-				player.getBody().applyLinearImpulse(new Vec2(-slowDownForce,0), player.getBody().getPosition());
-			}
-		}
+		}  
 
 		if (xbox.isButtonBDown() || input.isKeyPressed(Input.KEY_DOWN) || input.isKeyPressed(Input.KEY_S)) {
 			if( !player.isCharging() && !player.isOnGround()) {
@@ -550,4 +544,7 @@ public class Game extends BasicGame {
 //		this.parts.remove(part);		
 	}
 	
+	public static Generator getGenerator() {
+		return generator;
+	}
 }
