@@ -366,6 +366,8 @@ public class Player {
 		this.dead = true;
 		this.deadAndOnGround = false;
 		
+		System.out.println("player died");
+		
 	}
 	
 	public void draw(Graphics g, boolean debugView){

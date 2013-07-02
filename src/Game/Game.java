@@ -49,6 +49,7 @@ public class Game extends BasicGame {
 	private static ArrayList<Part>			parts			= new ArrayList<Part>();
 	private static ArrayList<Girder>		girders			= new ArrayList<Girder>();
 	private static Generator 				generator;
+	private static ArrayList<Spikes>		spikes			= new ArrayList<Spikes>();
 	
 
 	private static House house;
@@ -106,17 +107,18 @@ public class Game extends BasicGame {
 
 		generator = new Generator(world, 15f, 4.5f, 5f*0.25f, 6f*0.25f);
 		
+		spikes.add(new Spikes(world, 10, 0, 5, 1));
 		player = new Player(world, 5f, 7.5f);
 //		player = new Player(world, 25f, 0f);
 		world.setContactListener(new MyContactListener(this));
-//		for(int i=0; i<10; ++i){
-//
-//			enemies.add( new EnemyPrimitive(this, 10*i +10f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
-//		}
-//		enemies.add(new EnemyStupidFollower(this,  10f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
-//		enemies.add(new EnemyStupidFollower(this,  15f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
-//		enemies.add(new EnemyStupidFollower(this, 124f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
-//		enemies.add(new EnemyPrimitive     (this,  14f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+		for(int i=0; i<10; ++i){
+
+			enemies.add( new EnemyPrimitive(this, 10*i +10f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
+		}
+		enemies.add(new EnemyStupidFollower(this,  10f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+		enemies.add(new EnemyStupidFollower(this,  15f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+		enemies.add(new EnemyStupidFollower(this, 124f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+		enemies.add(new EnemyPrimitive     (this,  14f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
 		
 	}
 	
@@ -197,6 +199,10 @@ public class Game extends BasicGame {
 		
 		for (Girder sb : girders) {
 			sb.draw(g, debugView);
+		}
+		
+		for (Spikes s : spikes){
+			s.draw(g, debugView);
 		}
 		
 		house.drawFront(g, debugView);
@@ -546,5 +552,9 @@ public class Game extends BasicGame {
 	
 	public static Generator getGenerator() {
 		return generator;
+	}
+	
+	public static ArrayList<Spikes> getSpikes() {
+		return spikes;
 	}
 }

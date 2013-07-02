@@ -121,11 +121,26 @@ public class MyContactListener implements ContactListener{
 					}
 				}
 			}
+			
+//			+ generator
+			if(game.getGenerator().getFixture() == contact.getFixtureA() || game.getGenerator().getFixture() == contact.getFixtureB() ){
+				game.getPlayer().setAbleToGetLaser(true);
+			}
+			
+//			+ spikes
+			for (Spikes spike : game.getSpikes() ){
+				if (spike.getFixture() == contact.getFixtureA() || spike.getFixture() == contact.getFixtureB() ) {
+					game.getPlayer().die();
+				}
+				
+			}
 		}
 		
-		// enemy + missile
+		// enemy
 		for( Enemy enemy : game.getEnemies()){
 			if ( !enemy.isDead() ){
+				
+//				 + missile
 				for(GameObject dynamicObject : game.getDynamicObjects() ){
 					if (enemy.getFixture() == contact.getFixtureA() || enemy.getFixture() == contact.getFixtureB() ){
 						if (dynamicObject.getFixture() == contact.getFixtureA() || dynamicObject.getFixture() == contact.getFixtureB() ){
@@ -137,6 +152,19 @@ public class MyContactListener implements ContactListener{
 						}
 					}
 				}
+				
+//				+ spikes
+				for (Spikes spike : game.getSpikes() ){
+
+					if (enemy.getFixture() == contact.getFixtureA() || enemy.getFixture() == contact.getFixtureB() ){
+						if (spike.getFixture() == contact.getFixtureA() || spike.getFixture() == contact.getFixtureB() ) {
+							enemy.die();
+						}
+					}
+					
+				}
+				
+				
 			}
 		}
 	}
