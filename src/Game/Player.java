@@ -122,25 +122,25 @@ public class Player {
 	private Animation currentAnimation;
 
 	private void initAnimations() throws SlickException {
-		
+		int scale = 4;
 		// XXX evtl auch da eine hashmap verwenden?
-		SpriteSheet sheetWalk 		= new SpriteSheet("images/walkcycle.png", 	600, 575);
-		SpriteSheet sheetRun 		= new SpriteSheet("images/runcycle.png", 	735, 385);
-		SpriteSheet sheetWallJump	= new SpriteSheet("images/walljump.png", 	620, 685);
-		SpriteSheet sheetWallIdle	= new SpriteSheet("images/wallidle.png", 	620, 685);
-		SpriteSheet sheetTailwhip	= new SpriteSheet("images/tailwhip.png",	770, 360);
-		SpriteSheet sheetIdle		= new SpriteSheet("images/idle.png", 		454, 575);
-		SpriteSheet sheetGroundpoundRoll	= new SpriteSheet("images/groundpoundroll.png", 600, 540);
-		SpriteSheet sheetGroundpoundAir		= new SpriteSheet("images/groundpoundair.png", 600, 540);
-		SpriteSheet sheetGroundpoundImpact	= new SpriteSheet("images/groundpoundimpact.png", 600, 540);
-		SpriteSheet sheetDeath		= new SpriteSheet("images/death.png", 		730, 320);					// 3
-		SpriteSheet sheetDeathAir	= new SpriteSheet("images/deathair.png", 	730, 320);
-		SpriteSheet sheetWalkJump	= new SpriteSheet("images/jump.png", 		675, 575);
-		SpriteSheet sheetWalkJumpAir= new SpriteSheet("images/jumpair.png", 	675, 575);
-		SpriteSheet sheetRunJump	= new SpriteSheet("images/flycycle.png", 	735, 385);
-		SpriteSheet sheetBite		= new SpriteSheet("images/bite.png", 		454, 575);					// 4
-		SpriteSheet sheetShock		= new SpriteSheet("images/shock.png", 		454, 575);
-		SpriteSheet sheetLaser		= new SpriteSheet("images/lasercycle.png", 	600, 540);		 		// 5
+		SpriteSheet sheetWalk 		= new SpriteSheet("images/walkcycle.png", 	600/scale, 575/scale);
+		SpriteSheet sheetRun 		= new SpriteSheet("images/runcycle.png", 	735/scale, 385/scale);
+		SpriteSheet sheetWallJump	= new SpriteSheet("images/walljump.png", 	620/scale, 685/scale);
+		SpriteSheet sheetWallIdle	= new SpriteSheet("images/wallidle.png", 	620/scale, 685/scale);
+		SpriteSheet sheetTailwhip	= new SpriteSheet("images/tailwhip.png",	770/scale, 360/scale);
+		SpriteSheet sheetIdle		= new SpriteSheet("images/idle.png", 		454/scale, 575/scale);
+		SpriteSheet sheetGroundpoundRoll	= new SpriteSheet("images/groundpoundroll.png", 600/scale, 540/scale);
+		SpriteSheet sheetGroundpoundAir		= new SpriteSheet("images/groundpoundair.png", 600/scale, 540/scale);
+		SpriteSheet sheetGroundpoundImpact	= new SpriteSheet("images/groundpoundimpact.png", 600/scale, 540/scale);
+		SpriteSheet sheetDeath		= new SpriteSheet("images/death.png", 		730/scale, 320/scale);					// 3
+		SpriteSheet sheetDeathAir	= new SpriteSheet("images/deathair.png", 	730/scale, 320/scale);
+		SpriteSheet sheetWalkJump	= new SpriteSheet("images/jump.png", 		675/scale, 575/scale);
+		SpriteSheet sheetWalkJumpAir= new SpriteSheet("images/jumpair.png", 	675/scale, 575/scale);
+		SpriteSheet sheetRunJump	= new SpriteSheet("images/flycycle.png", 	735/scale, 385/scale);
+		SpriteSheet sheetBite		= new SpriteSheet("images/bite.png", 		454/scale, 575/scale);					// 4
+		SpriteSheet sheetShock		= new SpriteSheet("images/shock.png", 		454/scale, 575/scale);
+		SpriteSheet sheetLaser		= new SpriteSheet("images/lasercycle.png", 	600/scale, 540/scale);		 		// 5
 		
 		Animation animationWallJump = new Animation(sheetWallJump, 	70);
 		animationWallJump.setLooping(false);
@@ -378,10 +378,10 @@ public class Player {
 		float drawHeight = currentAnimation.getHeight() / 150f;
 		drawWidth= (left) ? drawWidth: -drawWidth;
 		
-//		currentAnimation.draw( position.x + drawWidth*0.5f,
-//				-position.y - drawHeight*0.5f - 0.5f, // -0.5f --> sonst wuerde sprite in den boden hinein stehen 
-//				-drawWidth, 
-//				drawHeight);	
+		currentAnimation.draw( position.x + drawWidth*0.5f,
+				-position.y - drawHeight*0.5f - 0.5f*0.5f, // -0.5f --> sonst wuerde sprite in den boden hinein stehen 
+				-drawWidth, 
+				drawHeight);	
 	}
 	
 	public void drawOutline(Graphics g) {

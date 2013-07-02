@@ -73,11 +73,11 @@ public class ZoomArea {
 		this.flipped = flipped;
 	}
 	
-	public boolean isSelected(float mouseX, float mouseY) {
-		if (mouseX < this.x1 ||
-				mouseY < this.y1 ||
-				mouseX > this.x2 ||
-				mouseY > this.y2) {
+	public boolean isInArea(float x, float y) {
+		if (	x < this.x1 ||
+				y < this.y1 ||
+				x > this.x2 ||
+				y > this.y2) {
 			return false;
 		}
 		return true;

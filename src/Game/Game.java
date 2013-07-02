@@ -36,8 +36,10 @@ public class Game extends BasicGame {
 	
 	private static boolean debugView = false;
 	
-	private static float zoom = 128f;
-	private static final float ZOOM_STEP = 4f;
+	private static boolean USE_ZOOM_AREAS = true;
+	private static float DEFAULT_ZOOM = 128f;
+	private static float zoom = DEFAULT_ZOOM;
+	private static final float MANUAL_ZOOM_STEP = 4f;
 	
 	private static World world;
 
@@ -78,13 +80,14 @@ public class Game extends BasicGame {
 		
 		// load the level
 		try {
-			String json = readFile("levels/big.json");
+			String json = readFile("levels/level1.json");
 			level = new Gson().fromJson(json, Level.class);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-		house = new House(world, 0f, 0f);
+		house = new House(world, -21f, -19f);
+//		house = new House(world, 0f, 0f);
 		
 		// create the tiles
 		for (int x = 0; x < level.getWidth(); ++x) {
@@ -106,14 +109,13 @@ public class Game extends BasicGame {
 		player = new Player(world, 5f, 7.5f);
 //		player = new Player(world, 25f, 0f);
 		world.setContactListener(new MyContactListener(this));
-//		for(int i=0; i<10; ++i){
-//
-//			enemies.add( new EnemyPrimitive(this, 10*i +10f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
-//		}
-//		enemies.add(new EnemyStupidFollower(this,  10f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
-//		enemies.add(new EnemyStupidFollower(this,  15f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
-//		enemies.add(new EnemyStupidFollower(this, 124f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
-//		enemies.add(new EnemyPrimitive     (this,  14f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+		for(int i=0; i<10; ++i) {
+			enemies.add( new EnemyPrimitive(this, 10*i +10f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
+		}
+		enemies.add(new EnemyStupidFollower(this,  10f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+		enemies.add(new EnemyStupidFollower(this,  15f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+		enemies.add(new EnemyStupidFollower(this, 124f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+		enemies.add(new EnemyPrimitive     (this,  14f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
 		
 	}
 	
@@ -156,11 +158,15 @@ public class Game extends BasicGame {
 		g.translate(cam.getX() * zoom + screenWidth / 2f, cam.getY() * zoom + screenHeight * 2f / 3f);
 		g.scale(zoom, zoom);
 		
-		house.draw(g, debugView);
-
 		for (GameObject staticObj : staticObjects) {
 			staticObj.draw(g, debugView);
 		}
+		
+		for (Tile tile : tiles) {
+			tile.draw(g, debugView);
+		}
+		
+		house.draw(g, debugView);
 
 		GameObject glowingObj = chooseTelekinesisTarget();
 		for (GameObject ball : dynamicObjects) {
@@ -179,11 +185,6 @@ public class Game extends BasicGame {
 		player.draw(g, debugView);
 		for(Enemy enemy : enemies){
 			enemy.draw(g, debugView);	
-		}
-		
-		
-		for (Tile tile : tiles) {
-			tile.draw(g, debugView);
 		}
 
 		for (Part part : parts){
@@ -239,7 +240,7 @@ public class Game extends BasicGame {
 				g.pushTransform();
 				g.translate(cam.getX() * zoom + screenWidth / 2, cam.getY() * zoom + screenHeight * 2 / 3);
 				g.scale(zoom, zoom);
-				g.drawRect(za.getX1(), za.getY1(), za.getWidth(), za.getHeight());
+				g.drawRect(za.getX1(), -za.getY1(), za.getWidth(), -za.getHeight());
 				g.popTransform();
 			}
 		}
@@ -361,20 +362,36 @@ public class Game extends BasicGame {
 			}
 		}
 			
-		
-
 		// TODO Kamera Smoothness muss auch angepasst werden, je nach Zoom
-		if (input.isKeyDown(Input.KEY_E)) {
-			if (zoom < 200) {
-				zoom += ZOOM_STEP;
+		if (USE_ZOOM_AREAS) {
+			float biggestZoom = 0f;
+			for (ZoomArea za: level.getZoomAreas()) {
+				Vec2 pos = player.getBody().getPosition();
+				System.out.println(za.getWidth());
+				if (za.isInArea(pos.x, pos.y)) {
+					System.out.println("ZOOM");
+					if (za.getZoom() > biggestZoom) {
+						biggestZoom = za.getZoom();
+					}
+				}
+				if (biggestZoom == 0f) {
+					biggestZoom = DEFAULT_ZOOM;
+				}
+			}
+			zoom = cam.curveValue(biggestZoom, zoom, 30);
+		} else {
+			if (input.isKeyDown(Input.KEY_E)) {
+				if (zoom < 200) {
+					zoom += MANUAL_ZOOM_STEP;
+				}
+			}
+			if (input.isKeyDown(Input.KEY_R)) {
+				if (zoom - MANUAL_ZOOM_STEP > MANUAL_ZOOM_STEP) {
+					zoom -= MANUAL_ZOOM_STEP;
+				}
 			}
 		}
-		if (input.isKeyDown(Input.KEY_R)) {
-			if (zoom - ZOOM_STEP > ZOOM_STEP) {
-				zoom -= ZOOM_STEP;
-			}
-		}
-
+		
 		if (input.isKeyPressed(Input.KEY_X)) {
 			if (!dynamicObjects.isEmpty()) {
 				// GameObject o = crates.get(0);
@@ -409,8 +426,8 @@ public class Game extends BasicGame {
 			world.setGravity(new Vec2(0f, -30f));
 		}
 		if (input.isKeyDown(Input.KEY_C)) {
-			float max_size = 0.5f;
-			float min_size = 0.5f;
+			float max_size = 0.05f;
+			float min_size = 0.05f;
 			float size = (float) Math.random() * max_size + min_size;
 
 			CircleShape c = new CircleShape();
