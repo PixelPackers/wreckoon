@@ -11,10 +11,10 @@ public class EnemyPrimitive extends Enemy{
 
 	// units are update cycles
 	private final static int DIRECTION_SWITCH_MIN_TIME 	= 25;
-	private final static int IDLE_WAITING_TIME 			= 100;
+	private final static int MIN_IDLE_WAITING_TIME 			= 50;
+	private final static int MAX_IDLE_WAITING_TIME 			= 150;
+	private int idleTime;
 
-	private float	maxSpeed		= 1.25f;
-	private float	speed			= -maxSpeed;
 	private int		updateCounter	= 0;
 	private boolean	idle			= false;
 	
@@ -24,7 +24,9 @@ public class EnemyPrimitive extends Enemy{
 			BodyType bodyType) throws SlickException {
 		super(game, posX, posY, imgPath);
 		PIG_SIZE_FACTOR = 1f;
-
+		
+		this.idleTime=  (int)(Math.random() *  (MAX_IDLE_WAITING_TIME - MIN_IDLE_WAITING_TIME) + MIN_IDLE_WAITING_TIME);
+		
 		initAnimations();
 		
 		this.setImage(new Image("images/dumbpig.png"));
@@ -49,9 +51,9 @@ public class EnemyPrimitive extends Enemy{
 				this.currentAnimation = animations.get("idle");
 			}
 			
-			if ( idle && updateCounter > IDLE_WAITING_TIME){
+			if ( idle && updateCounter > MIN_IDLE_WAITING_TIME){
 				this.left = !this.left;  
-				speed = (left) ? -maxSpeed : maxSpeed;
+				speed = -speed;
 				this.idle = false;
 				updateCounter=0;
 				this.currentAnimation = animations.get("walk");
@@ -70,7 +72,7 @@ public class EnemyPrimitive extends Enemy{
 		
 		Animation animationWalk = new Animation(sheetWalk, 80);
 		
-		Animation animationIdle= new Animation(sheetIdle, IDLE_WAITING_TIME);
+		Animation animationIdle= new Animation(sheetIdle, MIN_IDLE_WAITING_TIME);
 		animationIdle.setLooping(false);
 		
 		Animation animationDie= new Animation(sheetDie, 80);

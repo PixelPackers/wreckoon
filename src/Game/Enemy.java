@@ -22,6 +22,10 @@ public abstract class Enemy extends GameObjectBox {
 	
 	protected float PIG_SIZE_FACTOR;
 
+	private static final float	MIN_SPEED		= 0.75f;
+	private static final float	MAX_SPEED		= 1.5f;
+	protected float	speed;
+
 	private boolean dead = false;
 	protected boolean left = false;
 	
@@ -37,8 +41,10 @@ public abstract class Enemy extends GameObjectBox {
 
 	public Enemy(Game game, float posX, float posY, String imgPath) throws SlickException {
 		super(game.getWorld(), posX, posY, width, height, 3.3f, 0.3f, 0.3f, imgPath, BodyType.DYNAMIC);
-		
+
 		this.game = game;
+		
+		this.speed =  (float)(Math.random() *  (MAX_SPEED-MIN_SPEED) + MIN_SPEED);
 		
 		createSensors();
 	}
