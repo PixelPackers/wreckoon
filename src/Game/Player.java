@@ -727,13 +727,13 @@ public class Player {
 				if(leftWallColliding()){
 					
 					this.left = false;
-					jumpSpeedX = this.jumpPower * 0.5f;
+					jumpSpeedX = -this.jumpPower * 0.5f;
 					this.jumpingFromWall = true;
 					
 				} else if(rightWallColliding()){
 					
 					this.left = true;
-					jumpSpeedX = -this.jumpPower * 0.5f;
+					jumpSpeedX = this.jumpPower * 0.5f;
 					this.jumpingFromWall = true;
 				
 				}

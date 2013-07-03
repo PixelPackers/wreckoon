@@ -21,7 +21,7 @@ public class EnemyPrimitive extends Enemy{
 	
 	public EnemyPrimitive(Game game, float posX, float posY, float width, float height, float density, float friction, float restitution, String imgPath,
 			BodyType bodyType) throws SlickException {
-		super(game, posX, posY, width, height, density, friction, restitution, imgPath, bodyType);
+		super(game, posX, posY, imgPath);
 
 
 		this.setImage(new Image("images/dumbpig.png"));

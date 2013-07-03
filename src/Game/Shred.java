@@ -43,7 +43,7 @@ public class Shred extends GameObjectPolygon {
 		image.draw(this.getBody().getPosition().x - radius, this.getBody().getPosition().y -radius, radius*2f, radius*2f);
 		
 		if(++counter == MIN_TIME){
-			game.getObjectsToRemove().add(this);
+//			game.getObjectsToRemove().add(this);
 			// FIXME
 //			game.getShreds().remove(this);
 		}

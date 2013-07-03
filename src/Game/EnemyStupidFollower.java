@@ -16,10 +16,11 @@ public class EnemyStupidFollower extends Enemy {
 	
 	public EnemyStupidFollower(Game game, float posX, float posY, float width, float height, float density, float friction, float restitution, String imgPath,
 			BodyType bodyType) throws SlickException {
-		super(game, posX, posY, width, height, density, friction, restitution, imgPath, bodyType);
+		super(game, posX, posY, imgPath);
 		
 		this.getBody().setFixedRotation(true);
 		this.setImage(new Image("images/smartpig.png"));
+		initAnimations();
 		
 	}
 	
@@ -50,9 +51,9 @@ public class EnemyStupidFollower extends Enemy {
 	@Override
 	protected void initAnimations() throws SlickException {
 
-		SpriteSheet sheetWalk = new SpriteSheet("images/walkcycle.png", 	600, 575);
+		SpriteSheet sheetWalk = new SpriteSheet("images/smartpigrun.png", 	580, 610);
 		SpriteSheet sheetIdle = new SpriteSheet("images/smartpigIdle.png", 	600, 575);
-		SpriteSheet sheetDie  = new SpriteSheet("images/walkcycle.png", 	600, 575);
+		SpriteSheet sheetDie  = new SpriteSheet("images/smartpigdeath.png", 	600, 575);
 		
 		Animation animationWalk = new Animation(sheetWalk, 80);
 		
@@ -66,6 +67,17 @@ public class EnemyStupidFollower extends Enemy {
 		animations.put("idle", animationIdle);
 		animations.put("die", animationDie);
 		
+		currentAnimation = animationWalk;
+		
+	}
+	
+	@Override
+	public void drawImage() {
+		currentAnimation.draw( 
+				getBody().getPosition().x-width*0.5f,
+				getBody().getPosition().y-height*0.5f, 
+				width * 1.5f, 
+				height * 1.5f);
 	}
 	
 }

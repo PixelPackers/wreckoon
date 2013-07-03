@@ -17,8 +17,8 @@ import org.newdawn.slick.geom.Polygon;
 public abstract class Enemy extends GameObjectBox {
 	
 	protected Game game;
-	protected float width;
-	protected float height;
+	protected static final float width = 0.8f;
+	protected static final float height = 0.8f;
 
 	private boolean dead = false;
 	protected boolean left = false;
@@ -33,13 +33,10 @@ public abstract class Enemy extends GameObjectBox {
 	protected HashMap<String, Animation> animations = new HashMap<String, Animation>();
 	protected Animation currentAnimation;
 
-	public Enemy(Game game, float posX, float posY, float width, float height, float density, float friction, float restitution, String imgPath,
-			BodyType bodyType) throws SlickException {
-		super(game.getWorld(), posX, posY, width, height, density, friction, restitution, imgPath, bodyType);
+	public Enemy(Game game, float posX, float posY, String imgPath) throws SlickException {
+		super(game.getWorld(), posX, posY, width, height, 3.3f, 0.3f, 0.3f, imgPath, BodyType.DYNAMIC);
 		
 		this.game = game;
-		this.width = width;
-		this.height = height;
 		
 		createSensors();
 	}
