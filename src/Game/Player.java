@@ -323,7 +323,7 @@ public class Player {
 		float xSpace = default_xSpace;
 		float ySpace = default_ySpace;
 		
-		for (int i=0;i<2; ++i){
+		for (int i=0; i < 2; ++i){
 			if(i % 2 == 0){ xSpace = -default_xSpace; } else { xSpace = default_xSpace; }
 			for (int j=0;j<2; ++j){
 				if(j % 2 == 0){ ySpace = -default_ySpace; } else { ySpace = default_ySpace;	}
@@ -616,7 +616,7 @@ public class Player {
 		
 	}
 
-	public void accelerate() {
+	public void accelerate(float magnitude) {
 		
 //		if( shouldntMove() )
 //			return;
@@ -653,7 +653,7 @@ public class Player {
 //		}
 
 		// third approach
-		float speed = (left) ? -50 : 50;
+		float speed = (left) ? -50 * magnitude : 50 * magnitude;
 //		if ( Math.abs(velocityX + accelerationX) < Math.abs(maxVelocity)  ) {
 //			this.body.applyForce( new Vec2(speed, 0), this.body.getPosition() );
 //		}
@@ -668,7 +668,12 @@ public class Player {
 		
 		//*/
 		if(!groundPounding && !doTailwhip && this.isOnGround() && jumpCounter > 5){
-			if(this.running){
+//			if(this.running){
+//				this.currentAnimation = animations.get("run");
+//			} else {
+//				this.currentAnimation = animations.get("walk");
+//			}
+			if (Math.abs(getBody().getLinearVelocity().x) > 1.8d) {
 				this.currentAnimation = animations.get("run");
 			} else {
 				this.currentAnimation = animations.get("walk");

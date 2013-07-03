@@ -132,9 +132,21 @@ public class Game extends BasicGame {
 //		player = new Player(world, 25f, 0f);
 		world.setContactListener(new MyContactListener(this));
 		
-		for (int i = 0; i < 10; ++i) {
-			enemies.add( new EnemyPrimitive		(this, 1*i +10f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
-			enemies.add( new EnemyStupidFollower(this, 1f*i, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+//		for (int i = 0; i < 10; ++i) {
+//			enemies.add( new EnemyPrimitive		(this, 1*i +10f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
+//			enemies.add( new EnemyStupidFollower(this, 1f*i, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+//		}
+		
+		// create the enemies
+		for (SpawnPoint e : level.getEnemies()) {
+			switch (e.getType()) {
+				case 0:
+					enemies.add(new EnemyPrimitive(this, e.getX(), e.getY(), 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+				break;
+				case 1:
+					enemies.add(new EnemyStupidFollower(this, e.getX(), e.getY(), 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+				break;
+			}
 		}
 
 	}
@@ -383,7 +395,7 @@ public class Game extends BasicGame {
 					player.setLeft(true);
 //				} 
 				if (player.movesLeft()) {
-					player.accelerate();
+					player.accelerate((float) xbox.getLeftThumbMagnitude());
 				} 
 //				else if( player.getBody().getLinearVelocity().x > minCounterSteerSpeed) { 
 //					player.setLeft(true);
@@ -403,7 +415,7 @@ public class Game extends BasicGame {
 					player.setLeft(false);
 //				}
 				if (!player.movesLeft()) {
-					player.accelerate();
+					player.accelerate((float) xbox.getLeftThumbMagnitude());
 				}
 //				else if (player.getBody().getLinearVelocity().x < -minCounterSteerSpeed) { 
 //					player.setLeft(false);

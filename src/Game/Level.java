@@ -11,6 +11,7 @@ public class Level {
 	private ArrayList<BackgroundObject> backgroundObjects;
 	private ArrayList<ZoomArea> zoomAreas;
 	private ArrayList<Part> parts;
+	private ArrayList<SpawnPoint> enemies;
 	
 	public Level(int width, int height) {
 		this.blocks = new Block[width][height];
@@ -19,6 +20,17 @@ public class Level {
 				this.blocks[x][y] = new Block();
 			}
 		}
+	}
+	
+	public ArrayList<SpawnPoint> getEnemies() {
+		return enemies;
+	}
+	
+	public void addEnemy(SpawnPoint e) {
+		if (enemies == null) {
+			enemies = new ArrayList<SpawnPoint>();
+		}
+		enemies.add(e);
 	}
 	
 	public ArrayList<Part> getParts() {
