@@ -34,15 +34,17 @@ public class MyContactListener implements ContactListener{
 		if (	contact.getFixtureA() == game.getPlayer().getTailFixture()
 			|| 	contact.getFixtureB() == game.getPlayer().getTailFixture() ) {
 			
+//			+ dynamic objects
 			for (GameObject gameObject : game.getDynamicObjects()){
 				if (	gameObject.getBody().getFixtureList() == contact.getFixtureB() 
 					||	gameObject.getBody().getFixtureList() == contact.getFixtureA()){
 					
-					gameObject.getBody().setLinearVelocity( new Vec2(0,20) );
+					gameObject.getBody().setLinearVelocity( new Vec2(0,-20) );
 //					break;
 				}
 			}
 			
+//			+ enemies
 			for( Enemy enemy : game.getEnemies()){
 				if( enemy.getFixture() == contact.getFixtureA() ||
 					enemy.getFixture() == contact.getFixtureB()

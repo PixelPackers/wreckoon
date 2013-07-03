@@ -44,6 +44,7 @@ public class EnemyPrimitive extends Enemy{
 			if(this.isOnWall()  && updateCounter > DIRECTION_SWITCH_MIN_TIME && !idle){
 				idle = true;
 				updateCounter=0;
+				this.currentAnimation = animations.get("idle");
 			}
 			
 			if ( idle && updateCounter > IDLE_WAITING_TIME){
@@ -51,6 +52,7 @@ public class EnemyPrimitive extends Enemy{
 				speed = (left) ? -maxSpeed : maxSpeed;
 				this.idle = false;
 				updateCounter=0;
+				this.currentAnimation = animations.get("walk");
 			}
 		}
 		
@@ -78,16 +80,6 @@ public class EnemyPrimitive extends Enemy{
 		
 		currentAnimation = animationWalk;
 	
-	}
-
-	@Override
-	public void drawImage() {
-		float drawWidth = (this.getBody().getLinearVelocity().x > 0.1f) ? width : -width;
-		currentAnimation.draw( 
-				getBody().getPosition().x-drawWidth*0.5f,
-				getBody().getPosition().y-height*0.5f, 
-				drawWidth, 
-				height);
 	}
 	
 }
