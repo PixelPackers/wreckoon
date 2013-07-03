@@ -6,9 +6,9 @@ import org.jbox2d.dynamics.World;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
-public class Nut extends GameObjectPolygon {
+public class Shred extends GameObjectPolygon {
 	
-	private static final float FACTOR = 0.15f;
+	private static final float 	FACTOR = 0.4f;
 	private static final int	MIN_TIME = 50;
 	
 	private Game game;
@@ -24,34 +24,33 @@ public class Nut extends GameObjectPolygon {
 		new Vec2(-0.20507812f 	* FACTOR, 	 0.359375f		* FACTOR),
 		new Vec2(-0.47851562f 	* FACTOR, 	 0.0078125f 	* FACTOR)
 	};
-	
-	public Nut(Game game, World world, Vec2 pos, String imgPath)
+		
+	public Shred(Game game, World world, Vec2 pos, String imgPath)
 			throws SlickException {
 		
-		super(world, pos.x, pos.y, verts, 0.5f, 0.5f, 0.5f, imgPath, BodyType.DYNAMIC);
+		super(world, pos.x, pos.y, verts, 1f, 0.5f, 0f, imgPath, BodyType.DYNAMIC);
 		
 		this.game = game;
-		this.image = new Image(imgPath);
-		
+		this.image = new Image(imgPath);		
 	}
 	
 	public void drawImage(){
-		float radius = FACTOR*0.666f;
+		float radius = FACTOR*0.5f;
 
 		float angle = this.getBody().getAngle();
 		image.setRotation(-(float) Math.toDegrees(angle));
 		
 		image.draw(this.getBody().getPosition().x - radius, this.getBody().getPosition().y -radius, radius*2f, radius*2f);
-
+		
 		if(++counter == MIN_TIME){
 			collectable = true;
 		}
 	}
-
+	
 	public void collect(){
-		System.out.println("nut collected");
+		System.out.println("bolt collected");
 	}
-
+	
 	public boolean isCollectable() {
 		return collectable;
 	}

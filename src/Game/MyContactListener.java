@@ -149,10 +149,13 @@ public class MyContactListener implements ContactListener{
 			Iterator iterator = game.getBolts().iterator();
 			while (iterator.hasNext()){
 				Bolt bolt = (Bolt) iterator.next();
-				if (bolt.getFixture() == contact.getFixtureA() || bolt.getFixture() == contact.getFixtureB() ) {
+				if (bolt.isCollectable()) {
 					
-					iterator.remove();
-					game.getObjectsToRemove().add(bolt);
+					if (bolt.getFixture() == contact.getFixtureA() || bolt.getFixture() == contact.getFixtureB() ) {
+						bolt.collect();
+						iterator.remove();
+						game.getObjectsToRemove().add(bolt);
+					}
 					
 				}
 			}
@@ -162,10 +165,13 @@ public class MyContactListener implements ContactListener{
 			iterator = game.getNuts().iterator();
 			while (iterator.hasNext()){
 				Nut nut = (Nut) iterator.next();
-				if (nut.getFixture() == contact.getFixtureA() || nut.getFixture() == contact.getFixtureB() ) {
-					iterator.remove();
 
-					game.getObjectsToRemove().add(nut);
+				if (nut.isCollectable()) {
+					if (nut.getFixture() == contact.getFixtureA() || nut.getFixture() == contact.getFixtureB() ) {
+						nut.collect();
+						iterator.remove();
+						game.getObjectsToRemove().add(nut);
+					}
 				}
 			}
 		}

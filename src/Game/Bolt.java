@@ -8,10 +8,13 @@ import org.newdawn.slick.SlickException;
 
 public class Bolt extends GameObjectPolygon {
 	
-	private static final float FACTOR = 0.2f;
+	private static final float 	FACTOR = 0.2f;
+	private static final int	MIN_TIME = 50;
 	
 	private Game game;
 	private Image image;
+	private int counter = 0;
+	private boolean collectable = false;
 	
 	private static Vec2[] verts = new Vec2[]{
 		new Vec2(-0.1875f 		* FACTOR, 	-0.38671875f 	* FACTOR),
@@ -32,11 +35,23 @@ public class Bolt extends GameObjectPolygon {
 	}
 	
 	public void drawImage(){
-		float radius = 0.1f;
+		float radius = FACTOR*0.5f;
 
 		float angle = this.getBody().getAngle();
 		image.setRotation(-(float) Math.toDegrees(angle));
 		
 		image.draw(this.getBody().getPosition().x - radius, this.getBody().getPosition().y -radius, radius*2f, radius*2f);
+		
+		if(++counter == MIN_TIME){
+			collectable = true;
+		}
+	}
+	
+	public void collect(){
+		System.out.println("bolt collected");
+	}
+	
+	public boolean isCollectable() {
+		return collectable;
 	}
 }

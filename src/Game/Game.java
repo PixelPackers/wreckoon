@@ -55,8 +55,13 @@ public class Game extends BasicGame {
 	private static ArrayList<Conveyor>		conveyor 		= new ArrayList<Conveyor>();
 	private static ArrayList<Bolt>			bolts 			= new ArrayList<Bolt>();
 	private static ArrayList<Nut>			nuts 			= new ArrayList<Nut>();
+	private static ArrayList<Shred>			shreds 			= new ArrayList<Shred>();
+
+
+	private static ArrayList<GameObject>	objectsToAdd	 = new ArrayList<GameObject>();
 	
 	private static ArrayList<GameObject>	objectsToRemove = new ArrayList<GameObject>();
+	private static ArrayList<Enemy>			enemiesToRemove = new ArrayList<Enemy>();
 
 
 	private static House house;
@@ -157,11 +162,28 @@ public class Game extends BasicGame {
 					(float) (player.getBody().getPosition().y + xbox.getRightThumbY() * 3),
 					10);
 		
+		
 		for (GameObject o :  objectsToRemove){
 			world.destroyBody(o.getBody());
-		}
-		
+		}		
 		objectsToRemove.clear();
+		
+		for (Enemy e :  enemiesToRemove){
+			for(int i=0; i<15; ++i){
+				getNuts().add(new Nut(this, getWorld(), e.getBody().getPosition().add(new Vec2(0,0)), "images/nut"+ ((int) (Math.random()*3)+1)+".png" ));
+				getBolts().add(new Bolt(this, getWorld(), e.getBody().getPosition().add(new Vec2(0,0)), "images/bolt"+ ((int) (Math.random()*3)+1)+".png" ));
+				getShreds().add(new Shred(this, getWorld(), e.getBody().getPosition().add(new Vec2(0,0)), "images/shred"+ ((int) (Math.random()*3)+1)+".png" ));
+			}
+			enemies.remove(e);
+		}		
+		
+		enemiesToRemove.clear();
+		
+//		for (GameObject o :  objectsToAdd){
+//			world.destroyBody(o.getBody());
+//		}		
+//		objectsToAdd.clear();
+		
 		
 		world.step(delta / 1000f, 18, 6);
 	}
@@ -230,6 +252,9 @@ public class Game extends BasicGame {
 		}
 		for(Nut n : nuts){
 			n.draw(g, debugView);
+		}
+		for(Shred s : shreds){
+			s.draw(g, debugView);
 		}
 
 		house.drawFront(g, debugView);
@@ -614,8 +639,19 @@ public class Game extends BasicGame {
 		return nuts;
 	}
 	
+	public static ArrayList<GameObject> getObjectsToAdd() {
+		return objectsToAdd;
+	}
+	
 	public static ArrayList<GameObject> getObjectsToRemove() {
 		return objectsToRemove;
 	}
-
+	
+	public static ArrayList<Enemy> getEnemiesToRemove() {
+		return enemiesToRemove;
+	}
+	
+	public static ArrayList<Shred> getShreds() {
+		return shreds;
+	}
 }

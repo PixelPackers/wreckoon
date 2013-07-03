@@ -192,14 +192,11 @@ public abstract class Enemy extends GameObjectBox {
 	
 	public void die() {
 
-		boltExplosion();
-		this.dead = true;
-	}
-	
-	private void boltExplosion() {
-
-		System.out.println("bolts erstellen");
+		// sprite
+		game.getObjectsToRemove().add(this);
+		game.getEnemiesToRemove().add(this);
 		
+		this.dead = true;
 	}
 
 	public boolean isDead() {
