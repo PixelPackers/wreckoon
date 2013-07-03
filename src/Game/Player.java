@@ -246,6 +246,17 @@ public class Player {
 			new Vec2( height * 0.5f, -width * 0.5f),
 			new Vec2( height * 0.5f,  width * 0.5f)
 		};
+		
+//		Vec2[] vertsSensor = new Vec2[]{				
+//				new Vec2( width * 0.25f, -height *  0.5f),
+//				new Vec2( width *  0.5f, -height * 0.25f),
+//				new Vec2( width *  0.5f,  height * 0.25f),
+//				new Vec2( width * 0.25f,  height *  0.5f),
+//				new Vec2(-width * 0.25f,  height *  0.5f),
+//				new Vec2(-width *  0.5f,  height * 0.25f),
+//				new Vec2(-width *  0.5f, -height * 0.25f),
+//				new Vec2(-width * 0.25f, -height *  0.5f)
+//			};
 
 		PolygonShape secondPolygonShape = new PolygonShape();
 		secondPolygonShape.set(vertsSensor, vertsSensor.length);
@@ -694,6 +705,11 @@ public class Player {
 
 		}
 		
+	}
+	
+	public void cancelJump() {
+		getBody().setLinearVelocity(new Vec2(getBody().getLinearVelocity().x,
+											getBody().getLinearVelocity().y * 0.35f));
 	}
 
 	public void jump(){

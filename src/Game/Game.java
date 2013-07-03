@@ -433,6 +433,10 @@ public class Game extends BasicGame {
 				player.increaseShootingDirection(0, 1);
 			} 
 		}
+		
+		if (xbox.isButtonAUp() && player.getBody().getLinearVelocity().y < 0f && !player.isOnGround()) {
+			player.cancelJump();
+		}
 
 		if (xbox.isLeftThumbTiltedDown() || input.isKeyDown(Input.KEY_DOWN) || input.isKeyDown(Input.KEY_S)) {
 			if( player.isCharging() ){

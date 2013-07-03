@@ -39,6 +39,7 @@ public class Shred extends GameObjectPolygon {
 
 		float angle = this.getBody().getAngle();
 		image.setRotation(-(float) Math.toDegrees(angle));
+		image.setAlpha(1f - counter/(float)MIN_TIME);
 		
 		image.draw(this.getBody().getPosition().x - radius, this.getBody().getPosition().y -radius, radius*2f, radius*2f);
 		
