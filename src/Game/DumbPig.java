@@ -23,7 +23,7 @@ public class DumbPig extends Enemy{
 	public DumbPig(Game game, float posX, float posY, float width, float height, float density, float friction, float restitution, String imgPath,
 			BodyType bodyType) throws SlickException {
 		super(game, posX, posY, imgPath);
-		PIG_SIZE_FACTOR = 1f;
+		PIG_CLASS_SIZE_FACTOR = 1.2f;
 		
 		this.idleTime=  (int)(Math.random() *  (MAX_IDLE_WAITING_TIME - MIN_IDLE_WAITING_TIME) + MIN_IDLE_WAITING_TIME);
 		
@@ -50,6 +50,7 @@ public class DumbPig extends Enemy{
 					idle = true;
 					updateCounter=0;
 					this.currentAnimation = animations.get("idle");
+					this.currentAnimation.restart();
 				}
 			}
 			
@@ -69,15 +70,15 @@ public class DumbPig extends Enemy{
 	protected void initAnimations() throws SlickException {
 
 		SpriteSheet sheetWalk = new SpriteSheet("images/dumbpigwalk.png", 	550, 550);
-		SpriteSheet sheetIdle = new SpriteSheet("images/dumbpigidle.png", 	550, 550);
+		SpriteSheet sheetIdle = new SpriteSheet("images/dumbpigidlescratch.png", 	550, 550);
 		SpriteSheet sheetDie  = new SpriteSheet("images/smartpigdeath.png", 	550, 550);
 		
 		Animation animationWalk = new Animation(sheetWalk, 80);
 		
-		Animation animationIdle= new Animation(sheetIdle, MIN_IDLE_WAITING_TIME);
+		Animation animationIdle = new Animation(sheetIdle, idleTime/2);
 		animationIdle.setLooping(false);
 		
-		Animation animationDie= new Animation(sheetDie, DIE_TIME);
+		Animation animationDie = new Animation(sheetDie, DIE_TIME);
 		animationDie.setLooping(false);
 
 		animations.put("walk", animationWalk);

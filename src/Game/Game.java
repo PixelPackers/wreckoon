@@ -218,7 +218,7 @@ public class Game extends BasicGame {
 					bolt.getBody().setLinearVelocity( direction);
 					getBolts().add(bolt);
 
-					Shred shred = new Shred(this, getWorld(), o.getBody().getPosition().add(new Vec2(0,0)), "images/shred"+ ((int) (Math.random()*3)+1)+".png" );
+					Shred shred = new Shred(this, getWorld(), o.getBody().getPosition().add(new Vec2(0,0)), "images/shred"+ ((int) (Math.random()*3)+1)+".png", ((Enemy) o).getPigSize());
 					shred.getBody().setLinearVelocity(direction);
 					getShreds().add(shred);
 					

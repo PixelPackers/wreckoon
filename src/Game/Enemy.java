@@ -17,10 +17,10 @@ import org.newdawn.slick.geom.Polygon;
 public abstract class Enemy extends GameObjectBox {
 	
 	protected Game game;
-	protected static final float width = 0.8f;
-	protected static final float height = width;
+//	protected static final float width = 0.8f;
+//	protected static final float height = width;
 	
-	protected float PIG_SIZE_FACTOR;
+	protected float PIG_CLASS_SIZE_FACTOR;
 
 	protected static final int DIE_TIME 			= 100;
 //	TODO kA warum die zahl...
@@ -31,6 +31,11 @@ public abstract class Enemy extends GameObjectBox {
 	private static final float	MAX_SPEED		= 1.5f;
 	protected float	speed;
 
+	private static final float	MIN_SIZE		= 0.75f;
+	private static final float	MAX_SIZE		= 1.25f;
+	private static float staticPigSize = (float)(Math.random() *  (MAX_SIZE-MIN_SIZE) + MIN_SIZE);
+	private float pigSize;;
+	
 	private boolean dead = false;
 	protected boolean left = false;
 	
@@ -45,11 +50,14 @@ public abstract class Enemy extends GameObjectBox {
 	protected Animation currentAnimation;
 
 	public Enemy(Game game, float posX, float posY, String imgPath) throws SlickException {
-		super(game.getWorld(), posX, posY, width, height, 3.3f, 0.3f, 0.3f, imgPath, BodyType.DYNAMIC);
+		super(game.getWorld(), posX, posY, staticPigSize, staticPigSize, 3.3f, 0.3f, 0.3f, imgPath, BodyType.DYNAMIC);
 
 		this.game = game;
-		
+
 		this.speed =  (float)(Math.random() *  (MAX_SPEED-MIN_SPEED) + MIN_SPEED);
+		
+		pigSize = staticPigSize; 
+		staticPigSize = (float)(Math.random() *  (MAX_SIZE-MIN_SIZE) + MIN_SIZE);
 		
 		createSensors();
 	}
@@ -58,16 +66,15 @@ public abstract class Enemy extends GameObjectBox {
 	
 	private void createSensors() {
 
-		float width = this.width;
-		float height = this.height;
+		float width = pigSize;
+		float height = pigSize;
 	
 		// wall collision sensors
-		float sensorSizeWidth	= width  * 0.125f;
-		float sensorSizeHeight	= height * 0.4f;
-		float default_xSpace = width*0.5f;
-		float default_ySpace = height*0.25f;
-		float xSpace = default_xSpace;
-		float ySpace = default_ySpace;
+		float sensorSizeWidth	= width  * 0.1f;
+		float sensorSizeHeight	= height * 0.3f;
+		
+		float xSpace = width*0.5f;
+		float ySpace = height*0.25f;
 		float putDown = 0.3f;
 		{
 		// left sensor
@@ -229,11 +236,15 @@ public abstract class Enemy extends GameObjectBox {
 	}
 
 	public void drawImage() {
-		float drawWidth = (left) ? -width : width;
+		float drawWidth = (left) ? -pigSize : pigSize;
 		currentAnimation.draw( 
 				getBody().getPosition().x-drawWidth*0.5f,
-				getBody().getPosition().y-height*0.5f, 
-				drawWidth * PIG_SIZE_FACTOR, 
-				height * PIG_SIZE_FACTOR);
+				getBody().getPosition().y-pigSize*0.5f, 
+				drawWidth * PIG_CLASS_SIZE_FACTOR, 
+				pigSize * PIG_CLASS_SIZE_FACTOR);
+	}
+	
+	public float getPigSize() {
+		return pigSize;
 	}
 }
