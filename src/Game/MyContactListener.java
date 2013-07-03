@@ -1,5 +1,7 @@
 package Game;
 
+import java.util.Iterator;
+
 import org.jbox2d.callbacks.ContactImpulse;
 import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.collision.Manifold;
@@ -142,7 +144,30 @@ public class MyContactListener implements ContactListener{
 				}
 				break;
 			}
+
+//			+ bolts	
+			Iterator iterator = game.getBolts().iterator();
+			while (iterator.hasNext()){
+				Bolt bolt = (Bolt) iterator.next();
+				if (bolt.getFixture() == contact.getFixtureA() || bolt.getFixture() == contact.getFixtureB() ) {
+					
+					iterator.remove();
+					game.getObjectsToRemove().add(bolt);
+					
+				}
+			}
 			
+
+//			+ nuts	
+			iterator = game.getNuts().iterator();
+			while (iterator.hasNext()){
+				Nut nut = (Nut) iterator.next();
+				if (nut.getFixture() == contact.getFixtureA() || nut.getFixture() == contact.getFixtureB() ) {
+					iterator.remove();
+
+					game.getObjectsToRemove().add(nut);
+				}
+			}
 		}
 		
 		// enemy

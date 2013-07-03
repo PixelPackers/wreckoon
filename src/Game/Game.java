@@ -53,6 +53,10 @@ public class Game extends BasicGame {
 	private static Generator 				generator;
 	private static ArrayList<Spikes>		spikes			= new ArrayList<Spikes>();
 	private static ArrayList<Conveyor>		conveyor 		= new ArrayList<Conveyor>();
+	private static ArrayList<Bolt>			bolts 			= new ArrayList<Bolt>();
+	private static ArrayList<Nut>			nuts 			= new ArrayList<Nut>();
+	
+	private static ArrayList<GameObject>	objectsToRemove = new ArrayList<GameObject>();
 
 
 	private static House house;
@@ -83,7 +87,7 @@ public class Game extends BasicGame {
 
 		// load the level
 		try {
-			String json = readFile("levels/level1.json");
+			String json = readFile("levels/big.json");
 			level = new Gson().fromJson(json, Level.class);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -152,6 +156,13 @@ public class Game extends BasicGame {
 		cam.follow(	(float) (player.getBody().getPosition().x + xbox.getRightThumbX() * 3),
 					(float) (player.getBody().getPosition().y + xbox.getRightThumbY() * 3),
 					10);
+		
+		for (GameObject o :  objectsToRemove){
+			world.destroyBody(o.getBody());
+		}
+		
+		objectsToRemove.clear();
+		
 		world.step(delta / 1000f, 18, 6);
 	}
 
@@ -212,6 +223,13 @@ public class Game extends BasicGame {
 
 		for (Conveyor c : conveyor){
 			c.draw(g, debugView);
+		}
+		
+		for(Bolt b : bolts){
+			b.draw(g, debugView);
+		}
+		for(Nut n : nuts){
+			n.draw(g, debugView);
 		}
 
 		house.drawFront(g, debugView);
@@ -445,17 +463,11 @@ public class Game extends BasicGame {
 			float min_size = 0.05f;
 			float size = (float) Math.random() * (max_size - min_size) + min_size;
 
-			CircleShape c = new CircleShape();
-			c.m_radius = size;
-			FixtureDef fixtureDef = new FixtureDef();
-			fixtureDef.shape = c;
-			fixtureDef.density = 1f;
-			fixtureDef.friction = 0.5f;
-
 			for (int i = 0; i < 4; ++i) {
-				GameObjectCircle ball = new GameObjectCircle(world, player.getBody().getPosition().x, player.getBody().getPosition().y + size
-						* 2, size, 1f, 0.5f, 0f, "images/player.png", BodyType.DYNAMIC);
-				dynamicObjects.add(ball);
+
+//				dynamicObjects.add( new GameObjectCircle(world, player.getBody().getPosition().x, player.getBody().getPosition().y - size * 2, size, 1f, 0.5f, 0f, "images/player.png", BodyType.DYNAMIC));
+				bolts.add(new Bolt(this, world, player.getBody().getPosition().add(new Vec2(0,-1)), "images/bolt"+ ((int) (Math.random()*3)+1)+".png" ));
+				nuts.add(new Nut(this, world, player.getBody().getPosition().add(new Vec2(0,-1)), "images/nut"+ ((int) (Math.random()*3)+1)+".png" ));
 			}
 		}
 
@@ -592,6 +604,18 @@ public class Game extends BasicGame {
 
 	public static ArrayList<Conveyor> getConveyor() {
 		return conveyor;
+	}
+	
+	public static ArrayList<Bolt> getBolts() {
+		return bolts;
+	}
+	
+	public static ArrayList<Nut> getNuts() {
+		return nuts;
+	}
+	
+	public static ArrayList<GameObject> getObjectsToRemove() {
+		return objectsToRemove;
 	}
 
 }

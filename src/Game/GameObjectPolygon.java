@@ -35,10 +35,15 @@ public class GameObjectPolygon extends GameObject {
 	}
 
 	public void drawImage() {
+
+		float sizeX = 1;
+		float sizeY = 1;
+		
 		Vec2 position = this.getBody().getPosition();
 		float angle = this.getBody().getAngle();
+		
 		this.getImage().setRotation(-(float) Math.toDegrees(angle));
-		this.getImage().draw(position.x, position.y, 10, 10);
+		this.getImage().draw(position.x, -position.y, sizeX, sizeY);
 	}
 
 	@Override

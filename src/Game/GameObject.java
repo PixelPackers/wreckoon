@@ -14,7 +14,7 @@ public abstract class GameObject {
 
 	private Body 			body;
 	private BodyDef 		bodyDef;
-	private FixtureDef 	fixtureDef;
+	private FixtureDef 		fixtureDef;
 	private Fixture 		fixture;
 
 	private Image 		img;
