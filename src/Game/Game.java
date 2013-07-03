@@ -92,7 +92,7 @@ public class Game extends BasicGame {
 
 		// load the level
 		try {
-			String json = readFile("levels/big.json");
+			String json = readFile("levels/level1.json");
 			level = new Gson().fromJson(json, Level.class);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -111,7 +111,11 @@ public class Game extends BasicGame {
 			}
 		}
 
-		parts.add(new Part(world, this, 15f, 11.25f));
+		// create the parts
+		for (Part p : level.getParts()) {
+			parts.add(new Part(world, this, p.getX(), p.getY()));
+		}
+	
 
 		girders.add(new Girder(world, 30f,  -5f, 7.75f));
 		girders.add(new Girder(world, 25f,  -6f, 7.75f));
@@ -290,7 +294,7 @@ public class Game extends BasicGame {
 		
 		g.popTransform();
 		
-		drawZoomAreas(g);
+		//drawZoomAreas(g);
 
 		// GUI
 		

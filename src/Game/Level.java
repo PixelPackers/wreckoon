@@ -10,6 +10,7 @@ public class Level {
 	private Block[][] blocks;
 	private ArrayList<BackgroundObject> backgroundObjects;
 	private ArrayList<ZoomArea> zoomAreas;
+	private ArrayList<Part> parts;
 	
 	public Level(int width, int height) {
 		this.blocks = new Block[width][height];
@@ -20,6 +21,17 @@ public class Level {
 		}
 	}
 	
+	public ArrayList<Part> getParts() {
+		return parts;
+	}
+	
+	public void addPart(Part p) {
+		if (parts == null) {
+			parts = new ArrayList<Part>();
+		}
+		parts.add(p);
+	}
+		
 	public ArrayList<ZoomArea> getZoomAreas() {
 		return zoomAreas;
 	}
@@ -29,14 +41,6 @@ public class Level {
 			zoomAreas = new ArrayList<ZoomArea>();
 		}
 		zoomAreas.add(za);
-	}
-	
-	public void removeZoomArea(ZoomArea za) {
-		zoomAreas.remove(za);
-	}
-	
-	public boolean containsZoomArea(ZoomArea za) {
-		return zoomAreas.contains(za);
 	}
 	
 	public ArrayList<BackgroundObject> getBackgroundObjects() {
@@ -49,14 +53,6 @@ public class Level {
 		}
 		backgroundObjects.add(bo);
 		Collections.sort(backgroundObjects);
-	}
-	
-	public void removeBackgroundObject(BackgroundObject bo) {
-		backgroundObjects.remove(bo);
-	}
-	
-	public boolean containsBackgroundObject(BackgroundObject bo) {
-		return backgroundObjects.contains(bo);
 	}
 	
 	public void setBlock(int x, int y, int brush, int angle, boolean flipped) {

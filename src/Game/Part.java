@@ -81,6 +81,14 @@ public class Part {
 		update();		
 	}
 	
+	public float getX() {
+		return x;
+	}
+
+	public float getY() {
+		return y;
+	}
+
 	public void drawImage(){
 		image.draw(this.body.getPosition().x - radius, this.body.getPosition().y -radius, radius*2f, radius*2f);
 	}
