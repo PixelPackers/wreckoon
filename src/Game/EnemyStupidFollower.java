@@ -17,7 +17,8 @@ public class EnemyStupidFollower extends Enemy {
 	public EnemyStupidFollower(Game game, float posX, float posY, float width, float height, float density, float friction, float restitution, String imgPath,
 			BodyType bodyType) throws SlickException {
 		super(game, posX, posY, imgPath);
-		
+
+		PIG_SIZE_FACTOR = 1.5f;
 		this.getBody().setFixedRotation(true);
 		this.setImage(new Image("images/smartpig.png"));
 		initAnimations();

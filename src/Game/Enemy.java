@@ -19,6 +19,8 @@ public abstract class Enemy extends GameObjectBox {
 	protected Game game;
 	protected static final float width = 0.8f;
 	protected static final float height = 0.8f;
+	
+	protected float PIG_SIZE_FACTOR;
 
 	private boolean dead = false;
 	protected boolean left = false;
@@ -215,7 +217,7 @@ public abstract class Enemy extends GameObjectBox {
 		currentAnimation.draw( 
 				getBody().getPosition().x-drawWidth*0.5f,
 				getBody().getPosition().y-height*0.5f, 
-				drawWidth, 
-				height);
+				drawWidth * PIG_SIZE_FACTOR, 
+				height * PIG_SIZE_FACTOR);
 	}
 }

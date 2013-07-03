@@ -265,8 +265,8 @@ public class Player {
 		
 		
 		// eye laser
-		float laserLength = 10f;
-		float laserHeight = 1f;
+		float laserLength = 5f;
+		float laserHeight = 0.1f;
 		float spaceX = 0;
 		float spaceY = 0;
 		
@@ -786,8 +786,8 @@ public class Player {
 			this.tailwhipCounter = 0;
 			
 
-			float tailWidth 	= 1.5f*0.25f;
-			float tailHeight	= 0.5f*0.25f;
+			float tailWidth 	= 0.7f;
+			float tailHeight	= 0.2f;
 			float direction = this.width;
 			float distance = TAILWHIP_DISTANCE;
 			

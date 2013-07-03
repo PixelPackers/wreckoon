@@ -19,9 +19,11 @@ public class EnemyPrimitive extends Enemy{
 	private boolean	idle			= false;
 	
 	
+	
 	public EnemyPrimitive(Game game, float posX, float posY, float width, float height, float density, float friction, float restitution, String imgPath,
 			BodyType bodyType) throws SlickException {
 		super(game, posX, posY, imgPath);
+		PIG_SIZE_FACTOR = 1f;
 
 		initAnimations();
 		
@@ -68,7 +70,7 @@ public class EnemyPrimitive extends Enemy{
 		
 		Animation animationWalk = new Animation(sheetWalk, 80);
 		
-		Animation animationIdle= new Animation(sheetIdle, 80);
+		Animation animationIdle= new Animation(sheetIdle, IDLE_WAITING_TIME);
 		animationIdle.setLooping(false);
 		
 		Animation animationDie= new Animation(sheetDie, 80);
