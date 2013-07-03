@@ -48,7 +48,7 @@ public class Bolt extends GameObjectPolygon {
 	}
 	
 	public void collect(){
-		System.out.println("bolt collected");
+//		System.out.println("bolt collected");
 	}
 	
 	public boolean isCollectable() {

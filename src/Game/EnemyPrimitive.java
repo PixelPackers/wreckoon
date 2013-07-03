@@ -19,9 +19,11 @@ public class EnemyPrimitive extends Enemy{
 	private boolean	idle			= false;
 	
 	
+	
 	public EnemyPrimitive(Game game, float posX, float posY, float width, float height, float density, float friction, float restitution, String imgPath,
 			BodyType bodyType) throws SlickException {
 		super(game, posX, posY, imgPath);
+		PIG_SIZE_FACTOR = 1f;
 
 		initAnimations();
 		
@@ -44,6 +46,7 @@ public class EnemyPrimitive extends Enemy{
 			if(this.isOnWall()  && updateCounter > DIRECTION_SWITCH_MIN_TIME && !idle){
 				idle = true;
 				updateCounter=0;
+				this.currentAnimation = animations.get("idle");
 			}
 			
 			if ( idle && updateCounter > IDLE_WAITING_TIME){
@@ -51,6 +54,7 @@ public class EnemyPrimitive extends Enemy{
 				speed = (left) ? -maxSpeed : maxSpeed;
 				this.idle = false;
 				updateCounter=0;
+				this.currentAnimation = animations.get("walk");
 			}
 		}
 		
@@ -66,7 +70,7 @@ public class EnemyPrimitive extends Enemy{
 		
 		Animation animationWalk = new Animation(sheetWalk, 80);
 		
-		Animation animationIdle= new Animation(sheetIdle, 80);
+		Animation animationIdle= new Animation(sheetIdle, IDLE_WAITING_TIME);
 		animationIdle.setLooping(false);
 		
 		Animation animationDie= new Animation(sheetDie, 80);
@@ -78,16 +82,6 @@ public class EnemyPrimitive extends Enemy{
 		
 		currentAnimation = animationWalk;
 	
-	}
-
-	@Override
-	public void drawImage() {
-		float drawWidth = (this.getBody().getLinearVelocity().x > 0.1f) ? width : -width;
-		currentAnimation.draw( 
-				getBody().getPosition().x-drawWidth*0.5f,
-				getBody().getPosition().y-height*0.5f, 
-				drawWidth, 
-				height);
 	}
 	
 }

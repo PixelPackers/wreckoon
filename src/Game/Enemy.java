@@ -19,6 +19,8 @@ public abstract class Enemy extends GameObjectBox {
 	protected Game game;
 	protected static final float width = 0.8f;
 	protected static final float height = 0.8f;
+	
+	protected float PIG_SIZE_FACTOR;
 
 	private boolean dead = false;
 	protected boolean left = false;
@@ -183,7 +185,7 @@ public abstract class Enemy extends GameObjectBox {
 		float force = 15f;
 		float x = (game.getPlayer().movesLeft()) ? -force : force;
 		
-		this.getBody().setLinearVelocity(new Vec2 (x, force) );
+		this.getBody().setLinearVelocity(new Vec2 (x, -force) );
 		
 	}
 	
@@ -208,5 +210,14 @@ public abstract class Enemy extends GameObjectBox {
 		if(this.conveyorSpeed != 0){
 			this.getBody().setLinearVelocity( new Vec2(getBody().getLinearVelocity().x + conveyorSpeed, getBody().getLinearVelocity().y) );
 		}
+	}
+
+	public void drawImage() {
+		float drawWidth = (left) ? -width : width;
+		currentAnimation.draw( 
+				getBody().getPosition().x-drawWidth*0.5f,
+				getBody().getPosition().y-height*0.5f, 
+				drawWidth * PIG_SIZE_FACTOR, 
+				height * PIG_SIZE_FACTOR);
 	}
 }

@@ -276,8 +276,8 @@ public class Player {
 		
 		
 		// eye laser
-		float laserLength = 10f;
-		float laserHeight = 1f;
+		float laserLength = 5f;
+		float laserHeight = 0.1f;
 		float spaceX = 0;
 		float spaceY = 0;
 		
@@ -742,13 +742,13 @@ public class Player {
 				if(leftWallColliding()){
 					
 					this.left = false;
-					jumpSpeedX = this.jumpPower * 0.5f;
+					jumpSpeedX = -this.jumpPower * 0.5f;
 					this.jumpingFromWall = true;
 					
 				} else if(rightWallColliding()){
 					
 					this.left = true;
-					jumpSpeedX = -this.jumpPower * 0.5f;
+					jumpSpeedX = this.jumpPower * 0.5f;
 					this.jumpingFromWall = true;
 				
 				}
@@ -802,8 +802,8 @@ public class Player {
 			this.tailwhipCounter = 0;
 			
 
-			float tailWidth 	= 1.5f;
-			float tailHeight	= 0.5f;
+			float tailWidth 	= 0.7f;
+			float tailHeight	= 0.2f;
 			float direction = this.width;
 			float distance = TAILWHIP_DISTANCE;
 			
@@ -964,7 +964,7 @@ public class Player {
 	// laser
 	public void createLaser(){
 
-	if (!this.laserActive && this.laserAble) {
+	if (true || !this.laserActive && this.laserAble) {
 			
 			this.laserActive = true;
 			

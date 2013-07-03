@@ -12,12 +12,13 @@ import org.newdawn.slick.geom.Polygon;
 
 public class EnemyStupidFollower extends Enemy {
 
-	private float jumpPower = -3f;
+	private float jumpPower = -5f;
 	
 	public EnemyStupidFollower(Game game, float posX, float posY, float width, float height, float density, float friction, float restitution, String imgPath,
 			BodyType bodyType) throws SlickException {
 		super(game, posX, posY, imgPath);
-		
+
+		PIG_SIZE_FACTOR = 1.5f;
 		this.getBody().setFixedRotation(true);
 		this.setImage(new Image("images/smartpig.png"));
 		initAnimations();
@@ -31,9 +32,11 @@ public class EnemyStupidFollower extends Enemy {
 			Player player = this.game.getPlayer();
 			float speed = 1.25f;
 			float x = speed;
+			left = false; 
 			
 			if(player.getBody().getPosition().x	< this.getBody().getPosition().x){
 				x = -speed;
+				left = true;
 			}
 			
 			if(this.isOnGround()){
@@ -69,15 +72,6 @@ public class EnemyStupidFollower extends Enemy {
 		
 		currentAnimation = animationWalk;
 		
-	}
-	
-	@Override
-	public void drawImage() {
-		currentAnimation.draw( 
-				getBody().getPosition().x-width*0.5f,
-				getBody().getPosition().y-height*0.5f, 
-				width, 
-				height);
 	}
 	
 }
