@@ -8,13 +8,14 @@ import org.newdawn.slick.SlickException;
 
 public class Shred extends GameObjectPolygon {
 	
-	private static final float 	FACTOR = 0.4f;
+	private static final float 	FACTOR = 0.25f;
 	private static final int	MIN_TIME = 110;
 	
 	private Game game;
 	private Image image;
 	private int counter = 0;
 	private boolean collectable = false;
+	private float pigSizeFactor;
 	
 	private static Vec2[] verts = new Vec2[]{
 		new Vec2(-0.1875f 		* FACTOR, 	-0.38671875f 	* FACTOR),
@@ -25,21 +26,22 @@ public class Shred extends GameObjectPolygon {
 		new Vec2(-0.47851562f 	* FACTOR, 	 0.0078125f 	* FACTOR)
 	};
 		
-	public Shred(Game game, World world, Vec2 pos, String imgPath)
+	public Shred(Game game, World world, Vec2 pos, String imgPath, float pigSizeFactor)
 			throws SlickException {
-		
 		super(world, pos.x, pos.y, verts, 1f, 0.5f, 0f, imgPath, BodyType.DYNAMIC);
 		
 		this.game = game;
-		this.image = new Image(imgPath);		
+		this.image = new Image(imgPath);
+		this.pigSizeFactor = pigSizeFactor;
 	}
 	
 	public void drawImage(){
-		float radius = FACTOR*0.5f;
+		float radius = FACTOR*0.5f * pigSizeFactor;
 
 		float angle = this.getBody().getAngle();
 		image.setRotation(-(float) Math.toDegrees(angle));
-		image.setAlpha(1f - counter/(float)MIN_TIME);
+		// TODO magic number und frame / millisec passt nicht 
+		image.setAlpha(1f - (counter-MIN_TIME*0.5f)/(float)MIN_TIME );
 		
 		image.draw(this.getBody().getPosition().x - radius, this.getBody().getPosition().y -radius, radius*2f, radius*2f);
 		

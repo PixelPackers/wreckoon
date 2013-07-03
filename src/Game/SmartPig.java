@@ -22,7 +22,7 @@ public class SmartPig extends Enemy {
 
 		this.jumpPower =  (float)(Math.random() *  (MAX_JUMP_POWER-MIN_JUMP_POWER) + MIN_JUMP_POWER);
 		
-		PIG_SIZE_FACTOR = 1.5f;
+		PIG_CLASS_SIZE_FACTOR = 1.5f;
 		this.getBody().setFixedRotation(true);
 		this.setImage(new Image("images/smartpig.png"));
 		initAnimations();
