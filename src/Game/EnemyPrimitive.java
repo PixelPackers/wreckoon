@@ -23,7 +23,8 @@ public class EnemyPrimitive extends Enemy{
 			BodyType bodyType) throws SlickException {
 		super(game, posX, posY, imgPath);
 
-
+		initAnimations();
+		
 		this.setImage(new Image("images/dumbpig.png"));
 		this.getBody().setFixedRotation(true);
 	}
@@ -59,9 +60,9 @@ public class EnemyPrimitive extends Enemy{
 	@Override
 	protected void initAnimations() throws SlickException {
 
-		SpriteSheet sheetWalk = new SpriteSheet("images/walkcycle.png", 	600, 575);
-		SpriteSheet sheetIdle = new SpriteSheet("images/walkcycle.png", 	600, 575);
-		SpriteSheet sheetDie  = new SpriteSheet("images/walkcycle.png", 	600, 575);
+		SpriteSheet sheetWalk = new SpriteSheet("images/dumbpigwalk.png", 	550, 550);
+		SpriteSheet sheetIdle = new SpriteSheet("images/dumbpigidle.png", 	550, 550);
+		SpriteSheet sheetDie  = new SpriteSheet("images/walkcycle.png", 	550, 550);
 		
 		Animation animationWalk = new Animation(sheetWalk, 80);
 		
@@ -74,7 +75,19 @@ public class EnemyPrimitive extends Enemy{
 		animations.put("walk", animationWalk);
 		animations.put("idle", animationIdle);
 		animations.put("die", animationDie);
+		
+		currentAnimation = animationWalk;
 	
 	}
 
+	@Override
+	public void drawImage() {
+		float drawWidth = (this.getBody().getLinearVelocity().x > 0.1f) ? width : -width;
+		currentAnimation.draw( 
+				getBody().getPosition().x-drawWidth*0.5f,
+				getBody().getPosition().y-height*0.5f, 
+				drawWidth, 
+				height);
+	}
+	
 }

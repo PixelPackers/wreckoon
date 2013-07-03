@@ -89,8 +89,8 @@ public class Player {
 	private float		maxPlayerRotation = 10f;
 	private World		world;
 	
-	private float width		= 1f * 0.25f;
-	private float height	= 2f * 0.25f;
+	private float width		= 0.48f;
+	private float height	= 0.48f;
 	private PolygonShape firstPolygonShape 		= new PolygonShape();
 	private PolygonShape secondPolygonShape 	= new PolygonShape();
 	
@@ -465,20 +465,20 @@ public class Player {
 	
 	public void update() {
 		
-		// slow down player if no directionmovment button is pressed
-		if( this.conveyorSpeed == 0 && !this.movementButtonIsDown){
-			float slowDownForce = 0.5f;
-			float slowDownThreshold = 0.15f;
-			// left
-			if(this.getBody().getLinearVelocity().x < -slowDownThreshold && this.isOnGround() ) {
-				this.getBody().applyLinearImpulse(new Vec2(slowDownForce,0), this.getBody().getPosition());
-			} else
-			
-			// right
-			if(this.getBody().getLinearVelocity().x > slowDownThreshold && this.isOnGround() ) {
-				this.getBody().applyLinearImpulse(new Vec2(-slowDownForce,0), this.getBody().getPosition());
-			}
-		}
+//		// slow down player if no directionmovment button is pressed
+//		if( this.conveyorSpeed == 0 && !this.movementButtonIsDown){
+//			float slowDownForce = 0.5f;
+//			float slowDownThreshold = 0.15f;
+//			// left
+//			if(this.getBody().getLinearVelocity().x < -slowDownThreshold && this.isOnGround() ) {
+//				this.getBody().applyLinearImpulse(new Vec2(slowDownForce,0), this.getBody().getPosition());
+//			} else
+//			
+//			// right
+//			if(this.getBody().getLinearVelocity().x > slowDownThreshold && this.isOnGround() ) {
+//				this.getBody().applyLinearImpulse(new Vec2(-slowDownForce,0), this.getBody().getPosition());
+//			}
+//		}
 		
 		// float in air while shooting laser
 		if ( this.laserActive ){

@@ -421,7 +421,7 @@ public class Game extends BasicGame {
 			}
 		}  
 
-		if (xbox.isButtonBDown() || input.isKeyPressed(Input.KEY_DOWN) || input.isKeyPressed(Input.KEY_S)) {
+		if (xbox.getLeftThumbY() > 0.5f || input.isKeyPressed(Input.KEY_DOWN) || input.isKeyPressed(Input.KEY_S)) {
 			if( !player.isCharging() && !player.isOnGround()) {
 				player.groundpoundInit();
 			}

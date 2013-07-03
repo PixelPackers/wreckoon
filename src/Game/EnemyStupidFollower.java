@@ -76,8 +76,8 @@ public class EnemyStupidFollower extends Enemy {
 		currentAnimation.draw( 
 				getBody().getPosition().x-width*0.5f,
 				getBody().getPosition().y-height*0.5f, 
-				width * 1.5f, 
-				height * 1.5f);
+				width, 
+				height);
 	}
 	
 }

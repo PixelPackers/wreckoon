@@ -279,6 +279,12 @@ public class Xbox360Controller extends XboxController {
 	public double getLeftTriggerValue() { return triggerLeft.getValue(); }
 	public double getRightTriggerValue() { return triggerRight.getValue(); }
 
+	public double getLeftThumbX() {
+		return Math.cos(Math.toRadians(getLeftThumbDirection() - 90d)) * getLeftThumbMagnitude();
+	}
+	public double getLeftThumbY() {
+		return Math.sin(Math.toRadians(getLeftThumbDirection() - 90d)) * getLeftThumbMagnitude();
+	}
 	public double getRightThumbX() {
 		return Math.cos(Math.toRadians(getRightThumbDirection() - 90d)) * getRightThumbMagnitude();
 	}
