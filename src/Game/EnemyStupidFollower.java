@@ -51,7 +51,7 @@ public class EnemyStupidFollower extends Enemy {
 	protected void initAnimations() throws SlickException {
 
 		SpriteSheet sheetWalk = new SpriteSheet("images/walkcycle.png", 	600, 575);
-		SpriteSheet sheetIdle = new SpriteSheet("images/walkcycle.png", 	600, 575);
+		SpriteSheet sheetIdle = new SpriteSheet("images/smartpigIdle.png", 	600, 575);
 		SpriteSheet sheetDie  = new SpriteSheet("images/walkcycle.png", 	600, 575);
 		
 		Animation animationWalk = new Animation(sheetWalk, 80);

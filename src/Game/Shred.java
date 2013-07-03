@@ -8,7 +8,7 @@ import org.newdawn.slick.SlickException;
 
 public class Shred extends GameObjectPolygon {
 	
-	private static final float 	FACTOR = 0.4f;
+	private static final float 	FACTOR = 0.2f;
 	private static final int	MIN_TIME = 50;
 	
 	private Game game;
@@ -43,7 +43,9 @@ public class Shred extends GameObjectPolygon {
 		image.draw(this.getBody().getPosition().x - radius, this.getBody().getPosition().y -radius, radius*2f, radius*2f);
 		
 		if(++counter == MIN_TIME){
-			collectable = true;
+			game.getObjectsToRemove().add(this);
+			// FIXME
+//			game.getShreds().remove(this);
 		}
 	}
 	

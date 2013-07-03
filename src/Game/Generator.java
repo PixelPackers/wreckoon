@@ -35,6 +35,7 @@ public class Generator extends GameObjectBox {
 		}
 		
 		animation = new Animation(spriteSheet, 100);
+		animation.setPingPong(true);
 		animation.start();
 	}
 	

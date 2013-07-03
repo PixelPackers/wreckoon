@@ -6,7 +6,7 @@ import org.jbox2d.dynamics.World;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
-public class Bolt extends GameObjectPolygon {
+public class DropItem extends GameObjectPolygon {
 	
 	private static final float 	FACTOR = 0.2f;
 	private static final int	MIN_TIME = 15;
@@ -25,7 +25,7 @@ public class Bolt extends GameObjectPolygon {
 		new Vec2(-0.47851562f 	* FACTOR, 	 0.0078125f 	* FACTOR)
 	};
 		
-	public Bolt(Game game, World world, Vec2 pos, String imgPath)
+	public DropItem(Game game, World world, Vec2 pos, String imgPath)
 			throws SlickException {
 		
 		super(world, pos.x, pos.y, verts, 1f, 0.5f, 0f, imgPath, BodyType.DYNAMIC);
@@ -48,7 +48,6 @@ public class Bolt extends GameObjectPolygon {
 	}
 	
 	public void collect(){
-		System.out.println("bolt collected");
 	}
 	
 	public boolean isCollectable() {

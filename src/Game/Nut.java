@@ -9,7 +9,7 @@ import org.newdawn.slick.SlickException;
 public class Nut extends GameObjectPolygon {
 	
 	private static final float FACTOR = 0.15f;
-	private static final int	MIN_TIME = 50;
+	private static final int	MIN_TIME = 15;
 	
 	private Game game;
 	private Image image;
