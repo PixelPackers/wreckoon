@@ -39,7 +39,7 @@ public class MyContactListener implements ContactListener{
 				if (	gameObject.getBody().getFixtureList() == contact.getFixtureB() 
 					||	gameObject.getBody().getFixtureList() == contact.getFixtureA()){
 					
-					gameObject.getBody().setLinearVelocity( new Vec2(0,-20) );
+					gameObject.getBody().setLinearVelocity( new Vec2(0,-10) );
 //					break;
 				}
 			}

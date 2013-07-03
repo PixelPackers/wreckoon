@@ -18,9 +18,14 @@ public abstract class Enemy extends GameObjectBox {
 	
 	protected Game game;
 	protected static final float width = 0.8f;
-	protected static final float height = 0.8f;
+	protected static final float height = width;
 	
 	protected float PIG_SIZE_FACTOR;
+
+	protected static final int DIE_TIME 			= 100;
+//	TODO kA warum die zahl...
+	protected static final int DIE_TIME_IN_FRAMES 	=  30;
+	protected int dieCounter = 0;
 
 	private static final float	MIN_SPEED		= 0.75f;
 	private static final float	MAX_SPEED		= 1.5f;
@@ -188,7 +193,7 @@ public abstract class Enemy extends GameObjectBox {
 	
 	public void throwBack(){
 
-		float force = 15f;
+		float force = 7.5f;
 		float x = (game.getPlayer().movesLeft()) ? -force : force;
 		
 		this.getBody().setLinearVelocity(new Vec2 (x, -force) );
@@ -199,9 +204,9 @@ public abstract class Enemy extends GameObjectBox {
 
 		// sprite
 		game.getObjectsToRemove().add(this);
-		game.getEnemiesToRemove().add(this);
 		
 		this.dead = true;
+		this.dieCounter = 0;
 	}
 
 	public boolean isDead() {
@@ -216,6 +221,11 @@ public abstract class Enemy extends GameObjectBox {
 		if(this.conveyorSpeed != 0){
 			this.getBody().setLinearVelocity( new Vec2(getBody().getLinearVelocity().x + conveyorSpeed, getBody().getLinearVelocity().y) );
 		}
+		
+		if( dead && dieCounter == DIE_TIME_IN_FRAMES) {
+			game.getEnemiesToRemove().add(this);
+		}
+		++dieCounter;
 	}
 
 	public void drawImage() {

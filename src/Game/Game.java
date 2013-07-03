@@ -133,8 +133,8 @@ public class Game extends BasicGame {
 		world.setContactListener(new MyContactListener(this));
 		
 		for (int i = 0; i < 10; ++i) {
-			enemies.add( new EnemyPrimitive		(this, 1*i +10f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
-			enemies.add( new EnemyStupidFollower(this, 1f*i, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+			enemies.add( new DumbPig		(this, 1*i +10f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
+			enemies.add( new SmartPig(this, 1f*i, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
 		}
 
 	}
@@ -168,34 +168,36 @@ public class Game extends BasicGame {
 		
 		for (GameObject o :  objectsToRemove){
 			world.destroyBody(o.getBody());
+			
+			if(o instanceof Enemy){
+				for(int i=0; i<7; ++i){
+					
+					float power = 10f;
+					Vec2 direction = new Vec2( 
+							(float)(Math.random()*power*2-power),
+							-((float)(Math.random()*power)) );
+					
+					
+					Nut nut = new Nut(this, getWorld(), o.getBody().getPosition().add(new Vec2(0,0)), "images/nut"+ ((int) (Math.random()*3)+1)+".png" );
+					nut.getBody().setLinearVelocity( direction);
+					getNuts().add(nut);
+					
+					Bolt bolt = new Bolt(this, getWorld(), o.getBody().getPosition().add(new Vec2(0,0)), "images/bolt"+ ((int) (Math.random()*3)+1)+".png" );
+					bolt.getBody().setLinearVelocity( direction);
+					getBolts().add(bolt);
+
+					Shred shred = new Shred(this, getWorld(), o.getBody().getPosition().add(new Vec2(0,0)), "images/shred"+ ((int) (Math.random()*3)+1)+".png" );
+					shred.getBody().setLinearVelocity(direction);
+					getShreds().add(shred);
+					
+					
+				}
+			}
 		}		
 		objectsToRemove.clear();
 		
 		for (Enemy e :  enemiesToRemove){
 
-			
-			for(int i=0; i<7; ++i){
-				
-				float power = 10f;
-				Vec2 direction = new Vec2( 
-						(float)(Math.random()*power*2-power),
-						-((float)(Math.random()*power)) );
-				
-				
-				Nut nut = new Nut(this, getWorld(), e.getBody().getPosition().add(new Vec2(0,0)), "images/nut"+ ((int) (Math.random()*3)+1)+".png" );
-				nut.getBody().setLinearVelocity( direction);
-				getNuts().add(nut);
-				
-				Bolt bolt = new Bolt(this, getWorld(), e.getBody().getPosition().add(new Vec2(0,0)), "images/bolt"+ ((int) (Math.random()*3)+1)+".png" );
-				bolt.getBody().setLinearVelocity( direction);
-				getBolts().add(bolt);
-
-				Shred shred = new Shred(this, getWorld(), e.getBody().getPosition().add(new Vec2(0,0)), "images/shred"+ ((int) (Math.random()*3)+1)+".png" );
-				shred.getBody().setLinearVelocity(direction);
-				getShreds().add(shred);
-				
-				
-			}
 			enemies.remove(e);
 		}		
 		enemiesToRemove.clear();
