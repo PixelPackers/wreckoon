@@ -587,23 +587,22 @@ public class Player {
 			destroyLaser();
 		}
 		
+
 		if (this.biting && this.currentAnimation.isStopped() ) {
 			this.currentAnimation = animations.get("shock");
-			if(biteCounter > SHOCK_DURATION ) {
-				this.biting = false;
-				this.currentAnimation = animations.get("idle");
-			}
 		}
+
+		if	(this.biting && biteCounter == SHOCK_DURATION ) {
+			this.biting = false;
+			this.currentAnimation = animations.get("idle");
+			this.laserAble = true;			
+		}
+
 
 		if (this.laserActive && this.currentAnimation.isStopped() ) {
 			this.currentAnimation = animations.get("laser");
 		}
 		
-		
-		if(this.conveyorSpeed != 0){
-//			this.body.applyLinearImpulse(new Vec2(conveyorSpeed,0), this.body.getPosition());
-			this.body.setLinearVelocity( new Vec2(body.getLinearVelocity().x + conveyorSpeed, body.getLinearVelocity().y) );
-		}
 	}
 
 	public void accelerate() {
@@ -727,13 +726,13 @@ public class Player {
 				if(leftWallColliding()){
 					
 					this.left = false;
-					jumpSpeedX = -this.jumpPower * 0.5f;
+					jumpSpeedX = this.jumpPower * 0.5f;
 					this.jumpingFromWall = true;
 					
 				} else if(rightWallColliding()){
 					
 					this.left = true;
-					jumpSpeedX = this.jumpPower * 0.5f;
+					jumpSpeedX = -this.jumpPower * 0.5f;
 					this.jumpingFromWall = true;
 				
 				}
