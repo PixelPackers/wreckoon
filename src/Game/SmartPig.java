@@ -10,14 +10,18 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Polygon;
 
-public class EnemyStupidFollower extends Enemy {
+public class SmartPig extends Enemy {
 
-	private float jumpPower = -5f;
+	private static final float MIN_JUMP_POWER = -3f;
+	private static final float MAX_JUMP_POWER = -6f;
+	private float jumpPower;
 	
-	public EnemyStupidFollower(Game game, float posX, float posY, float width, float height, float density, float friction, float restitution, String imgPath,
+	public SmartPig(Game game, float posX, float posY, float width, float height, float density, float friction, float restitution, String imgPath,
 			BodyType bodyType) throws SlickException {
 		super(game, posX, posY, imgPath);
 
+		this.jumpPower =  (float)(Math.random() *  (MAX_JUMP_POWER-MIN_JUMP_POWER) + MIN_JUMP_POWER);
+		
 		PIG_SIZE_FACTOR = 1.5f;
 		this.getBody().setFixedRotation(true);
 		this.setImage(new Image("images/smartpig.png"));
@@ -30,7 +34,7 @@ public class EnemyStupidFollower extends Enemy {
 		
 		if (!isDead() ){ 
 			Player player = this.game.getPlayer();
-			float speed = 1.25f;
+			
 			float x = speed;
 			left = false; 
 			
@@ -56,14 +60,14 @@ public class EnemyStupidFollower extends Enemy {
 
 		SpriteSheet sheetWalk = new SpriteSheet("images/smartpigrun.png", 	580, 610);
 		SpriteSheet sheetIdle = new SpriteSheet("images/smartpigIdle.png", 	600, 575);
-		SpriteSheet sheetDie  = new SpriteSheet("images/smartpigdeath.png", 	600, 575);
+		SpriteSheet sheetDie  = new SpriteSheet("images/smartpigdeath.png", 	550, 600);
 		
 		Animation animationWalk = new Animation(sheetWalk, 80);
 		
 		Animation animationIdle= new Animation(sheetIdle, 80);
 		animationIdle.setLooping(false);
 		
-		Animation animationDie= new Animation(sheetDie, 80);
+		Animation animationDie= new Animation(sheetDie, DIE_TIME);
 		animationDie.setLooping(false);
 
 		animations.put("walk", animationWalk);
@@ -72,6 +76,11 @@ public class EnemyStupidFollower extends Enemy {
 		
 		currentAnimation = animationWalk;
 		
+	}
+	@Override
+	public void die() {
+		super.die();
+		currentAnimation = animations.get("die");
 	}
 	
 }

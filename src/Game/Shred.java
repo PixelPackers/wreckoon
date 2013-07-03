@@ -8,8 +8,8 @@ import org.newdawn.slick.SlickException;
 
 public class Shred extends GameObjectPolygon {
 	
-	private static final float 	FACTOR = 0.2f;
-	private static final int	MIN_TIME = 50;
+	private static final float 	FACTOR = 0.4f;
+	private static final int	MIN_TIME = 110;
 	
 	private Game game;
 	private Image image;
