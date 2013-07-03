@@ -38,7 +38,7 @@ public class GameObjectPolygon extends GameObject {
 		Vec2 position = this.getBody().getPosition();
 		float angle = this.getBody().getAngle();
 		this.getImage().setRotation(-(float) Math.toDegrees(angle));
-		this.getImage().draw(position.x, -position.y, 10, 10);
+		this.getImage().draw(position.x, position.y, 10, 10);
 	}
 
 	@Override
@@ -46,10 +46,10 @@ public class GameObjectPolygon extends GameObject {
 
 		Polygon polygonToDraw = new Polygon();
 		Vec2[] verts = this.polygonShape.getVertices();
-		for (int i=0; i< this.polygonShape.m_vertexCount; ++i) {
+		for (int i = 0; i < this.polygonShape.m_vertexCount; ++i) {
 			Vec2 vert = verts[i];
 			Vec2 worldPoint = this.getBody().getWorldPoint(vert);
-			polygonToDraw.addPoint(worldPoint.x, -worldPoint.y);
+			polygonToDraw.addPoint(worldPoint.x, worldPoint.y);
 		}
 		g.draw(polygonToDraw);
 		

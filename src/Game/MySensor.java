@@ -29,7 +29,7 @@ public class MySensor {
 			
 			Vec2 sensorVert 		= sensorVerts[i];
 			Vec2 sensorWorldPoint	= body.getWorldPoint(sensorVert);
-			polygonToDraw.addPoint(sensorWorldPoint.x, -sensorWorldPoint.y);
+			polygonToDraw.addPoint(sensorWorldPoint.x, sensorWorldPoint.y);
 			
 		}
 		Color prevColor = g.getColor();

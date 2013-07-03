@@ -23,7 +23,7 @@ import org.newdawn.slick.geom.Polygon;
 
 public class Player {
 
-	private static final float	TAILWHIP_DISTANCE	= 20f * 0.25f;
+	private static final float	TAILWHIP_DISTANCE	= 5f;
 	private static final int	TAILWHIP_TIME		= 110;
 	private static final int 	GROUNDPOUND_AIRTIME = 30;
 	private static final int 	LASER_DURATION 		= 200;
@@ -34,10 +34,10 @@ public class Player {
 //	private final float ACC_RUNNING = 0.75f;
 //	
 	// XXX more friction test
-	private final float MAX_VELOCITY_WALKING = 7f * 0.25f;
-	private final float MAX_VELOCITY_RUNNING = 20f * 0.25f;
-	private final float ACC_WALKING = 1.5f * 0.25f;
-	private final float ACC_RUNNING = 1.75f * 0.25f;
+	private final float MAX_VELOCITY_WALKING = 1.75f;
+	private final float MAX_VELOCITY_RUNNING = 5f;
+	private final float ACC_WALKING = 0.375f;
+	private final float ACC_RUNNING = 0.4375f;
 	private final float playerFriction = 1f;
 	
 	private int groundPoundCounter	= 0;
@@ -51,9 +51,9 @@ public class Player {
 	private int floatingCounter 	= 0;
 	
 	
-	private float jumpPower				= 10f;
+	private float jumpPower				= -10f;
 	private float wallJumpPowerFactor	= 0.3f;
-	private float groundPoundPower		= -50f * 0.25f;
+	private float groundPoundPower		= 12.5f;
 
 	private boolean left			= false;
 	private boolean running			= false;
@@ -65,6 +65,10 @@ public class Player {
 	private boolean deadAndOnGround	= false;	
 	private boolean biting			= false;
 	private boolean laserActive		= false;
+	private boolean ableToGetLaser	= false;
+	private boolean laserAble		= false;
+	
+	private boolean movementButtonIsDown = false;
 	
 	//XXX ??
 	private float	accelerationX = ACC_WALKING;
@@ -79,6 +83,8 @@ public class Player {
 	private	Vec2 		shootingDirection		= new Vec2(1,1);
 	private float 		floatingDistanceX		= 3f * 0.25f;
 	private float 		floatingDistanceY		= 3f * 0.25f;
+	
+	private float 		conveyorSpeed			= 0f;
 	
 	private float		maxPlayerRotation = 10f;
 	private World		world;
@@ -259,11 +265,16 @@ public class Player {
 		
 		
 		// eye laser
+		float laserLength = 10f;
+		float laserHeight = 1f;
+		float spaceX = 0;
+		float spaceY = 0;
+		
 		Vec2[] vertsLaser = new Vec2[]{
-			new Vec2( this.getBody().getPosition() ),
-			new Vec2( this.getBody().getPosition().x,		this.getBody().getPosition().y + 1),
-			new Vec2( this.getBody().getPosition().x + 50,	this.getBody().getPosition().y + 1),
-			new Vec2( this.getBody().getPosition().x + 50,	this.getBody().getPosition().y)
+			new Vec2( spaceX, 				spaceY ),
+			new Vec2( spaceX,				spaceY + laserHeight),
+			new Vec2( spaceX + laserLength,	spaceY + laserHeight),
+			new Vec2( spaceX + laserLength,	spaceY)
 		};
 
 		this.polygonShapeLaser = new PolygonShape();
@@ -272,6 +283,8 @@ public class Player {
 		this.fixtureDefLaser = new FixtureDef();
 		this.fixtureDefLaser.shape = this.polygonShapeLaser;
 		fixtureDefLaser.isSensor = true;
+		destroyLaser();
+
 			
 		this.createSensors();
 		this.adjustHitboxes();		
@@ -323,13 +336,13 @@ public class Player {
 		}
 		
 		// ground collision
-		float groundCollisionSensorHeight=0.25f * 0.25f;
+		float groundCollisionSensorHeight = 0.0625f;
 		
 		Vec2[] vertsGroundSensor = new Vec2[]{
-			new Vec2(-width * 0.45f, -height * 0.5f - groundCollisionSensorHeight),
-			new Vec2(-width * 0.45f, -height * 0.5f + groundCollisionSensorHeight),
-			new Vec2( width * 0.45f, -height * 0.5f + groundCollisionSensorHeight),
-			new Vec2( width * 0.45f, -height * 0.5f - groundCollisionSensorHeight)
+			new Vec2(-width * 0.45f, height * 0.5f - groundCollisionSensorHeight),
+			new Vec2(-width * 0.45f, height * 0.5f + groundCollisionSensorHeight),
+			new Vec2( width * 0.45f, height * 0.5f + groundCollisionSensorHeight),
+			new Vec2( width * 0.45f, height * 0.5f - groundCollisionSensorHeight)
 		};
 
 		PolygonShape sensorPolygonShape = new PolygonShape();
@@ -337,12 +350,11 @@ public class Player {
 		
 		FixtureDef 	fixtureDefSensor = new FixtureDef();
 		fixtureDefSensor.shape = sensorPolygonShape;
-		fixtureDefSensor.isSensor=true;
+		fixtureDefSensor.isSensor = true;
 		
 		this.sensorGroundCollision = new MySensor( this.body.createFixture(fixtureDefSensor), sensorPolygonShape );
 		sensorList.add(sensorGroundCollision);
 		
-
 		sensorBottomLeft 	= sensorList.get(0);
 		sensorTopLeft		= sensorList.get(1);
 		sensorBottomRight 	= sensorList.get(2);
@@ -379,7 +391,7 @@ public class Player {
 		drawWidth= (left) ? drawWidth: -drawWidth;
 		
 		currentAnimation.draw( position.x + drawWidth*0.5f,
-				-position.y - drawHeight*0.5f - 0.5f*0.5f, // -0.5f --> sonst wuerde sprite in den boden hinein stehen 
+				position.y - drawHeight*0.5f - 0.5f*0.5f, // -0.5f --> sonst wuerde sprite in den boden hinein stehen 
 				-drawWidth, 
 				drawHeight);	
 	}
@@ -389,10 +401,10 @@ public class Player {
 			Polygon polygonToDraw = new Polygon();
 			Vec2[] verts = this.firstPolygonShape.getVertices();
 			
-			for (int i=0; i< this.firstPolygonShape.m_vertexCount; ++i) {
+			for (int i = 0; i < this.firstPolygonShape.m_vertexCount; ++i) {
 				Vec2 vert = verts[i];
 				Vec2 worldPoint = this.body.getWorldPoint(vert);
-				polygonToDraw.addPoint(worldPoint.x, -worldPoint.y);
+				polygonToDraw.addPoint(worldPoint.x, worldPoint.y);
 			}
 			
 			g.draw(polygonToDraw);
@@ -404,7 +416,7 @@ public class Player {
 			for (int i=0; i< this.secondPolygonShape.m_vertexCount; ++i) {
 				Vec2 vert = verts[i];
 				Vec2 worldPoint = this.body.getWorldPoint(vert);
-				polygonToDraw.addPoint(worldPoint.x, -worldPoint.y);
+				polygonToDraw.addPoint(worldPoint.x, worldPoint.y);
 			}
 			
 			g.draw(polygonToDraw);
@@ -423,7 +435,7 @@ public class Player {
 			for (int i=0; i< this.polygonShapeTail.m_vertexCount; ++i) {
 				Vec2 vert = verts[i];
 				Vec2 worldPoint = this.body.getWorldPoint(vert);
-				polygonToDraw.addPoint(worldPoint.x, -worldPoint.y);
+				polygonToDraw.addPoint(worldPoint.x, worldPoint.y);
 			}
 			g.draw(polygonToDraw);
 		}
@@ -438,8 +450,8 @@ public class Player {
 				Vec2 vert = verts[i];
 				
 				// FIXME magic numbers bzw player konstruktor start position
-				Vec2 worldPoint = this.body.getWorldPoint(vert.sub( new Vec2(20f,30f) ));
-				polygonToDraw.addPoint(worldPoint.x, -worldPoint.y);
+				Vec2 worldPoint = this.body.getWorldPoint(vert);
+				polygonToDraw.addPoint(worldPoint.x, worldPoint.y);
 			}
 			
 			g.draw(polygonToDraw);
@@ -452,6 +464,21 @@ public class Player {
 	}
 	
 	public void update() {
+		
+		// slow down player if no directionmovment button is pressed
+		if( this.conveyorSpeed == 0 && !this.movementButtonIsDown){
+			float slowDownForce = 0.5f;
+			float slowDownThreshold = 0.15f;
+			// left
+			if(this.getBody().getLinearVelocity().x < -slowDownThreshold && this.isOnGround() ) {
+				this.getBody().applyLinearImpulse(new Vec2(slowDownForce,0), this.getBody().getPosition());
+			} else
+			
+			// right
+			if(this.getBody().getLinearVelocity().x > slowDownThreshold && this.isOnGround() ) {
+				this.getBody().applyLinearImpulse(new Vec2(-slowDownForce,0), this.getBody().getPosition());
+			}
+		}
 		
 		// float in air while shooting laser
 		if ( this.laserActive ){
@@ -570,6 +597,12 @@ public class Player {
 
 		if (this.laserActive && this.currentAnimation.isStopped() ) {
 			this.currentAnimation = animations.get("laser");
+		}
+		
+		
+		if(this.conveyorSpeed != 0){
+//			this.body.applyLinearImpulse(new Vec2(conveyorSpeed,0), this.body.getPosition());
+			this.body.setLinearVelocity( new Vec2(body.getLinearVelocity().x + conveyorSpeed, body.getLinearVelocity().y) );
 		}
 	}
 
@@ -837,7 +870,7 @@ public class Player {
 				float 	playerY				= this.getBody().getPosition().y;
 				
 				float 	targetX				= playerX + floatingDistanceX * directionMultiplier;
-				float 	targetY				= playerY + floatingDistanceY;
+				float 	targetY				= playerY - floatingDistanceY;
 				
 				// object tracks player movement
 				moveFloatingObjectToTarget( targetX, targetY);
@@ -916,16 +949,14 @@ public class Player {
 	// laser
 	public void createLaser(){
 
-		if ( !this.laserActive){
+	if (!this.laserActive && this.laserAble) {
 			
 			this.laserActive = true;
 			
 			// save position where laser was activated
 			this.laserStartingPosition = this.body.getPosition();
-			System.out.println(this.laserStartingPosition);
 			
 //			TODO WORK IN PROGRESS
-//			lock player in air
 //			disable movement
 		
 			laserCounter = 0;
@@ -948,14 +979,19 @@ public class Player {
 		}
 
 		this.laserActive = false;
+		this.laserAble = false;
+
 	}
 	
+
 	public void bite(){
-		this.biting = true;
-		this.biteCounter = 0;
-		
-		this.currentAnimation = animations.get("bite");
-		this.currentAnimation.restart();
+		if(!this.biting && this.ableToGetLaser){
+			this.biting = true;
+			this.biteCounter = 0;
+			
+			this.currentAnimation = animations.get("bite");
+			this.currentAnimation.restart();
+		}
 	}
 	
 	
@@ -1149,9 +1185,24 @@ public class Player {
 		
 	}
 	
+	public Fixture getFixtureLaser() {
+		return fixtureLaser;
+	}
+	
 	public boolean shouldntMove() {
 		return this.dizzy && false;
 //		mit charging funkt telekinese ziel steuerung nicht mehr...
 //		return this.isCharging() || this.dizzy;
+	}
+	
+	public void setMovementButtonIsDown(boolean movementButtonIsDown) {
+		this.movementButtonIsDown = movementButtonIsDown;
+	}
+	
+	public void setAbleToGetLaser(boolean ableToGetLaser) {
+		this.ableToGetLaser = ableToGetLaser;
+	}
+	public void setConveyorSpeed(float conveyorSpeed) {
+		this.conveyorSpeed = conveyorSpeed;
 	}
 }

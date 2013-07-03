@@ -37,9 +37,9 @@ public class Girder {
 		upperLength = length;
 
 		rope[0] = new GameObjectBox(world, posX, posY, 0.3f, 0.3f, 0.5f, 0.3f, 0.3f, null, BodyType.STATIC, true);
-		rope[1] = new GameObjectBox(world, posX, posY - length, 0.4f, 0.4f, 6f, 0.3f, 0.3f, null, BodyType.DYNAMIC, true);
+		rope[1] = new GameObjectBox(world, posX, posY + length, 0.4f, 0.4f, 6f, 0.3f, 0.3f, null, BodyType.DYNAMIC, true);
 		
-		steelBeam = new GameObjectBox(world, posX, posY - length - LOWER_LENGTH, GIRDER_WIDTH, GIRDER_HEIGHT, DENSITY, FRICTION, RESTITUTION,
+		steelBeam = new GameObjectBox(world, posX, posY + length + LOWER_LENGTH, GIRDER_WIDTH, GIRDER_HEIGHT, DENSITY, FRICTION, RESTITUTION,
 				"images/girder" + ((int) (Math.random() * 3 + 1)) + ".png", BodyType.DYNAMIC);
 		steelBeam.getBody().setAngularDamping(1f);
 		steelBeam.getBody().setLinearDamping(1f);
@@ -48,13 +48,13 @@ public class Girder {
 		revoluteJointDef.bodyB = rope[1].getBody();
 		revoluteJointDef.collideConnected = false;
 		revoluteJointDef.localAnchorA.set(new Vec2(0f, 0f));
-		revoluteJointDef.localAnchorB.set(new Vec2(0f, length));
+		revoluteJointDef.localAnchorB.set(new Vec2(0f, -length));
 		world.createJoint(revoluteJointDef);
 		
 		revoluteJointDef.bodyA = steelBeam.getBody();
 		revoluteJointDef.bodyB = rope[1].getBody();
 		revoluteJointDef.collideConnected = false;
-		revoluteJointDef.localAnchorA.set(new Vec2(0f, LOWER_LENGTH));
+		revoluteJointDef.localAnchorA.set(new Vec2(0f, -LOWER_LENGTH));
 		revoluteJointDef.localAnchorB.set(new Vec2(0f, 0f));
 		world.createJoint(revoluteJointDef);
 		
@@ -69,14 +69,14 @@ public class Girder {
 		} else {
 			g.pushTransform();
 			Vec2 rope0Pos = rope[0].getBody().getPosition();
-			g.translate(rope0Pos.x, -rope0Pos.y);
-			g.rotate(0f, 0f, (float) -Math.toDegrees(rope[1].getBody().getAngle()));
+			g.translate(rope0Pos.x, rope0Pos.y);
+			g.rotate(0f, 0f, (float) Math.toDegrees(rope[1].getBody().getAngle()));
 			longRope.draw(-ROPE_WIDTH * 0.5f, 0f, ROPE_WIDTH, upperLength);
 			g.popTransform();
 			
 			g.pushTransform();
-			g.translate(steelBeam.getBody().getPosition().x, -steelBeam.getBody().getPosition().y);
-			g.rotate(0f, 0f, (float) -Math.toDegrees(steelBeam.getBody().getAngle()));
+			g.translate(steelBeam.getBody().getPosition().x, steelBeam.getBody().getPosition().y);
+			g.rotate(0f, 0f, (float) Math.toDegrees(steelBeam.getBody().getAngle()));
 			tiedRopes.draw(-GIRDER_WIDTH * 0.5f, -1.075f, GIRDER_WIDTH, 0.9f);
 			g.popTransform();
 		}

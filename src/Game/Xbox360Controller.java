@@ -1,5 +1,7 @@
 package Game;
 
+import org.jbox2d.common.Vec2;
+
 import ch.aplu.xboxcontroller.XboxController;
 import ch.aplu.xboxcontroller.XboxControllerAdapter;
 
@@ -276,4 +278,12 @@ public class Xbox360Controller extends XboxController {
 	
 	public double getLeftTriggerValue() { return triggerLeft.getValue(); }
 	public double getRightTriggerValue() { return triggerRight.getValue(); }
+
+	public double getRightThumbX() {
+		return Math.cos(Math.toRadians(getRightThumbDirection() - 90d)) * getRightThumbMagnitude();
+	}
+	public double getRightThumbY() {
+		return Math.sin(Math.toRadians(getRightThumbDirection() - 90d)) * getRightThumbMagnitude();
+	}
+	
 }

@@ -23,13 +23,15 @@ public abstract class Enemy extends GameObjectBox {
 	private boolean dead = false;
 	protected boolean left = false;
 	
+	private float conveyorSpeed = 0f;
+	
 	protected ArrayList<MySensor> sensorList = new ArrayList<MySensor>();
 	protected MySensor 	sensorLeft;
 	protected MySensor 	sensorRight;
 	protected MySensor	sensorGroundCollision;
-	
-	private Animation a;
-	private Animation currentAnimation;
+
+	protected HashMap<String, Animation> animations = new HashMap<String, Animation>();
+	protected Animation currentAnimation;
 
 	public Enemy(Game game, float posX, float posY, float width, float height, float density, float friction, float restitution, String imgPath,
 			BodyType bodyType) throws SlickException {
@@ -56,7 +58,7 @@ public abstract class Enemy extends GameObjectBox {
 		float default_ySpace = height*0.25f;
 		float xSpace = default_xSpace;
 		float ySpace = default_ySpace;
-		float putDown = 0f;
+		float putDown = 0.3f;
 		{
 		// left sensor
 		Vec2[] vertsSensor = new Vec2[]{
@@ -94,13 +96,13 @@ public abstract class Enemy extends GameObjectBox {
 		sensorList.add(new MySensor(this.getBody().createFixture(fixtureDefSensor), sensorPolygonShape ) );
 		}
 		// ground collision
-		float groundCollisionSensorHeight=0.2f;
+		float groundCollisionSensorHeight=0.1f;
 		
 		Vec2[] vertsGroundSensor = new Vec2[]{
-			new Vec2(-width * 0.45f, -height * 0.5f - groundCollisionSensorHeight),
-			new Vec2(-width * 0.45f, -height * 0.5f + groundCollisionSensorHeight),
-			new Vec2( width * 0.45f, -height * 0.5f + groundCollisionSensorHeight),
-			new Vec2( width * 0.45f, -height * 0.5f - groundCollisionSensorHeight)
+			new Vec2(-width * 0.45f, height * 0.5f - groundCollisionSensorHeight),
+			new Vec2(-width * 0.45f, height * 0.5f + groundCollisionSensorHeight),
+			new Vec2( width * 0.45f, height * 0.5f + groundCollisionSensorHeight),
+			new Vec2( width * 0.45f, height * 0.5f - groundCollisionSensorHeight)
 		};
 
 		PolygonShape sensorPolygonShape = new PolygonShape();
@@ -126,7 +128,7 @@ public abstract class Enemy extends GameObjectBox {
 		for (int i=0; i< this.polygonShape.m_vertexCount; ++i) {
 			Vec2 vert = verts[i];
 			Vec2 worldPoint = this.getBody().getWorldPoint(vert);
-			polygonToDraw.addPoint(worldPoint.x, -worldPoint.y);
+			polygonToDraw.addPoint(worldPoint.x, worldPoint.y);
 		}
 		
 		if(this.dead)
@@ -152,7 +154,7 @@ public abstract class Enemy extends GameObjectBox {
 //		currentAnimation.draw( position.x + drawWidth*0.5f,
 //				-position.y - drawHeight*0.5f - 0.5f, // -0.5f --> sonst wuerde sprite in den boden hinein stehen 
 //				-drawWidth, 
-//				drawHeight);	
+//				drawHeight);
 //	}
 	
 	public boolean isOnGround(){
@@ -169,17 +171,7 @@ public abstract class Enemy extends GameObjectBox {
 
 	public boolean rightWallColliding(){
 		return sensorRight.isColliding();
-	}	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	}
 	
 	public ArrayList<MySensor> getSensorList() {
 		return sensorList;
@@ -198,13 +190,29 @@ public abstract class Enemy extends GameObjectBox {
 		
 	}
 	
-	public void die(){
+	public void die() {
+
+		boltExplosion();
 		this.dead = true;
 	}
 	
+	private void boltExplosion() {
+
+		System.out.println("bolts erstellen");
+		
+	}
+
 	public boolean isDead() {
 		return dead;
 	}
 	
-	public abstract void update();
+	public void setConveyorSpeed(float conveyorSpeed) {
+		this.conveyorSpeed = conveyorSpeed;
+	}
+	
+	public void update() {
+		if(this.conveyorSpeed != 0){
+			this.getBody().setLinearVelocity( new Vec2(getBody().getLinearVelocity().x + conveyorSpeed, getBody().getLinearVelocity().y) );
+		}
+	}
 }

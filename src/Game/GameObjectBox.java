@@ -30,8 +30,8 @@ public class GameObjectBox extends GameObjectPolygon {
 	public void drawImage(){
 		Vec2 position = this.getBody().getPosition();
 		float angle = this.getBody().getAngle();
-		this.getImage().setRotation(-(float) Math.toDegrees(angle));
-		this.getImage().draw(position.x - this.width / 2, -position.y - this.height / 2, this.width, this.height);
+		this.getImage().setRotation((float) Math.toDegrees(angle));
+		this.getImage().draw(position.x - this.width / 2, position.y - this.height / 2, this.width, this.height);
 	}
 	@Override
 	public void drawOutline(Graphics g){

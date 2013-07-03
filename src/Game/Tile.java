@@ -605,9 +605,9 @@ public class Tile {
 	public void drawImage() {
 		// FIXME magic numbers
 		//Image image = Tile.img.getSubImage(this.type % 12, this.type / 12).getFlippedCopy(flipped, false);
-		Image image = Tile.img.getSubImage((this.type % 12) * 512 + 2, (this.type / 12) * 512 + 2, 508, 508).getFlippedCopy(flipped, false);
-		image.setRotation(-angle);
-		image.draw(this.x - TILE_SIZE * 0.5f, -this.y - TILE_SIZE * 0.5f, TILE_SIZE, TILE_SIZE);
+		Image image = Tile.img.getSubImage((this.type % 12) * 512 + 2, (this.type / 12) * 512 + 2, 508, 508).getFlippedCopy(!flipped, false);
+		image.setRotation(180 + angle);
+		image.draw(this.x - TILE_SIZE * 0.5f, this.y - TILE_SIZE * 0.5f, TILE_SIZE, TILE_SIZE);
 	}
 
 	public void drawOutline(Graphics g) {
@@ -620,7 +620,7 @@ public class Tile {
 			Vec2[] verts = polygonShape.getVertices();
 			for (int i = 0; i < polygonShape.getVertexCount(); ++i) {
 				Vec2 worldPoint = body.getWorldPoint(verts[i]);
-				polygon.addPoint(worldPoint.x, -worldPoint.y);
+				polygon.addPoint(worldPoint.x, worldPoint.y);
 				// p.addPoint(b.getPosition().x+ verts[i].x,
 				// -(b.getPosition().y +verts[i].y));
 			}

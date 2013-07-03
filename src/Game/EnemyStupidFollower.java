@@ -2,15 +2,17 @@ package Game;
 
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
+import org.newdawn.slick.Animation;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Polygon;
 
 public class EnemyStupidFollower extends Enemy {
 
-	private float jumpPower = 3f;
+	private float jumpPower = -3f;
 	
 	public EnemyStupidFollower(Game game, float posX, float posY, float width, float height, float density, float friction, float restitution, String imgPath,
 			BodyType bodyType) throws SlickException {
@@ -22,6 +24,7 @@ public class EnemyStupidFollower extends Enemy {
 	}
 	
 	public void update(){
+		super.update();
 		
 		if (!isDead() ){ 
 			Player player = this.game.getPlayer();
@@ -46,7 +49,22 @@ public class EnemyStupidFollower extends Enemy {
 
 	@Override
 	protected void initAnimations() throws SlickException {
-		// TODO Auto-generated method stub
+
+		SpriteSheet sheetWalk = new SpriteSheet("images/walkcycle.png", 	600, 575);
+		SpriteSheet sheetIdle = new SpriteSheet("images/walkcycle.png", 	600, 575);
+		SpriteSheet sheetDie  = new SpriteSheet("images/walkcycle.png", 	600, 575);
+		
+		Animation animationWalk = new Animation(sheetWalk, 80);
+		
+		Animation animationIdle= new Animation(sheetIdle, 80);
+		animationIdle.setLooping(false);
+		
+		Animation animationDie= new Animation(sheetDie, 80);
+		animationDie.setLooping(false);
+
+		animations.put("walk", animationWalk);
+		animations.put("idle", animationIdle);
+		animations.put("die", animationDie);
 		
 	}
 	

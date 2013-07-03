@@ -10,7 +10,7 @@ public class Camera {
 	}
 
 	public float getX() {
-		return -x;
+		return x;
 	}
 
 	public void setX(float x) {

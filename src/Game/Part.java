@@ -15,7 +15,7 @@ import org.newdawn.slick.SlickException;
 
 public class Part {
 
-	private static final float radius = 2;
+	private static final float radius = 0.5f;
 	private World world;
 	private Game game;
 	private float x;
@@ -24,7 +24,7 @@ public class Part {
 	private boolean collected = false;
 	
 	private float floatingHeight = 0f;
-	private float floatingSpeed = 0.02f;
+	private float floatingSpeed = 0.005f;
 	private int i = 0;
 	
 	
@@ -49,7 +49,7 @@ public class Part {
 		bodyDef.type = BodyType.STATIC;
 //		bodyDef.type = BodyType.DYNAMIC;
 		bodyDef.position.set(x,y);
-		
+
 		this.body = world.createBody(bodyDef);
 		this.fixture = this.body.createFixture(fixtureDef);
 	}
@@ -82,11 +82,11 @@ public class Part {
 	}
 	
 	public void drawImage(){
-		image.draw(this.body.getPosition().x - radius, -this.body.getPosition().y -radius, radius*2f, radius*2f);
+		image.draw(this.body.getPosition().x - radius, this.body.getPosition().y -radius, radius*2f, radius*2f);
 	}
 	
 	public void drawOutline(Graphics g){
-		g.drawArc(this.body.getPosition().x - this.radius*0.5f, -this.body.getPosition().y - this.radius*0.5f, this.radius, this.radius, 0f, 360f);
+		g.drawArc(this.body.getPosition().x - this.radius*0.5f, this.body.getPosition().y - this.radius*0.5f, this.radius, this.radius, 0f, 360f);
 	}
 	
 	public void update(){
