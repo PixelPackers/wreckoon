@@ -66,6 +66,9 @@ public class Player {
 	private boolean ableToGetLaser	= false;
 	private boolean laserAble		= false;
 	
+	private boolean locked = false;
+	private boolean godmode = false;
+		
 	private boolean movementButtonIsDown = false;
 	
 	//XXX ??
@@ -110,7 +113,6 @@ public class Player {
 	private Fixture		fixtureLaser 		= new Fixture();
 	private FixtureDef	fixtureDefLaser 	= new FixtureDef();
 	private PolygonShape polygonShapeLaser	= new PolygonShape();
-	private Vec2 		laserStartingPosition;
 	
 	private MySensor 	sensorTopLeft;
 	private MySensor 	sensorTopRight;
@@ -381,10 +383,11 @@ public class Player {
 	}
 	
 	public void die() {
-		
-		this.currentAnimation = animations.get("deathAir");
-		this.dead = true;
-		this.deadAndOnGround = false;
+		if(!godmode){
+			this.currentAnimation = animations.get("deathAir");
+			this.dead = true;
+			this.deadAndOnGround = false;
+		}
 		
 	}
 	
@@ -506,8 +509,9 @@ public class Player {
 		
 		// float in air while shooting laser
 		if ( this.laserActive ){
-			this.body.setTransform(this.laserStartingPosition, this.body.getAngle());
-			this.body.setLinearVelocity(new Vec2(0,0.5f) );
+//			this.body.setTransform(this.laserStartingPosition, this.body.getAngle());
+//			FIXME magic number
+			this.body.setLinearVelocity(new Vec2(0f,-0.3f) );
 		}
 		
 		// XXX evtl da checken, welche hitbox ausrichtung angebracht is
@@ -617,22 +621,21 @@ public class Player {
 		}
 
 		if	(this.biting && biteCounter == SHOCK_DURATION ) {
-			this.biting = false;
-			this.currentAnimation = animations.get("idle");
-			this.laserAble = true;			
+			biteFinalize();		
 		}
 
 
 		if (this.laserActive && this.currentAnimation.isStopped() ) {
 			this.currentAnimation = animations.get("laser");
+			createLaser();
 		}
 		
 	}
 
 	public void accelerate(float magnitude) {
 		
-//		if( shouldntMove() )
-//			return;
+		if( locked )
+			return;
 		
 		float velocityX 	= this.body.getLinearVelocity().x;
 		float velocityY 	= this.body.getLinearVelocity().y;
@@ -732,7 +735,7 @@ public class Player {
 
 	public void jump(){
 
-		if( this.shouldntMove() )
+		if( locked )
 			return;
 		
 		if( !groundPounding && (sensorGroundCollision.isColliding() || leftWallColliding() || rightWallColliding() ) ) {
@@ -778,6 +781,13 @@ public class Player {
 	}
 	public void groundpoundInit(){
 		
+		if (locked) {
+	 		return;
+	 	} else {
+	 		lock();
+//			FIXME wegen movement evtl doch nich tlocken? spzeial lock für movement?
+		}
+		
 		if(groundPoundCounter > 50){
 			
 			this.currentAnimation = animations.get("groundpound");
@@ -802,6 +812,7 @@ public class Player {
 		
 		if(this.groundPoundCounter > GROUNDPOUND_AIRTIME ) {
 			this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, groundPoundPower));
+			unlock();
 		} else {
 			this.getBody().setLinearVelocity(new Vec2(0f,0f));
 		}
@@ -809,7 +820,7 @@ public class Player {
 	
 	public void tailwhipInit(){
  
-		if (this.shouldntMove()) {
+		if ( locked ) {
 			return;
 		}
 		
@@ -888,7 +899,7 @@ public class Player {
 	
 	public void telekinesis(){
 
-		if (this.shouldntMove()) {
+		if ( locked ) {
 			return;
 		}
 		
@@ -980,33 +991,29 @@ public class Player {
 	}
 	
 	// laser
-	public void createLaser(){
+	public void initializeLaser(){
 
-	if (true || !this.laserActive && this.laserAble) {
+		if (locked){
+			return;
+		} else {
+			lock();
+		}
 		
-			Iterator iterator = getLaser().getLaserContacts().iterator();
-			while ( iterator.hasNext()){
-				Enemy enemy = (Enemy) iterator.next();
-				enemy.die();
-				iterator.remove();
+		if (true || !this.laserActive && this.laserAble) {
+				
+				this.laserActive = true;
+				
+				laserCounter = 0;
+			
+				this.currentAnimation = animations.get("groundpound");
+				this.currentAnimation.restart();
 			}
-		
-			this.laserActive = true;
-			
-			// save position where laser was activated
-			this.laserStartingPosition = this.body.getPosition();
-			
-//			TODO WORK IN PROGRESS
-//			disable movement
-		
-			laserCounter = 0;
+	}
 	
-			if (this.fixtureLaser == null) {
-				this.fixtureLaser = this.body.createFixture(this.fixtureDefLaser);
-			}
-			
-			this.currentAnimation = animations.get("groundpound");
-			this.currentAnimation.restart();
+	private void createLaser(){
+		if (this.fixtureLaser == null) {
+			this.fixtureLaser = this.body.createFixture(this.fixtureDefLaser);
+			godmode = true;
 		}
 		
 	}
@@ -1020,19 +1027,37 @@ public class Player {
 
 		this.laserActive = false;
 		this.laserAble = false;
+		godmode = false;
+		unlock();
 
 	}
 	
 
+
 	public void bite(){
-		if(!this.biting && this.ableToGetLaser){
-			this.biting = true;
-			this.biteCounter = 0;
-			
-			this.currentAnimation = animations.get("bite");
-			this.currentAnimation.restart();
+		if(locked){
+			return;
+		} else if (this.ableToGetLaser){
+			lock();
+//			TODO wird this.biting ühaupt gebraucht, jetzt mit lock()?
+			if(!this.biting){
+				this.biting = true;
+				this.biteCounter = 0;
+				
+				this.currentAnimation = animations.get("bite");
+				this.currentAnimation.restart();	
+			}
 		}
+		
 	}
+	
+	private void biteFinalize(){
+		this.biting = false;
+		this.currentAnimation = animations.get("idle");
+		this.laserAble = true;
+		unlock();
+	}
+	
 	
 	
 	
@@ -1132,7 +1157,7 @@ public class Player {
 	}
 
 	public void setLeft ( boolean left){
-		if( this.shouldntMove() ) {
+		if( locked ) {
 			return;
 		}
 		
@@ -1232,11 +1257,11 @@ public class Player {
 		return fixtureLaser;
 	}
 	
-	public boolean shouldntMove() {
-		return this.dizzy && false;
-//		mit charging funkt telekinese ziel steuerung nicht mehr...
-//		return this.isCharging() || this.dizzy;
-	}
+//	public boolean shouldntMove() {
+//		return this.dizzy && false;
+////		mit charging funkt telekinese ziel steuerung nicht mehr...
+////		return this.isCharging() || this.dizzy;
+//	}
 	
 	public void setMovementButtonIsDown(boolean movementButtonIsDown) {
 		this.movementButtonIsDown = movementButtonIsDown;
@@ -1247,5 +1272,15 @@ public class Player {
 	}
 	public void setConveyorSpeed(float conveyorSpeed) {
 		this.conveyorSpeed = conveyorSpeed;
+	}
+	public boolean isLocked() {
+		return locked;
+	}
+	public void lock(){
+		locked = true;
+	}
+	
+	public void unlock(){
+		locked = false;
 	}
 }
