@@ -36,10 +36,13 @@ public class Game extends BasicGame {
 
 	private static boolean debugView = false;
 
-	private static boolean useZoomAreas = true;
-	private static float DEFAULT_ZOOM = 128f;
-	private static float zoom = DEFAULT_ZOOM;
+	private static boolean useZoomAreas = false;
+	private static float tragetZoom = 128f;
+	private static float zoom = tragetZoom;
 	private static final float MANUAL_ZOOM_STEP = 4f;
+	
+	private static float laserAngle;
+	private static float laserTargetAngle;
 
 	private static World world;
 
@@ -73,7 +76,10 @@ public class Game extends BasicGame {
 
 	private Color backgroundColor = new Color(112, 149, 163);
 	private float BACKGROUND_SCALE = 0.008f;
+	private int angleshit;
 	private static Image[] trashpile = new Image[5];
+	
+	private static Laser laser;
 
 	public Game() {
 		super("The Raccooning");
@@ -129,14 +135,11 @@ public class Game extends BasicGame {
 		//conveyor.add(new Conveyor(world, 7f, 4f, 11f, 0.1f, 0.5f, 0.5f, 0.5f));
 
 		player = new Player(world, 5f, 3f);
+		laser = new Laser(world, 0f, 0f);
+		player.setLaser(laser);
+		
 //		player = new Player(world, 25f, 0f);
 		world.setContactListener(new MyContactListener(this));
-		
-
-//		for (int i = 0; i < 10; ++i) {
-//			enemies.add( new EnemyPrimitive		(this, 1*i +10f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
-//			enemies.add( new EnemyStupidFollower(this, 1f*i, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
-//		}
 		
 		// create the enemies
 		for (SpawnPoint e : level.getEnemies()) {
@@ -150,10 +153,10 @@ public class Game extends BasicGame {
 			}
 		}
 
-		for (int i = 0; i < 10; ++i) {
-			enemies.add( new DumbPig(this, 1*i +10f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
-			enemies.add( new SmartPig(this, 1f*i, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
-		}
+//		for (int i = 0; i < 10; ++i) {
+//			enemies.add( new DumbPig(this, 1*i +10f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
+//			enemies.add( new SmartPig(this, 1f*i, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+//		}
 
 	}
 
@@ -172,7 +175,18 @@ public class Game extends BasicGame {
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
 		processInput(gc);
-
+		
+		laserTargetAngle = (float) Math.toRadians(xbox.getLeftThumbDirection() - 90d);
+		
+//		if (laserAngle < 360f) {
+//			laserAngle -= 360f;
+//		}
+		laserAngle = cam.curveValue(laserTargetAngle, laserAngle, 10);
+		laser.position(
+				player.getBody().getPosition().x,
+				player.getBody().getPosition().y,
+				laserAngle);
+		
 		player.update();
 
 		for(Enemy enemy : enemies){
@@ -235,7 +249,7 @@ public class Game extends BasicGame {
 
 	@Override
 	public void render(GameContainer gc, Graphics g) throws SlickException {
-
+		
 		g.setBackground(backgroundColor);
 
 		drawBackgroundObjects(g);
@@ -304,6 +318,8 @@ public class Game extends BasicGame {
 
 		house.drawFront(g, debugView);
 		
+		//laser.draw(g, debugView);
+		
 		g.popTransform();
 		
 		//drawZoomAreas(g);
@@ -320,13 +336,7 @@ public class Game extends BasicGame {
 		g.drawString("ShootingDirection: " + player.getShootingDirection(), 200, 10);
 		g.drawString("ShootingPower: " + player.getShootingPower(), 200, 30);
 		g.drawString("pos: " + player.getBody().getPosition(), 200, 50);
-
-
-		// warum funkt fill mit pattern nicht? 
-		Image pattern = new Image ("images/washer.png", 1);
-		g.fillRect(10, -10, 21, 21, pattern, 102, 102 );
-
-
+		
 	}
 
 	public static void main(String[] args) throws SlickException {
@@ -482,10 +492,10 @@ public class Game extends BasicGame {
 					}
 				}
 			}
-			if (biggestZoom < 0.01f) {
-				biggestZoom = DEFAULT_ZOOM;
+			if (biggestZoom > 0.001f) {
+				tragetZoom = biggestZoom;
 			}
-			zoom = cam.curveValue(biggestZoom, zoom, 30);
+			zoom = cam.curveValue(tragetZoom, zoom, 30);
 		} else {
 			if (input.isKeyDown(Input.KEY_E)) {
 				if (zoom < 200) {
@@ -613,7 +623,7 @@ public class Game extends BasicGame {
 			}
 		}	
 
-		if(input.isKeyPressed(input.KEY_J)){
+		if(xbox.isButtonYDown() || input.isKeyPressed(input.KEY_J)){
 			player.createLaser();
 		}
 		if(input.isKeyPressed(input.KEY_K)){

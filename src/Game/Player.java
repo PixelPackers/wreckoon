@@ -2,6 +2,7 @@ package Game;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
@@ -116,6 +117,8 @@ public class Player {
 	private MySensor	sensorBottomLeft;
 	private MySensor 	sensorBottomRight;
 	private MySensor	sensorGroundCollision;
+	
+	private Laser laser;
 
 
 	private ArrayList<MySensor> sensorList			= new ArrayList<MySensor>();
@@ -298,6 +301,14 @@ public class Player {
 		this.adjustHitboxes();		
 	}
 	
+	public void setLaser(Laser laser) {
+		this.laser = laser;
+	}
+	
+	public Laser getLaser() {
+		return this.laser;
+	}
+	
 	private void createSensors() {
 
 		// delete old sensors
@@ -449,21 +460,26 @@ public class Player {
 		}
 		
 		// laser
-
-		if (this.fixtureLaser != null) {
-			Polygon polygonToDraw = new Polygon();
-			Vec2[] verts = this.polygonShapeLaser.getVertices();
-			
-			for (int i=0; i< this.polygonShapeLaser.m_vertexCount; ++i) {
-				Vec2 vert = verts[i];
-				
-				// FIXME magic numbers bzw player konstruktor start position
-				Vec2 worldPoint = this.body.getWorldPoint(vert);
-				polygonToDraw.addPoint(worldPoint.x, worldPoint.y);
-			}
-			
-			g.draw(polygonToDraw);
+		if (laserActive) {
+			laser.drawOutline(g);
 		}
+		
+		// old laser
+//		if (this.fixtureLaser != null) {
+//			
+//			Polygon polygonToDraw = new Polygon();
+//			Vec2[] verts = this.polygonShapeLaser.getVertices();
+//			
+//			for (int i=0; i< this.polygonShapeLaser.m_vertexCount; ++i) {
+//				Vec2 vert = verts[i];
+//				
+//				// FIXME magic numbers bzw player konstruktor start position
+//				Vec2 worldPoint = this.body.getWorldPoint(vert);
+//				polygonToDraw.addPoint(worldPoint.x, worldPoint.y);
+//			}
+//			
+//			g.draw(polygonToDraw);
+//		}
 		
 	}
 	
@@ -967,7 +983,14 @@ public class Player {
 	public void createLaser(){
 
 	if (true || !this.laserActive && this.laserAble) {
-			
+		
+			Iterator iterator = getLaser().getLaserContacts().iterator();
+			while ( iterator.hasNext()){
+				Enemy enemy = (Enemy) iterator.next();
+				enemy.die();
+				iterator.remove();
+			}
+		
 			this.laserActive = true;
 			
 			// save position where laser was activated
@@ -1137,6 +1160,9 @@ public class Player {
 		return this.lockedObject != null;
 	}
 	
+	public boolean isLaserActive() {
+		return laserActive;
+	}
 	
 	public boolean isCharging(){
 		return this.charging;
