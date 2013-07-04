@@ -101,11 +101,15 @@ public class SmartPig extends Enemy {
 		SpriteSheet sheetRun = new SpriteSheet("images/smartpigrun.png", 	580, 610);
 		SpriteSheet sheetIdle = new SpriteSheet("images/smartpigIdle.png", 	550, 600);
 		SpriteSheet sheetDie  = new SpriteSheet("images/smartpigdeath.png", 	550, 600);
+		SpriteSheet sheetDisabled  = new SpriteSheet("images/smartpigdisable.png", 	550, 500);
+		
 		
 		Animation animationWalk = new Animation(sheetWalk, 120);
-		Animation animationRun= new Animation(sheetRun, 80);
-		
-		Animation animationIdle= new Animation(sheetIdle, 150);
+		Animation animationRun = new Animation(sheetRun, 80);
+
+		Animation animationIdle = new Animation(sheetIdle, 150);
+
+		Animation animationDisabled = new Animation(sheetDisabled, 150);
 		
 		Animation animationDie= new Animation(sheetDie, DIE_TIME);
 		animationDie.setLooping(false);
@@ -113,6 +117,7 @@ public class SmartPig extends Enemy {
 		animations.put("walk", animationWalk);
 		animations.put("run", animationRun);
 		animations.put("idle", animationIdle);
+		animations.put("disabled", animationDisabled);
 		animations.put("die", animationDie);
 		
 		currentAnimation = animationWalk;
@@ -139,5 +144,6 @@ public class SmartPig extends Enemy {
 	public void throwBack() {
 		super.throwBack();
 		aggro = false;
+		this.currentAnimation = animations.get("disabled");
 	}
 }

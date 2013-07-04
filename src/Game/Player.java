@@ -337,6 +337,7 @@ public class Player {
 			this.deadAndOnGround = false;
 		}
 		lock();
+		System.out.println("die.lock()");
 		
 	}
 	
@@ -463,9 +464,11 @@ public class Player {
 //		if(getSensorGroundCollision().isColliding() && this.body.getLinearVelocity().y < 0f){
 		if(getSensorGroundCollision().isColliding()){
 			
-			if(groundPounding){
+			if(groundPounding || wasLasering){
 				this.groundPounding = false;
 				dizzyIncrease = -1;
+				unlock();
+				System.out.println("new unlock");
 			}
 			this.jumpingFromWall = false;
 			wasLasering = false;
@@ -691,12 +694,14 @@ public class Player {
 		
 		if (locked || wasLasering) {
 	 		return;
-	 	} else {
-	 		lock();
-//			FIXME wegen movement evtl doch nicht locken? spzeial lock für movement?
-		}
+	 	} 
 		
-		if(groundPoundCounter > 50){
+		if(groundPoundCounter > 50 && !groundPounding){
+			
+
+	 		lock();
+	 		System.out.println("groundPoundInit.lock()");
+//			FIXME wegen movement evtl doch nicht locken? spzeial lock für movement?
 			
 			this.currentAnimation = animations.get("groundpound");
 			this.currentAnimation.restart();
@@ -721,6 +726,7 @@ public class Player {
 		if( this.groundPoundCounter > GROUNDPOUND_AIRTIME ) {
 			this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, groundPoundPower));
 			unlock();
+			System.out.println("groundpound.unlock()");
 		} else {
 			this.getBody().setLinearVelocity(new Vec2(0f,0f));
 		}
@@ -901,6 +907,7 @@ public class Player {
 	public void initializeLaser(){
 		if(dead){
 			unlock();
+			System.out.println("initializeLaser.unlock()");
 			dead=false;
 			return;
 		}
@@ -908,6 +915,7 @@ public class Player {
 			return;
 		} else {
 			lock();
+			System.out.println("initializeLaser.lock()");
 		}
 		
 		if (true || !this.laserStarted && this.laserAble) {
@@ -944,6 +952,7 @@ public class Player {
 		godmode = false;
 		
 		unlock();
+		System.out.println("destroyLaser.unlock()");
 
 	}
 	
@@ -954,6 +963,7 @@ public class Player {
 			return;
 		} else if (this.ableToGetLaser){
 			lock();
+			System.out.println("bite.lock()");
 //			TODO wird this.biting ühaupt gebraucht, jetzt mit lock()?
 			if(!this.biting){
 				this.biting = true;
@@ -971,6 +981,7 @@ public class Player {
 		this.currentAnimation = animations.get("idle");
 		this.laserAble = true;
 		unlock();
+		System.out.println("biteFinalize.unlock()");
 	}
 	
 	
