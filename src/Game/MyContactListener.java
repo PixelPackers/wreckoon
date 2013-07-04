@@ -66,6 +66,7 @@ public class MyContactListener implements ContactListener{
 						enemy.throwBack();
 						enemy.die();
 					} else {
+
 						game.getPlayer().getLaser().getLaserContacts().add(enemy);
 					}
 				}

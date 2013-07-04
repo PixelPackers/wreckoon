@@ -24,7 +24,7 @@ public class Player {
 	private static final float	TAILWHIP_DISTANCE	= 5f;
 	private static final int	TAILWHIP_TIME		= 110;
 	private static final int 	GROUNDPOUND_AIRTIME = 30;
-	private static final int 	LASER_DURATION 		= 200;
+	private static final int 	LASER_DURATION 		= 50;
 	private static final int 	SHOCK_DURATION		= 200;
 //	private final float MAX_VELOCITY_WALKING = 7f;
 //	private final float MAX_VELOCITY_RUNNING = 20f;
@@ -65,6 +65,7 @@ public class Player {
 	private boolean laserActive		= false;
 	private boolean ableToGetLaser	= false;
 	private boolean laserAble		= false;
+	private boolean laserStarted	= false;
 	
 	private boolean locked = false;
 	private boolean godmode = false;
@@ -92,27 +93,16 @@ public class Player {
 	
 	private float width		= 0.48f;
 	private float height	= 0.48f;
-	private PolygonShape firstPolygonShape 		= new PolygonShape();
 	private PolygonShape secondPolygonShape 	= new PolygonShape();
 	
 	private Body 		body;
 	private BodyDef 	bodyDef				= new BodyDef();
-	private Fixture 	firstFixture;
 	private Fixture 	secondFixture;
-	private FixtureDef 	firstFixtureDef 	= new FixtureDef();
 	private FixtureDef	secondFixtureDef	= new FixtureDef();
-
-	private FixtureDef	firstfixtureDefWheel = new FixtureDef();
-	private Fixture 	firstFixtureWheel;
 
 	private Fixture		fixtureTail 		= new Fixture();
 	private FixtureDef	fixtureDefTail 		= new FixtureDef();
 	private PolygonShape polygonShapeTail	= new PolygonShape();
-	
-
-	private Fixture		fixtureLaser 		= new Fixture();
-	private FixtureDef	fixtureDefLaser 	= new FixtureDef();
-	private PolygonShape polygonShapeLaser	= new PolygonShape();
 	
 	private MySensor 	sensorTopLeft;
 	private MySensor 	sensorTopRight;
@@ -124,7 +114,6 @@ public class Player {
 
 
 	private ArrayList<MySensor> sensorList			= new ArrayList<MySensor>();
-	private Image 		img;
 	
 	private HashMap<String, Animation> animations = new HashMap<String, Animation>();
 	private Animation currentAnimation;
@@ -213,35 +202,16 @@ public class Player {
 		
 		initAnimations();
 		
-		this.firstPolygonShape.set(polygonShapeVerts, polygonShapeVerts.length);
-		
-		this.firstFixtureDef.density 	= 11f;
-		this.firstFixtureDef.friction 	= playerFriction;
-		// XXX braucht ma das? evtl wegen vom reifen wegbouncen?
-		this.firstFixtureDef.restitution = 0f;
-		this.firstFixtureDef.shape = firstPolygonShape;
-		
-		this.img = new Image("images/player.png");
 
 		this.body = world.createBody(bodyDef);
-		this.firstFixture = this.body.createFixture(firstFixtureDef);
+		
 		// FIXME das oder body.sweep verwenden?
 		this.body.setFixedRotation(true);
 //		this.body.setLinearDamping(0.7f);
-		
-		// wheel
-		/// XXX GAY GAY GAY
-//		CircleShape circleShape = new CircleShape();
-//		circleShape.m_radius = 0.5f;
-//		
-//		this.firstfixtureDefWheel.shape = circleShape;
-//		this.firstFixtureWheel = this.body.createFixture(this.firstfixtureDefWheel);
+				
 		
 		
-		
-		
-		
-		// second hitbox
+		// player body hitbox
 		Vec2[] vertsSensor = new Vec2[]{
 			new Vec2(-height * 0.5f,  width * 0.5f),
 			new Vec2(-height * 0.5f, -width * 0.5f),
@@ -271,36 +241,8 @@ public class Player {
 		this.secondPolygonShape = secondPolygonShape;
 
 		this.secondFixture = this.body.createFixture(secondFixtureDef);
-		
-		// wheels
-//		this
-		// 2 kreise die sich rotieren lassen am player fixen, an jeweiliger hitbox orientieren
-		
-		
-		// eye laser
-		float laserLength = 5f;
-		float laserHeight = 0.1f;
-		float spaceX = 0;
-		float spaceY = 0;
-		
-		Vec2[] vertsLaser = new Vec2[]{
-			new Vec2( spaceX, 				spaceY ),
-			new Vec2( spaceX,				spaceY + laserHeight),
-			new Vec2( spaceX + laserLength,	spaceY + laserHeight),
-			new Vec2( spaceX + laserLength,	spaceY)
-		};
-
-		this.polygonShapeLaser = new PolygonShape();
-		this.polygonShapeLaser.set(vertsLaser, vertsLaser.length);
-		
-		this.fixtureDefLaser = new FixtureDef();
-		this.fixtureDefLaser.shape = this.polygonShapeLaser;
-		fixtureDefLaser.isSensor = true;
-		destroyLaser();
-
-			
+					
 		this.createSensors();
-		this.adjustHitboxes();		
 	}
 	
 	public void setLaser(Laser laser) {
@@ -392,7 +334,7 @@ public class Player {
 	}
 	
 	public void draw(Graphics g, boolean debugView){
-//		if (debugView || this.img == null) {
+//		if (debugView) {
 //			this.drawOutline(g);
 //		} else { 
 //			this.drawImage();
@@ -419,30 +361,18 @@ public class Player {
 	}
 	
 	public void drawOutline(Graphics g) {
-		if( !isRunning() ){
-			Polygon polygonToDraw = new Polygon();
-			Vec2[] verts = this.firstPolygonShape.getVertices();
-			
-			for (int i = 0; i < this.firstPolygonShape.m_vertexCount; ++i) {
-				Vec2 vert = verts[i];
-				Vec2 worldPoint = this.body.getWorldPoint(vert);
-				polygonToDraw.addPoint(worldPoint.x, worldPoint.y);
-			}
-			
-			g.draw(polygonToDraw);
-		} else {
-			
-			Polygon polygonToDraw = new Polygon();
-			Vec2[] verts = this.secondPolygonShape.getVertices();
-			
-			for (int i=0; i< this.secondPolygonShape.m_vertexCount; ++i) {
-				Vec2 vert = verts[i];
-				Vec2 worldPoint = this.body.getWorldPoint(vert);
-				polygonToDraw.addPoint(worldPoint.x, worldPoint.y);
-			}
-			
-			g.draw(polygonToDraw);
+
+		// body hitbox
+		Polygon polygonToDraw = new Polygon();
+		Vec2[] verts = this.secondPolygonShape.getVertices();
+		
+		for (int i=0; i< this.secondPolygonShape.m_vertexCount; ++i) {
+			Vec2 vert = verts[i];
+			Vec2 worldPoint = this.body.getWorldPoint(vert);
+			polygonToDraw.addPoint(worldPoint.x, worldPoint.y);
 		}
+		g.draw(polygonToDraw);
+		
 		
 		// draw sensors
 		for (MySensor mySensor : sensorList){
@@ -451,39 +381,22 @@ public class Player {
 		
 		// draw tail while attacking
 		if( this.doTailwhip ){	
-			Polygon polygonToDraw = new Polygon();
-			Vec2[] verts = this.polygonShapeTail.getVertices();
+			Polygon polygonTailwhipToDraw = new Polygon();
+			Vec2[] vertsTailwhip = this.polygonShapeTail.getVertices();
 			
 			for (int i=0; i< this.polygonShapeTail.m_vertexCount; ++i) {
-				Vec2 vert = verts[i];
+				Vec2 vert = vertsTailwhip[i];
 				Vec2 worldPoint = this.body.getWorldPoint(vert);
-				polygonToDraw.addPoint(worldPoint.x, worldPoint.y);
+				polygonTailwhipToDraw.addPoint(worldPoint.x, worldPoint.y);
 			}
-			g.draw(polygonToDraw);
+			g.draw(polygonTailwhipToDraw);
 		}
 		
 		// laser
 		if (laserActive) {
 			laser.drawOutline(g);
 		}
-		
-		// old laser
-//		if (this.fixtureLaser != null) {
-//			
-//			Polygon polygonToDraw = new Polygon();
-//			Vec2[] verts = this.polygonShapeLaser.getVertices();
-//			
-//			for (int i=0; i< this.polygonShapeLaser.m_vertexCount; ++i) {
-//				Vec2 vert = verts[i];
-//				
-//				// FIXME magic numbers bzw player konstruktor start position
-//				Vec2 worldPoint = this.body.getWorldPoint(vert);
-//				polygonToDraw.addPoint(worldPoint.x, worldPoint.y);
-//			}
-//			
-//			g.draw(polygonToDraw);
-//		}
-		
+			
 	}
 	
 	public float curveValue(float dest, float current, float smoothness) {
@@ -508,7 +421,7 @@ public class Player {
 //		}
 		
 		// float in air while shooting laser
-		if ( this.laserActive ){
+		if ( this.laserStarted ){
 //			this.body.setTransform(this.laserStartingPosition, this.body.getAngle());
 //			FIXME magic number
 			this.body.setLinearVelocity(new Vec2(0f,-0.3f) );
@@ -565,7 +478,7 @@ public class Player {
 		
 		this.telekinesis();
 
-		if( this.isOnGround() /*&& !this.isRunning() */&& !this.doTailwhip && idleCounter > 2 && !this.dead && !this.biting) {
+		if( this.isOnGround() /*&& !this.isRunning() */&& !this.doTailwhip && idleCounter > 2 && !this.dead && !this.biting && !locked) {
 			this.currentAnimation = animations.get("idle");
 		}
 		
@@ -583,18 +496,16 @@ public class Player {
 			this.currentAnimation = animations.get("runJump");
 		}
 		
-		if(!this.isOnGround() && !this.isJumpingFromWall() && !this.groundPounding && !this.dead && !this.laserActive) {
+		if(!this.isOnGround() && !this.isJumpingFromWall() && !this.groundPounding && !this.dead && !this.laserStarted) {
 			this.currentAnimation = animations.get("runJump");
 		}
 		
 		if (this.isGroundPounding() && !this.isOnGround() && this.currentAnimation.isStopped()) {
 			this.currentAnimation = animations.get("groundpoundAir");
-//			this.currentAnimation.restart();
 		}
 		
 		if (this.isOnGround() && this.dizzy){
 			this.currentAnimation = animations.get("groundpoundImpact");
-//			this.currentAnimation.restart();
 		}
 
 		if (this.isOnWall() && !this.isJumpingFromWall() && !this.isOnGround() ) {
@@ -609,13 +520,12 @@ public class Player {
 				this.currentAnimation = animations.get("death");
 				this.currentAnimation.restart();
 			}
-		}
+		}	
 		
-		if(this.fixtureLaser != null && laserCounter > LASER_DURATION ){
+		if( laserCounter > LASER_DURATION ){
 			destroyLaser();
 		}
 		
-
 		if (this.biting && this.currentAnimation.isStopped() ) {
 			this.currentAnimation = animations.get("shock");
 		}
@@ -625,9 +535,14 @@ public class Player {
 		}
 
 
-		if (this.laserActive && this.currentAnimation.isStopped() ) {
+		if (this.laserStarted && this.currentAnimation.isStopped() ) {
 			this.currentAnimation = animations.get("laser");
 			createLaser();
+		}
+		
+		// TODO überprüfen ob das jetzt mit lauf band funkt
+		if(this.conveyorSpeed != 0){
+			this.getBody().setLinearVelocity( new Vec2(getBody().getLinearVelocity().x + conveyorSpeed, getBody().getLinearVelocity().y) );
 		}
 		
 	}
@@ -711,23 +626,6 @@ public class Player {
 		
 	}
 	
-	public void adjustHitboxes(){
-		
-		// TODO overhead evtl durch lastLeft != left loesbar?
-		this.body.destroyFixture(this.firstFixture);
-		this.body.destroyFixture(this.secondFixture);
-		
-		if( isRunning() ){ 
-			this.secondFixture = this.body.createFixture(this.secondFixtureDef);
-			createSensors();
-		} else {
-			this.firstFixture = this.body.createFixture(this.firstFixtureDef);
-			createSensors();
-
-		}
-		
-	}
-	
 	public void cancelJump() {
 		getBody().setLinearVelocity(new Vec2(getBody().getLinearVelocity().x,
 											getBody().getLinearVelocity().y * 0.35f));
@@ -785,7 +683,7 @@ public class Player {
 	 		return;
 	 	} else {
 	 		lock();
-//			FIXME wegen movement evtl doch nich tlocken? spzeial lock für movement?
+//			FIXME wegen movement evtl doch nicht locken? spzeial lock für movement?
 		}
 		
 		if(groundPoundCounter > 50){
@@ -861,7 +759,6 @@ public class Player {
 			this.currentAnimation.restart();
 			
 			this.running = true;
-			adjustHitboxes();
 			this.tailwhip();
 			
 			
@@ -999,32 +896,34 @@ public class Player {
 			lock();
 		}
 		
-		if (true || !this.laserActive && this.laserAble) {
-				
-				this.laserActive = true;
-				
-				laserCounter = 0;
+		if (true || !this.laserStarted && this.laserAble) {
+		
+			this.laserStarted = true;
 			
-				this.currentAnimation = animations.get("groundpound");
-				this.currentAnimation.restart();
-			}
+			laserCounter = 0;
+			this.currentAnimation = animations.get("groundpound");
+			this.currentAnimation.restart();
+		}
 	}
 	
 	private void createLaser(){
-		if (this.fixtureLaser == null) {
-			this.fixtureLaser = this.body.createFixture(this.fixtureDefLaser);
-			godmode = true;
+
+		this.laserActive = true;	
+		
+		Iterator<Enemy> iterator = laser.getLaserContacts().iterator();
+		while (iterator.hasNext()){
+			Enemy enemy = (Enemy) iterator.next();
+			enemy.die();
+			iterator.remove();
 		}
 		
+		godmode = true;
+	
 	}
 	
 	public void destroyLaser(){
 
-		if (this.fixtureLaser != null ) {
-			this.body.destroyFixture(this.fixtureLaser);
-			this.fixtureLaser = null;
-		}
-
+		this.laserStarted = false;
 		this.laserActive = false;
 		this.laserAble = false;
 		godmode = false;
@@ -1108,8 +1007,6 @@ public class Player {
 		// performance wenn man if weglaesst?
 		if(this.running != running){
 			this.running = running;
-
-			adjustHitboxes();
 		}
 	}
 	
@@ -1244,17 +1141,7 @@ public class Player {
 	}
 	
 	public Fixture getFixture(){
-		
-		if(running){
-			return secondFixture;
-		} else {
-			return firstFixture;
-		}
-		
-	}
-	
-	public Fixture getFixtureLaser() {
-		return fixtureLaser;
+			return secondFixture; 
 	}
 	
 //	public boolean shouldntMove() {
