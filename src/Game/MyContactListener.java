@@ -66,6 +66,7 @@ public class MyContactListener implements ContactListener{
 						enemy.throwBack();
 						enemy.die();
 					} else {
+
 						game.getPlayer().getLaser().getLaserContacts().add(enemy);
 					}
 				}
@@ -108,7 +109,7 @@ public class MyContactListener implements ContactListener{
 			}
 		}
 		
-//		 player contact
+//		player contact
 		if( game.getPlayer().getFixture() == contact.getFixtureA() || game.getPlayer().getFixture() == contact.getFixtureB() ){
 		
 //			+ enemy contact
@@ -302,5 +303,34 @@ public class MyContactListener implements ContactListener{
 	}
 	
 	@Override	public void postSolve(Contact contact, ContactImpulse contactImpulse) {}
-	@Override	public void preSolve(Contact contact, Manifold manifold) {}
+	@Override	public void preSolve(Contact contact, Manifold manifold) {
+		
+////		player contact
+//		for( Enemy enemy : game.getEnemies()){									
+////			
+//			if( enemy.getFixture() == contact.getFixtureA() || enemy.getFixture() == contact.getFixtureB() ){
+//	
+//	//			+ bolts	
+//				Iterator iterator = game.getBolts().iterator();
+//				while (iterator.hasNext()){
+//					Bolt bolt = (Bolt) iterator.next();
+//					if (bolt.getFixture() == contact.getFixtureA() || bolt.getFixture() == contact.getFixtureB() ) {
+//						bolt.getFixture().setSensor(true);
+//					}
+//				}
+//				
+//	
+//	//			+ nuts	
+//				iterator = game.getNuts().iterator();
+//				while (iterator.hasNext()){
+//	
+//					Nut nut = (Nut) iterator.next();
+//	
+//					if (nut.getFixture() == contact.getFixtureA() || nut.getFixture() == contact.getFixtureB() ) {
+//						nut.getFixture().setSensor(true);
+//					}
+//				}
+//			}
+//		}
+	}
 }

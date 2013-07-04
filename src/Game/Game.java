@@ -636,17 +636,6 @@ public class Game extends BasicGame {
 			}
 		}
 
-		if (input.isKeyDown(Input.KEY_V)) {
-			if (!dynamicObjects.isEmpty()) {
-				GameObject o = dynamicObjects.get(10);
-				o.getBody().setTransform(new Vec2(player.getBody().getPosition().x + 2, player.getBody().getPosition().y + 1) // vec2
-																																// end
-						, 0); // transform end
-								// gravity f�r objekt deaktivieren?
-
-			}
-		}
-
 		if (input.isKeyPressed(Input.KEY_ENTER)) {
 			debugView = !debugView;			
 		}
@@ -705,7 +694,7 @@ public class Game extends BasicGame {
 		}	
 
 		if(xbox.isButtonYDown() || input.isKeyPressed(input.KEY_J)){
-			player.createLaser();
+			player.initializeLaser();
 		}
 		if(input.isKeyPressed(input.KEY_K)){
 			player.destroyLaser();
