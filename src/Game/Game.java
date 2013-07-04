@@ -78,12 +78,13 @@ public class Game extends BasicGame {
 
 	private Color backgroundColor = new Color(112, 149, 163);
 	private float BACKGROUND_SCALE = 0.008f;
-	private int angleshit;
-	private float targetAngleshit;
+	private float smoothBoltGUIAngle;
 	private static Image[] trashpile = new Image[5];
 	
 	private static Image pauseImage;
 	private static SpriteSheet digits;
+	
+	private int lastCheckpoint;
 	
 	private static Laser laser;
 	
@@ -427,10 +428,9 @@ public class Game extends BasicGame {
 		}
 		
 		//drawZoomAreas(g);
+		drawCheckpoints(g);
 
 		// GUI
-		
-		g.drawString("isLocked: " + player.isLocked(), 10, 10);
 		
 //		g.setColor(Color.white);
 //		// scale pixel size : box2d:size
@@ -443,19 +443,20 @@ public class Game extends BasicGame {
 //		g.drawString("ShootingDirection: " + player.getShootingDirection(), 200, 10);
 //		g.drawString("ShootingPower: " + player.getShootingPower(), 200, 30);
 //		g.drawString("pos: " + player.getBody().getPosition(), 200, 50);
-		g.drawString("bolts: " + player.getBoltCounter(), 10, 10);
 		g.drawString("pigs: " + player.getPigCounter(), 10, 30);
-		g.drawString("lock: " + player.isLocked(), 10, 50);
+		
+		g.drawString("left thumbstick angle: " +  xbox.getLeftThumbDirection(), 10, 50);
 		
 	}
 
 	private void drawBoltCounter() throws SlickException {
+		int boltGUIAngle = player.getBoltCounter();
 		Image nut = Images.getInstance().getImage("images/nut2.png");
-		targetAngleshit = cam.curveValue(angleshit, targetAngleshit, 10);
-		nut.setRotation(targetAngleshit * 30);
+		smoothBoltGUIAngle = cam.curveValue(boltGUIAngle, smoothBoltGUIAngle, 10);
+		nut.setRotation(smoothBoltGUIAngle * 30);
 		nut.setAlpha(1f);
 		nut.draw(screenWidth - 130, 36);
-		drawRightAlignedDigits(angleshit, screenWidth - 150, 40, 0.5f);
+		drawRightAlignedDigits(boltGUIAngle, screenWidth - 150, 40, 0.5f);
 	}
 
 	public static void main(String[] args) throws SlickException {
@@ -475,6 +476,18 @@ public class Game extends BasicGame {
 				g.translate(-cam.getX() * zoom + screenWidth / 2, -cam.getY() * zoom + screenHeight * 2 / 3);
 				g.scale(zoom, zoom);
 				g.drawRect(za.getX1(), za.getY1(), za.getWidth(), za.getHeight());
+				g.popTransform();
+			}
+		}
+	}
+	
+	private void drawCheckpoints(Graphics g) {
+		if (level.getCheckpoints() != null) {
+			for (Checkpoint cp : level.getCheckpoints()) {
+				g.pushTransform();
+				g.translate(-cam.getX() * zoom + screenWidth / 2, -cam.getY() * zoom + screenHeight * 2 / 3);
+				g.scale(zoom, zoom);
+				g.drawRect(cp.getX1(), cp.getY1(), cp.getWidth(), cp.getHeight());
 				g.popTransform();
 			}
 		}
@@ -605,7 +618,11 @@ public class Game extends BasicGame {
 			useZoomAreas = !useZoomAreas;
 		}
 		
-		
+		for (Checkpoint cp : level.getCheckpoints()) {
+			if (cp.isInArea(player.getBody().getPosition().x, player.getBody().getPosition().y)) {
+				player.setCheckpoint(cp);
+			}
+		}
 		
 		// TODO Kamera Smoothness muss auch angepasst werden, je nach Zoom
 		if (useZoomAreas) {
@@ -840,4 +857,5 @@ public class Game extends BasicGame {
 	public static ArrayList<DropItem> getDropItemsToRemove() {
 		return dropItemsToRemove;
 	}
+	
 }

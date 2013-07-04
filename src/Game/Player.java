@@ -119,6 +119,7 @@ public class Player {
 	
 	private HashMap<String, Animation> animations = new HashMap<String, Animation>();
 	private Animation currentAnimation;
+	private Checkpoint lastCheckpoint = new Checkpoint(2f, 10f, 3f, 11f);
 
 	private void initAnimations() throws SlickException {
 		int scale = 4;
@@ -331,19 +332,19 @@ public class Player {
 	}
 	
 	public void die() {
-		if(!godmode){
+		if (!godmode) {
 			this.currentAnimation = animations.get("deathAir");
 			this.dead = true;
 			this.deadAndOnGround = false;
 		}
 		lock();
-		
+		body.setTransform(lastCheckpoint.getMidPoint(), 0f);
 	}
-	
+
 	public void draw(Graphics g, boolean debugView){
 //		if (debugView) {
 //			this.drawOutline(g);
-//		} else { 
+//		} else {
 //			this.drawImage();
 //		}
 		
@@ -410,152 +411,158 @@ public class Player {
 		return current + (dest - current) / smoothness;
 	}
 	
-	public void update() { if(!dead) {
+	public void update() { 
 		
-//		// slow down player if no directionmovment button is pressed
-//		if( this.conveyorSpeed == 0 && !this.movementButtonIsDown){
-//			float slowDownForce = 0.5f;
-//			float slowDownThreshold = 0.15f;
-//			// left
-//			if(this.getBody().getLinearVelocity().x < -slowDownThreshold && this.isOnGround() ) {
-//				this.getBody().applyLinearImpulse(new Vec2(slowDownForce,0), this.getBody().getPosition());
-//			} else
-//			
-//			// right
-//			if(this.getBody().getLinearVelocity().x > slowDownThreshold && this.isOnGround() ) {
-//				this.getBody().applyLinearImpulse(new Vec2(-slowDownForce,0), this.getBody().getPosition());
-//			}
-//		}
+		if(!dead) {
 		
-		// float in air while shooting laser
-		if ( this.laserStarted ){
-//			this.body.setTransform(this.laserStartingPosition, this.body.getAngle());
-//			FIXME magic number
-			this.body.setLinearVelocity(new Vec2(0f,-0.3f) );
-		}
-		
-		// XXX evtl da checken, welche hitbox ausrichtung angebracht is
-				
-		
-//		// abwaerts bewegung an wand
-//		if( this.isOnWall() ){
-//			if(this.body.getLinearVelocity().y < 0){
-//				if( (this.leftWallColliding() && this.body.getLinearVelocity().x < 0f ) || (this.rightWallColliding() && this.body.getLinearVelocity().x > 0f )){
-//					this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, 1f));	
-//				}	else {
-//					this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, -2f));
-//				}
-//			}
-////			if( !this.isOnGround()){
-////				this.setRunning(false);
-////			}
-//		}
-		
-		if (this.groundPounding) {
-			this.groundpound();	
-		}
-		
-		// TODO konstante fuer speed
-		if( this.tailwhipCounter > 20f && this.doTailwhip ){
-			this.tailwhipFinalize();
-		}
-		
-//		if(getSensorGroundCollision().isColliding() && this.body.getLinearVelocity().y < 0f){
-		if(getSensorGroundCollision().isColliding()){
+	//		// slow down player if no directionmovment button is pressed
+	//		if( this.conveyorSpeed == 0 && !this.movementButtonIsDown){
+	//			float slowDownForce = 0.5f;
+	//			float slowDownThreshold = 0.15f;
+	//			// left
+	//			if(this.getBody().getLinearVelocity().x < -slowDownThreshold && this.isOnGround() ) {
+	//				this.getBody().applyLinearImpulse(new Vec2(slowDownForce,0), this.getBody().getPosition());
+	//			} else
+	//			
+	//			// right
+	//			if(this.getBody().getLinearVelocity().x > slowDownThreshold && this.isOnGround() ) {
+	//				this.getBody().applyLinearImpulse(new Vec2(-slowDownForce,0), this.getBody().getPosition());
+	//			}
+	//		}
 			
-			if(groundPounding || wasLasering){
-				this.groundPounding = false;
-				dizzyIncrease = -1;
-				unlock();
+			// float in air while shooting laser
+			if ( this.laserStarted ){
+	//			this.body.setTransform(this.laserStartingPosition, this.body.getAngle());
+	//			FIXME magic number
+				this.body.setLinearVelocity(new Vec2(0f,-0.3f) );
 			}
-			this.jumpingFromWall = false;
-			wasLasering = false;
 			
-		}
-		
-
-		
-		if(dizzyCounter > 0){
-			this.dizzy = true;
+			// XXX evtl da checken, welche hitbox ausrichtung angebracht is
+					
+			
+	//		// abwaerts bewegung an wand
+	//		if( this.isOnWall() ){
+	//			if(this.body.getLinearVelocity().y < 0){
+	//				if( (this.leftWallColliding() && this.body.getLinearVelocity().x < 0f ) || (this.rightWallColliding() && this.body.getLinearVelocity().x > 0f )){
+	//					this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, 1f));	
+	//				}	else {
+	//					this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, -2f));
+	//				}
+	//			}
+	////			if( !this.isOnGround()){
+	////				this.setRunning(false);
+	////			}
+	//		}
+			
+			if (this.groundPounding) {
+				this.groundpound();	
+			}
+			
+			// TODO konstante fuer speed
+			if( this.tailwhipCounter > 20f && this.doTailwhip ){
+				this.tailwhipFinalize();
+			}
+			
+	//		if(getSensorGroundCollision().isColliding() && this.body.getLinearVelocity().y < 0f){
+			if(getSensorGroundCollision().isColliding()){
+				
+				if(groundPounding || wasLasering){
+					this.groundPounding = false;
+					dizzyIncrease = -1;
+					unlock();
+				}
+				this.jumpingFromWall = false;
+				wasLasering = false;
+				
+			}
+			
+	
+			
+			if(dizzyCounter > 0){
+				this.dizzy = true;
+			} else {
+				this.dizzy = false;
+			}
+	//		this.adjustHitboxes();
+			
+			increaseCounters();
+			
+			// FIXME das oder fixed rotation verwenden?
+			//this.body.m_sweep.a = 0;
+			
+			this.telekinesis();
+	
+			if( this.isOnGround() /*&& !this.isRunning() */&& !this.doTailwhip && idleCounter > 2 && !this.dead && !this.biting && !locked) {
+				this.currentAnimation = animations.get("idle");
+			}
+			
+			if( !this.running && !this.isOnGround() && this.currentAnimation.isStopped() ) {
+				this.currentAnimation = animations.get("walkJumpAir");
+			}
+			
+			if (this.isJumpingFromWall() && this.currentAnimation.isStopped()) {
+				this.currentAnimation = animations.get("runJump");
+				this.jumpingFromWall = false;
+			}
+			
+			if (this.currentAnimation == animations.get("wallIdle") && !this.isOnWall()) {
+				this.jumpingFromWall = false;
+				this.currentAnimation = animations.get("runJump");
+			}
+			
+			if(!this.isOnGround() && !this.isJumpingFromWall() && !this.groundPounding && !this.dead && !this.laserStarted) {
+				this.currentAnimation = animations.get("runJump");
+			}
+			
+			if (this.isGroundPounding() && !this.isOnGround() && this.currentAnimation.isStopped()) {
+				this.currentAnimation = animations.get("groundpoundAir");
+			}
+			
+			if (this.isOnGround() && this.dizzy){
+				this.currentAnimation = animations.get("groundpoundImpact");
+			}
+	
+			if (this.isOnWall() && !this.isJumpingFromWall() && !this.isOnGround() ) {
+				this.currentAnimation = animations.get("wallIdle");
+			}
+			
+			if (this.dead && this.isOnGround() ) {
+				
+				if ( !this.deadAndOnGround ) {
+					this.deadAndOnGround = true;
+					
+					this.currentAnimation = animations.get("death");
+					this.currentAnimation.restart();
+				}
+			}	
+			
+			if( laserCounter == LASER_DURATION ){
+				destroyLaser();
+			}
+			
+			if (this.biting && this.currentAnimation.isStopped() ) {
+				this.currentAnimation = animations.get("shock");
+			}
+	
+			if	(this.biting && biteCounter == SHOCK_DURATION ) {
+				biteFinalize();		
+			}
+	
+	
+			if (this.laserStarted && this.currentAnimation.isStopped() ) {
+				this.currentAnimation = animations.get("laser");
+				createLaser();
+			}
+			
+			// TODO überprüfen ob das jetzt mit lauf band funkt
+			if(this.conveyorSpeed != 0){
+				this.getBody().setLinearVelocity( new Vec2(getBody().getLinearVelocity().x + conveyorSpeed, getBody().getLinearVelocity().y) );
+			}
 		} else {
-			this.dizzy = false;
+			body.setTransform(lastCheckpoint.getMidPoint(), 0f);
+			dead = false;
+			unlock();
 		}
-//		this.adjustHitboxes();
-		
-		increaseCounters();
-		
-		// FIXME das oder fixed rotation verwenden?
-		//this.body.m_sweep.a = 0;
-		
-		this.telekinesis();
-
-		if( this.isOnGround() /*&& !this.isRunning() */&& !this.doTailwhip && idleCounter > 2 && !this.dead && !this.biting && !locked) {
-			this.currentAnimation = animations.get("idle");
-		}
-		
-		if( !this.running && !this.isOnGround() && this.currentAnimation.isStopped() ) {
-			this.currentAnimation = animations.get("walkJumpAir");
-		}
-		
-		if (this.isJumpingFromWall() && this.currentAnimation.isStopped()) {
-			this.currentAnimation = animations.get("runJump");
-			this.jumpingFromWall = false;
-		}
-		
-		if (this.currentAnimation == animations.get("wallIdle") && !this.isOnWall()) {
-			this.jumpingFromWall = false;
-			this.currentAnimation = animations.get("runJump");
-		}
-		
-		if(!this.isOnGround() && !this.isJumpingFromWall() && !this.groundPounding && !this.dead && !this.laserStarted) {
-			this.currentAnimation = animations.get("runJump");
-		}
-		
-		if (this.isGroundPounding() && !this.isOnGround() && this.currentAnimation.isStopped()) {
-			this.currentAnimation = animations.get("groundpoundAir");
-		}
-		
-		if (this.isOnGround() && this.dizzy){
-			this.currentAnimation = animations.get("groundpoundImpact");
-		}
-
-		if (this.isOnWall() && !this.isJumpingFromWall() && !this.isOnGround() ) {
-			this.currentAnimation = animations.get("wallIdle");
-		}
-		
-		if (this.dead && this.isOnGround() ) {
-			
-			if ( !this.deadAndOnGround ) {
-				this.deadAndOnGround = true;
-				
-				this.currentAnimation = animations.get("death");
-				this.currentAnimation.restart();
-			}
-		}	
-		
-		if( laserCounter == LASER_DURATION ){
-			destroyLaser();
-		}
-		
-		if (this.biting && this.currentAnimation.isStopped() ) {
-			this.currentAnimation = animations.get("shock");
-		}
-
-		if	(this.biting && biteCounter == SHOCK_DURATION ) {
-			biteFinalize();		
-		}
-
-
-		if (this.laserStarted && this.currentAnimation.isStopped() ) {
-			this.currentAnimation = animations.get("laser");
-			createLaser();
-		}
-		
-		// TODO überprüfen ob das jetzt mit lauf band funkt
-		if(this.conveyorSpeed != 0){
-			this.getBody().setLinearVelocity( new Vec2(getBody().getLinearVelocity().x + conveyorSpeed, getBody().getLinearVelocity().y) );
-		}
-	}// !dead end	
 	}
 
 	public void accelerate(float magnitude) {
@@ -1200,7 +1207,19 @@ public class Player {
 	public int getPigCounter() {
 		return pigCounter;
 	}
-	public void increasePigCounterCounter(){
+	public void increasePigCounter(){
 		++pigCounter;
+	}
+
+	public void increaseBoltCounter(int i) {
+		boltCounter += i;
+	}
+
+	public void setCheckpoint(Checkpoint cp) {
+		lastCheckpoint = cp;
+	}
+
+	public Checkpoint getCheckpoint() {
+		return lastCheckpoint;
 	}
 }

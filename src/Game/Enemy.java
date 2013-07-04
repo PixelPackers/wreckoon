@@ -236,7 +236,7 @@ public abstract class Enemy extends GameObjectBox {
 		
 		this.dead = true;
 		this.dieCounter = 0;
-		game.getPlayer().increasePigCounterCounter();
+		game.getPlayer().increasePigCounter();
 	}
 
 	public boolean isDead() {

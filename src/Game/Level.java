@@ -10,6 +10,7 @@ public class Level {
 	private Block[][] blocks;
 	private ArrayList<BackgroundObject> backgroundObjects;
 	private ArrayList<ZoomArea> zoomAreas;
+	private ArrayList<Checkpoint> checkpoints;
 	private ArrayList<Part> parts;
 	private ArrayList<SpawnPoint> enemies;
 	
@@ -53,6 +54,17 @@ public class Level {
 			zoomAreas = new ArrayList<ZoomArea>();
 		}
 		zoomAreas.add(za);
+	}
+	
+	public ArrayList<Checkpoint> getCheckpoints() {
+		return checkpoints;
+	}
+	
+	public void addCheckpoint(Checkpoint cp) {
+		if (checkpoints == null) {
+			checkpoints = new ArrayList<Checkpoint>();
+		}
+		checkpoints.add(cp);
 	}
 	
 	public ArrayList<BackgroundObject> getBackgroundObjects() {

@@ -56,9 +56,10 @@ public class Part {
 	
 	public void collect(){
 		if (!this.collected) {
-			MusicManager.getInstance().itemCollected();
+			//MusicManager.getInstance().itemCollected();
 			this.world.destroyBody(this.body);
 			this.game.getRidOfPart(this);
+			this.game.getPlayer().increaseBoltCounter(500);
 			
 			this.collected = true;
 			// show counter
