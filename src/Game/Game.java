@@ -424,6 +424,9 @@ public class Game extends BasicGame {
 //		g.drawString("ShootingDirection: " + player.getShootingDirection(), 200, 10);
 //		g.drawString("ShootingPower: " + player.getShootingPower(), 200, 30);
 //		g.drawString("pos: " + player.getBody().getPosition(), 200, 50);
+		g.drawString("bolts: " + player.getBoltCounter(), 10, 10);
+		g.drawString("pigs: " + player.getPigCounter(), 10, 30);
+		g.drawString("lock: " + player.isLocked(), 10, 50);
 		
 	}
 

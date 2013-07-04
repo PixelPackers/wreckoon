@@ -73,7 +73,7 @@ public class SmartPig extends Enemy {
 					this.getBody().setLinearVelocity( new Vec2(this.getBody().getLinearVelocity().x, jumpPower) );
 				}
 				
-				this.currentAnimation = animations.get("walk");
+				this.currentAnimation = animations.get("run");
 				
 			} else { // patroullieren
 				
@@ -86,7 +86,7 @@ public class SmartPig extends Enemy {
 				
 				this.getBody().setLinearVelocity(new Vec2(x, this.getBody().getLinearVelocity().y) );
 			
-				this.currentAnimation = animations.get("idle");
+				this.currentAnimation = animations.get("walk");
 				
 			}
 		}
@@ -97,11 +97,13 @@ public class SmartPig extends Enemy {
 	@Override
 	protected void initAnimations() throws SlickException {
 
-		SpriteSheet sheetWalk = new SpriteSheet("images/smartpigrun.png", 	580, 610);
+		SpriteSheet sheetWalk= new SpriteSheet("images/smartpigWalk.png", 	550, 600);
+		SpriteSheet sheetRun = new SpriteSheet("images/smartpigrun.png", 	580, 610);
 		SpriteSheet sheetIdle = new SpriteSheet("images/smartpigIdle.png", 	550, 600);
 		SpriteSheet sheetDie  = new SpriteSheet("images/smartpigdeath.png", 	550, 600);
 		
-		Animation animationWalk = new Animation(sheetWalk, 80);
+		Animation animationWalk = new Animation(sheetWalk, 120);
+		Animation animationRun= new Animation(sheetRun, 80);
 		
 		Animation animationIdle= new Animation(sheetIdle, 150);
 		
@@ -109,6 +111,7 @@ public class SmartPig extends Enemy {
 		animationDie.setLooping(false);
 
 		animations.put("walk", animationWalk);
+		animations.put("run", animationRun);
 		animations.put("idle", animationIdle);
 		animations.put("die", animationDie);
 		
