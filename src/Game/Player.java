@@ -330,6 +330,7 @@ public class Player {
 			this.dead = true;
 			this.deadAndOnGround = false;
 		}
+		lock();
 		
 	}
 	
@@ -403,7 +404,7 @@ public class Player {
 		return current + (dest - current) / smoothness;
 	}
 	
-	public void update() {
+	public void update() { if(!dead) {
 		
 //		// slow down player if no directionmovment button is pressed
 //		if( this.conveyorSpeed == 0 && !this.movementButtonIsDown){
@@ -544,7 +545,7 @@ public class Player {
 		if(this.conveyorSpeed != 0){
 			this.getBody().setLinearVelocity( new Vec2(getBody().getLinearVelocity().x + conveyorSpeed, getBody().getLinearVelocity().y) );
 		}
-		
+	}// !dead end	
 	}
 
 	public void accelerate(float magnitude) {
@@ -889,7 +890,11 @@ public class Player {
 	
 	// laser
 	public void initializeLaser(){
-
+		if(dead){
+			unlock();
+			dead=false;
+			return;
+		}
 		if (locked){
 			return;
 		} else {

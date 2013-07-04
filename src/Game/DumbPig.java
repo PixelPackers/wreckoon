@@ -37,7 +37,7 @@ public class DumbPig extends Enemy{
 	public void update() {
 		super.update();
 
-		if ( !isDead() ){ 
+		if ( !isDead() && !dizzy ){ 
 		
 			if(this.isOnGround() && !idle){
 				this.getBody().setLinearVelocity(new Vec2(speed, this.getBody().getLinearVelocity().y) );
@@ -49,7 +49,11 @@ public class DumbPig extends Enemy{
 				if ( (this.leftWallColliding() && !left) || (this.rightWallColliding() && left)){
 					idle = true;
 					updateCounter=0;
-					this.currentAnimation = animations.get("idle");
+					if(Math.random() < 0.75){
+						this.currentAnimation = animations.get("idle");
+					} else {
+						this.currentAnimation = animations.get("idle2");
+					}
 					this.currentAnimation.restart();
 				}
 			}
@@ -70,12 +74,15 @@ public class DumbPig extends Enemy{
 	protected void initAnimations() throws SlickException {
 
 		SpriteSheet sheetWalk = new SpriteSheet("images/dumbpigwalk.png", 	550, 550);
-		SpriteSheet sheetIdle = new SpriteSheet("images/dumbpigidlescratch.png", 	550, 550);
+		SpriteSheet sheetIdle = new SpriteSheet("images/dumbpigidle.png", 	550, 550);
+		SpriteSheet sheetIdle2 = new SpriteSheet("images/dumbpigidlescratch.png", 	550, 550);
 		SpriteSheet sheetDie  = new SpriteSheet("images/smartpigdeath.png", 	550, 550);
 		
 		Animation animationWalk = new Animation(sheetWalk, 80);
-		
+
 		Animation animationIdle = new Animation(sheetIdle, idleTime/2);
+		
+		Animation animationIdle2 = new Animation(sheetIdle2, idleTime/2);
 		animationIdle.setLooping(false);
 		
 		Animation animationDie = new Animation(sheetDie, DIE_TIME);
@@ -83,6 +90,7 @@ public class DumbPig extends Enemy{
 
 		animations.put("walk", animationWalk);
 		animations.put("idle", animationIdle);
+		animations.put("idle2", animationIdle2);
 		animations.put("die", animationDie);
 		
 		currentAnimation = animationWalk;

@@ -25,19 +25,24 @@ public abstract class Enemy extends GameObjectBox {
 	protected static final int DIE_TIME 			= 100;
 //	TODO kA warum die zahl...
 	protected static final int DIE_TIME_IN_FRAMES 	=  30;
+	
 	protected int dieCounter = 0;
+	protected int dizzyCounter = 0;
 
-	private static final float	MIN_SPEED		= 0.75f;
+	protected static final int DIZZY_TIME 			= 100;
+	
+	private static final float	MIN_SPEED		= 1f;
 	private static final float	MAX_SPEED		= 1.5f;
 	protected float	speed;
 
 	private static final float	MIN_SIZE		= 0.75f;
 	private static final float	MAX_SIZE		= 1.25f;
 	private static float staticPigSize = (float)(Math.random() *  (MAX_SIZE-MIN_SIZE) + MIN_SIZE);
-	private float pigSize;;
+	private float pigSize;
 	
 	private boolean dead = false;
 	protected boolean left = false;
+	protected boolean dizzy = false;
 	
 	private float conveyorSpeed = 0f;
 	
@@ -200,6 +205,9 @@ public abstract class Enemy extends GameObjectBox {
 	
 	public void throwBack(){
 
+		dizzy = true;
+		dizzyCounter = 0;
+		
 		float force = 7.5f;
 		float x = (game.getPlayer().movesLeft()) ? -force : force;
 		
@@ -225,6 +233,7 @@ public abstract class Enemy extends GameObjectBox {
 	}
 	
 	public void update() {
+		
 		if(this.conveyorSpeed != 0){
 			this.getBody().setLinearVelocity( new Vec2(getBody().getLinearVelocity().x + conveyorSpeed, getBody().getLinearVelocity().y) );
 		}
@@ -232,16 +241,23 @@ public abstract class Enemy extends GameObjectBox {
 		if( dead && dieCounter == DIE_TIME_IN_FRAMES) {
 			game.getEnemiesToRemove().add(this);
 		}
+		
+		if(dizzy && dizzyCounter > DIZZY_TIME){
+			dizzy = false;
+		}
+		
 		++dieCounter;
+		++dizzyCounter;
 	}
 
 	public void drawImage() {
 		float drawWidth = (left) ? -pigSize : pigSize;
+		float drawHeight= (dizzy) ? -pigSize : pigSize;
 		currentAnimation.draw( 
 				getBody().getPosition().x-drawWidth*0.5f,
-				getBody().getPosition().y-pigSize*0.5f, 
+				getBody().getPosition().y-drawHeight*0.5f, 
 				drawWidth * PIG_CLASS_SIZE_FACTOR, 
-				pigSize * PIG_CLASS_SIZE_FACTOR);
+				drawHeight * PIG_CLASS_SIZE_FACTOR);
 	}
 	
 	public float getPigSize() {

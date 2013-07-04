@@ -2,6 +2,7 @@ package Game;
 
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.Filter;
 import org.jbox2d.dynamics.World;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
@@ -32,6 +33,7 @@ public class Bolt extends GameObjectPolygon {
 		
 		this.game = game;
 		this.image = new Image(imgPath);		
+		
 	}
 	
 	public void drawImage(){
