@@ -217,6 +217,10 @@ public abstract class Enemy extends GameObjectBox {
 		
 		this.getBody().setLinearVelocity(new Vec2 (x, -force) );
 		
+		if(Math.random() < 0.5){
+			left = !left;
+		}
+		
 	}
 	
 	public void die() {

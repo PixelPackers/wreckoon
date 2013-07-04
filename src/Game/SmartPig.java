@@ -43,10 +43,16 @@ public class SmartPig extends Enemy {
 		
 		float distance = (float) (Math.sqrt( (p.x - e.x)*(p.x - e.x) + (p.y - e.y)*(p.y - e.y) ) );
 		
-		if( distance < AGGRO_DISTANCE ){
+		if( (distance < AGGRO_DISTANCE && aggro) ||
+				(distance < AGGRO_DISTANCE && playerIsLeft() == left) ){
 			aggro = true;
 		} else {
-			aggro = false;
+			if(aggro) {
+				aggro = false;
+				if(Math.random() < 0.5){
+					left = !left;
+				}
+			}
 		}
 		
 		if (!isDead() && !dizzy ){
@@ -54,7 +60,7 @@ public class SmartPig extends Enemy {
 			
 				float x; 
 				
-				if(player.getBody().getPosition().x	< this.getBody().getPosition().x ){
+				if(playerIsLeft() ){
 					x = -speed;
 					setLeft(true);
 				} else {
@@ -124,5 +130,15 @@ public class SmartPig extends Enemy {
 			switchTimeCounter = 0;
 			this.left = left;
 		}
+	}
+	
+	private boolean playerIsLeft(){
+		return this.game.getPlayer().getBody().getPosition().x	< this.getBody().getPosition().x;
+		
+	}
+	@Override
+	public void throwBack() {
+		super.throwBack();
+		aggro = false;
 	}
 }
