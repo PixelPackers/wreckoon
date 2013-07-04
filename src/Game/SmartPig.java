@@ -82,7 +82,7 @@ public class SmartPig extends Enemy {
 					setLeft(!left);
 	
 				}
-				float x = (left) ? -speed*0.5f : speed*0.5f;
+				float x = (left) ? -speed*0.3f : speed*0.3f;
 				
 				this.getBody().setLinearVelocity(new Vec2(x, this.getBody().getLinearVelocity().y) );
 			
