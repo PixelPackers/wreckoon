@@ -5,11 +5,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
-import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
+import org.lwjgl.Sys;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Color;
@@ -88,6 +87,8 @@ public class Game extends BasicGame {
 		PAUSE
 	}
 	private Mode curMode = Mode.PLAY;
+	private Color multiplierColor = new Color(245, 179, 141);
+	private Color earthColor = new Color(164, 74, 13);
 
 	public Game() {
 		super("The Raccooning");
@@ -214,14 +215,10 @@ public class Game extends BasicGame {
 			house.updateAnimations();
 			
 			laserTargetAngle = (float) Math.toRadians(xbox.getLeftThumbDirection() - 90d);
-			
-	//		if (laserAngle < 360f) {
-	//			laserAngle -= 360f;
-	//		}
-			laserAngle = laser.curveAngle(laserTargetAngle, laserAngle, 10);
+			laserAngle = Laser.curveAngle(laserAngle, laserTargetAngle, 0.1f);
 			laser.position(
 					player.getBody().getPosition().x,
-					player.getBody().getPosition().y,
+					player.getBody().getPosition().y - 0.2f,
 					laserAngle);
 			
 			player.update();
@@ -230,10 +227,13 @@ public class Game extends BasicGame {
 				enemy.update();
 			}
 			
-			cam.follow(	(float) (player.getBody().getPosition().x + xbox.getRightThumbX() * 3),
-						(float) (player.getBody().getPosition().y + xbox.getRightThumbY() * 3),
-						10);
+			world.setGravity(new Vec2(0f, (float) ((1d - xbox.getLeftTriggerValue()) * 20f +  ((float) xbox.getRightTriggerValue() * -20f))));
 			
+			float targetCamX = (float) (player.getBody().getPosition().x + xbox.getRightThumbX() * 3f);
+			float targetCamY = (float) (player.getBody().getPosition().y + xbox.getRightThumbY() * 3f);
+			//if (targetCamY > level.getHeight() - screenHeight/2/zoom) targetCamY = level.getHeight() - screenHeight/2/zoom;
+			cam.follow(	targetCamX,	targetCamY, 10);
+			//if (cam.getY() > level.getHeight() - screenHeight/2/zoom) cam.setY(level.getHeight() - screenHeight/2/zoom); 
 			
 			for (GameObject o :  objectsToRemove){
 				world.destroyBody(o.getBody());
@@ -289,7 +289,10 @@ public class Game extends BasicGame {
 			
 			
 			world.step(delta / 1000f, 18, 6);
+			
 		}
+		
+		xbox.resetStates();
 	}
 
 	private void restartAnimations() {
@@ -384,6 +387,9 @@ public class Game extends BasicGame {
 		
 		//laser.draw(g, debugView);
 		
+		g.setColor(earthColor);
+		g.fillRect(-21.5f, level.getHeight() - 1f, level.getWidth() + 21f, 10f);
+		
 		g.popTransform();
 		
 		if (curMode == Mode.PAUSE) {
@@ -445,11 +451,12 @@ public class Game extends BasicGame {
 				g.translate(-cam.getX() * zoom * bo.getZ() + screenWidth / 2, -cam.getY() * zoom * bo.getZ() + screenHeight * 2 / 3);
 				g.scale(zoom * bo.getZ(), zoom * bo.getZ());
 
-				Image tmp = trashpile[bo.getType()];
+				//Image tmp = trashpile[bo.getType()];
+				Image tmp = trashpile[0];
 				tmp = tmp.getFlippedCopy(bo.isFlipped(), false);
-				tmp.setImageColor(1f - bo.getZ() + backgroundColor.r * bo.getZ(),
-						1f - bo.getZ() + backgroundColor.g * bo.getZ(),
-						1f - bo.getZ() + backgroundColor.b * bo.getZ());
+				tmp.setImageColor(1f - bo.getZ() + multiplierColor.r * bo.getZ(),
+						1f - bo.getZ() + multiplierColor.g * bo.getZ(),
+						1f - bo.getZ() + multiplierColor.b * bo.getZ());
 				tmp.draw(bo.getX() - tmp.getWidth() * BACKGROUND_SCALE / 2,
 						 bo.getY() - tmp.getHeight() * BACKGROUND_SCALE / 2,
 						 tmp.getWidth() * BACKGROUND_SCALE, tmp.getHeight() * BACKGROUND_SCALE);
@@ -709,8 +716,6 @@ public class Game extends BasicGame {
 		if(input.isKeyPressed(input.KEY_L)){
 			player.die();
 		}
-
-		xbox.resetStates();
 	}
 
 	public GameObject chooseTelekinesisTarget() {

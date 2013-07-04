@@ -1,7 +1,5 @@
 package Game;
 
-import org.jbox2d.common.Vec2;
-
 import ch.aplu.xboxcontroller.XboxController;
 import ch.aplu.xboxcontroller.XboxControllerAdapter;
 

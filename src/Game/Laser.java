@@ -14,10 +14,10 @@ public class Laser extends GameObjectPolygon {
 	private ArrayList<Enemy> laserContacts = new ArrayList<Enemy>();
 	
 	private static Vec2[] verts = new Vec2[] {
-			new Vec2( 0.5f, 0.3f),
-			new Vec2( 0.5f, -0.3f),
-			new Vec2( 3.5f, -0.5f),
-			new Vec2( 3.5f, 0.5f)
+			new Vec2( 0.5f, 0.1f),
+			new Vec2( 0.5f, -0.1f),
+			new Vec2( 8f, -0.5f),
+			new Vec2( 8f, 0.5f)
 		};
 	
 	public Laser(World world, float posX, float posY) throws SlickException {
@@ -30,19 +30,32 @@ public class Laser extends GameObjectPolygon {
 	
 	public void drawOutline(Graphics g) {
 		super.drawOutline(g);
-//		System.out.println(getBody().getPosition().x);
 	}
 	
 	public ArrayList<Enemy> getLaserContacts() {
 		return laserContacts;
 	}
-	
-	public float curveAngle(float dest, float current, float smoothness) {
-		if (dest - current < 180f) {
-			return current + (dest - current) / smoothness;
-		} else {
-			return current + (360f - dest - current) / smoothness;
-		}
-		
+
+	public static float curveAngle(float from, float to, float step)
+	{
+	    Vec2 fromVector = new Vec2((float)Math.cos(from), (float)Math.sin(from));
+	    Vec2 toVector = new Vec2((float)Math.cos(to), (float)Math.sin(to));
+
+	    Vec2 currentVector = slerp(fromVector, toVector, step);
+
+	    return (float)Math.atan2(currentVector.y, currentVector.x);
 	}
+
+	public static Vec2 slerp(Vec2 from, Vec2 to, float step)
+	{
+	    if (step == 0) return from;
+	    if (from == to || step == 1) return to;
+
+	    double theta = Math.acos(Vec2.dot(from, to));
+	    if (theta == 0) return to;
+
+	    double sinTheta = Math.sin(theta);
+	    return from.mul((float)(Math.sin((1 - step) * theta) / sinTheta)).add(to.mul((float)(Math.sin(step * theta) / sinTheta)));
+	}
+
 }

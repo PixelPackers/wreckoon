@@ -690,27 +690,7 @@ public class Tile {
 				fixtures.add(verts);
 				break;
 			}
-//		return multiplyFixtures(fixtures, TILE_SIZE);
 		return fixtures;
-	}
-	
-	
-	private ArrayList<Vec2[]> multiplyFixtures(ArrayList<Vec2[]> fixtures, float factor) {
-		
-		ArrayList<Vec2[]> newFixtures = new ArrayList<>();
-		
-		for(Vec2[] verts : fixtures){
-			
-			Vec2[] newVerts = new Vec2[verts.length];
-			
-			for (int i=0; i<verts.length; ++i) {
-				newVerts[i] = verts[i].mul(factor);
-			}
-			
-			newFixtures.add(newVerts);
-		}
-		
-		return newFixtures;
 	}
 	
 	public void draw(Graphics g, boolean debugView){

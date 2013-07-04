@@ -398,7 +398,7 @@ public class Player {
 		}
 		
 		// laser
-		if (laserActive) {
+		if (true || laserActive) {
 			laser.drawOutline(g);
 		}
 			
