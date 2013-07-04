@@ -66,6 +66,7 @@ public class Player {
 	private boolean ableToGetLaser	= false;
 	private boolean laserAble		= false;
 	private boolean laserStarted	= false;
+	private boolean wasLasering		= false;
 	
 	private boolean locked = false;
 	private boolean godmode = false;
@@ -460,11 +461,14 @@ public class Player {
 		
 //		if(getSensorGroundCollision().isColliding() && this.body.getLinearVelocity().y < 0f){
 		if(getSensorGroundCollision().isColliding()){
+			
 			if(groundPounding){
 				this.groundPounding = false;
 				dizzyIncrease = -1;
 			}
 			this.jumpingFromWall = false;
+			wasLasering = false;
+			
 		}
 		
 
@@ -527,7 +531,7 @@ public class Player {
 			}
 		}	
 		
-		if( laserCounter > LASER_DURATION ){
+		if( laserCounter == LASER_DURATION ){
 			destroyLaser();
 		}
 		
@@ -684,7 +688,7 @@ public class Player {
 	}
 	public void groundpoundInit(){
 		
-		if (locked) {
+		if (locked || wasLasering) {
 	 		return;
 	 	} else {
 	 		lock();
@@ -712,8 +716,8 @@ public class Player {
 	}
 	
 	private void groundpound(){
-		
-		if(this.groundPoundCounter > GROUNDPOUND_AIRTIME ) {
+
+		if( this.groundPoundCounter > GROUNDPOUND_AIRTIME ) {
 			this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, groundPoundPower));
 			unlock();
 		} else {
@@ -935,7 +939,9 @@ public class Player {
 		this.laserStarted = false;
 		this.laserActive = false;
 		this.laserAble = false;
+		wasLasering = true;
 		godmode = false;
+		
 		unlock();
 
 	}
