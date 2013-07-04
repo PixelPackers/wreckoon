@@ -5,6 +5,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.swing.text.Position;
+
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
@@ -647,6 +649,9 @@ public class Game extends BasicGame {
 				dropItems.add(new Bolt(this, world, player.getBody().getPosition().add(new Vec2(0,-1)), "images/bolt"+ ((int) (Math.random()*3)+1)+".png" ));
 				dropItems.add(new Nut(this, world, player.getBody().getPosition().add(new Vec2(0,-1)), "images/nut"+ ((int) (Math.random()*3)+1)+".png" ));
 			}
+			
+
+			enemies.add(new SmartPig(this, player.getBody().getPosition().x + 5f, player.getBody().getPosition().y - 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
 		}
 
 		if (input.isKeyPressed(Input.KEY_ENTER)) {

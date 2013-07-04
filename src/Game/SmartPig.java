@@ -43,8 +43,8 @@ public class SmartPig extends Enemy {
 		
 		float distance = (float) (Math.sqrt( (p.x - e.x)*(p.x - e.x) + (p.y - e.y)*(p.y - e.y) ) );
 		
-		if( (distance < AGGRO_DISTANCE && aggro) ||
-				(distance < AGGRO_DISTANCE && playerIsLeft() == left) ){
+		if( !player.isDead() &&  ((distance < AGGRO_DISTANCE && aggro) ||
+				(distance < AGGRO_DISTANCE && playerIsLeft() == left) ) ){
 			aggro = true;
 		} else {
 			if(aggro) {

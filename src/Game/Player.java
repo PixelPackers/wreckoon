@@ -1179,4 +1179,7 @@ public class Player {
 	public void unlock(){
 		locked = false;
 	}
+	public boolean isDead() {
+		return dead;
+	}
 }
