@@ -390,6 +390,8 @@ public class Game extends BasicGame {
 			g.setColor(new Color(0f, 0f, 0f, 0.3f));
 			g.fillRect(0, 0, screenWidth, screenHeight);
 			pauseImage.drawCentered(screenWidth * 0.5f, screenHeight * 0.4f);
+		} else {
+			g.setColor(Color.white);
 		}
 		
 		//drawZoomAreas(g);
