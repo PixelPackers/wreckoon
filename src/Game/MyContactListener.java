@@ -114,7 +114,7 @@ public class MyContactListener implements ContactListener{
 		
 //			+ enemy contact
 			for( Enemy enemy : game.getEnemies()){
-				if ( !enemy.isDead() && !game.getPlayer().isGroundPounding() ){
+				if ( !enemy.isDead() && !enemy.isDizzy() && !game.getPlayer().isGroundPounding() ){
 					if (enemy.getFixture() == contact.getFixtureA() || enemy.getFixture() == contact.getFixtureB() ){
 						game.getPlayer().die();
 						break;
@@ -153,34 +153,35 @@ public class MyContactListener implements ContactListener{
 			}
 
 //			+ bolts	
-			Iterator iterator = game.getBolts().iterator();
+//			Iterator iterator = game.getBolts().iterator();
+			Iterator iterator = game.getDropItems().iterator();
 			while (iterator.hasNext()){
-				Bolt bolt = (Bolt) iterator.next();
-				if (bolt.isCollectable()) {
+				DropItem dropItem = (DropItem) iterator.next();
+				if (dropItem.isCollectable()) {
 					
-					if (bolt.getFixture() == contact.getFixtureA() || bolt.getFixture() == contact.getFixtureB() ) {
-						bolt.collect();
+					if (dropItem.getFixture() == contact.getFixtureA() || dropItem.getFixture() == contact.getFixtureB() ) {
+						dropItem.collect();
 						iterator.remove();
-						game.getObjectsToRemove().add(bolt);
+						game.getObjectsToRemove().add(dropItem);
 					}
 					
 				}
 			}
 			
 
-//			+ nuts	
-			iterator = game.getNuts().iterator();
-			while (iterator.hasNext()){
-				Nut nut = (Nut) iterator.next();
-
-				if (nut.isCollectable()) {
-					if (nut.getFixture() == contact.getFixtureA() || nut.getFixture() == contact.getFixtureB() ) {
-						nut.collect();
-						iterator.remove();
-						game.getObjectsToRemove().add(nut);
-					}
-				}
-			}
+////			+ nuts	
+//			iterator = game.getNuts().iterator();
+//			while (iterator.hasNext()){
+//				Nut nut = (Nut) iterator.next();
+//
+//				if (nut.isCollectable()) {
+//					if (nut.getFixture() == contact.getFixtureA() || nut.getFixture() == contact.getFixtureB() ) {
+//						nut.collect();
+//						iterator.remove();
+//						game.getObjectsToRemove().add(nut);
+//					}
+//				}
+//			}
 		}
 		
 		// enemy
@@ -295,20 +296,23 @@ public class MyContactListener implements ContactListener{
 					||	gameObject.getBody().getFixtureList() == contact.getFixtureA()){
 					
 					gameObject.getBody().setLinearVelocity( new Vec2(0,120) );
-//									break;
+//					break;
 				}
 			}
 		}
 		
 	}
 	
-	@Override	public void postSolve(Contact contact, ContactImpulse contactImpulse) {}
+	@Override	public void postSolve(Contact contact, ContactImpulse contactImpulse) {
+		
+	}
 	@Override	public void preSolve(Contact contact, Manifold manifold) {
 		
 ////		player contact
-//		for( Enemy enemy : game.getEnemies()){									
+////		for( Enemy enemy : game.getEnemies()){									
 ////			
-//			if( enemy.getFixture() == contact.getFixtureA() || enemy.getFixture() == contact.getFixtureB() ){
+////			if( enemy.getFixture() == contact.getFixtureA() || enemy.getFixture() == contact.getFixtureB() ){
+//			if( game.getPlayer().getFixture() == contact.getFixtureA() || game.getPlayer().getFixture() == contact.getFixtureB() ){
 //	
 //	//			+ bolts	
 //				Iterator iterator = game.getBolts().iterator();
@@ -331,6 +335,6 @@ public class MyContactListener implements ContactListener{
 //					}
 //				}
 //			}
-//		}
+////		}
 	}
 }

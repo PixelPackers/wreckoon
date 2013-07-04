@@ -6,14 +6,17 @@ import org.jbox2d.dynamics.World;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
-public class DropItem extends GameObjectPolygon {
+public abstract class DropItem extends GameObjectPolygon {
+
+	private static float 	FACTOR = 0.15f;
+	protected float 	DRAW_FACTOR;
+	protected int	MIN_TIME;
+	protected int	MAX_TIME = 1500;
+	protected int	FADE_TIME = 100;
 	
-	private static final float 	FACTOR = 0.2f;
-	private static final int	MIN_TIME = 15;
-	
-	private Game game;
-	private Image image;
-	private int counter = 0;
+	protected Game game;
+	protected Image image;
+	protected int counter = 0;
 	private boolean collectable = false;
 	
 	private static Vec2[] verts = new Vec2[]{
@@ -35,22 +38,42 @@ public class DropItem extends GameObjectPolygon {
 	}
 	
 	public void drawImage(){
-		float radius = FACTOR*0.5f;
+		float radius = DRAW_FACTOR;
 
 		float angle = this.getBody().getAngle();
 		image.setRotation(-(float) Math.toDegrees(angle));
 		
+		
+//		if(counter > MAX_TIME-FADE_TIME){
+			
+			
+//			
+//			float blub = 1f - (counter - (MAX_TIME - FADE_TIME)) / FADE_TIME;
+//			System.out.println(blub);
+//			image.setAlpha(blub  );
+			float factor = 0.7f;
+			image.setAlpha(1f - (counter-MAX_TIME*factor)/MAX_TIME/factor);
+//		}
 		image.draw(this.getBody().getPosition().x - radius, this.getBody().getPosition().y -radius, radius*2f, radius*2f);
 		
-		if(++counter == MIN_TIME){
-			collectable = true;
-		}
 	}
 	
-	public void collect(){
-	}
+	public abstract void collect();
 	
 	public boolean isCollectable() {
 		return collectable;
+	}
+	
+	public void update(){
+		++counter;
+		
+		if(counter > MIN_TIME){
+			collectable = true;
+		} 
+		if (counter > MAX_TIME){
+
+			game.getObjectsToRemove().add(this);
+			game.getDropItemsToRemove().add(this);
+		}
 	}
 }

@@ -14,7 +14,6 @@ import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Polygon;
@@ -47,6 +46,8 @@ public class Player {
 	private int laserCounter 		= 0;
 	private int biteCounter 		= 0;
 	private int floatingCounter 	= 0;
+	private int boltCounter			= 0;
+	private int pigCounter			= 0;
 	
 	
 	private float jumpPower				= -10f;
@@ -66,6 +67,7 @@ public class Player {
 	private boolean ableToGetLaser	= false;
 	private boolean laserAble		= false;
 	private boolean laserStarted	= false;
+	private boolean wasLasering		= false;
 	
 	private boolean locked = false;
 	private boolean godmode = false;
@@ -398,7 +400,7 @@ public class Player {
 		}
 		
 		// laser
-		if (true || laserActive) {
+		if (laserActive) {
 			laser.drawOutline(g);
 		}
 			
@@ -460,11 +462,14 @@ public class Player {
 		
 //		if(getSensorGroundCollision().isColliding() && this.body.getLinearVelocity().y < 0f){
 		if(getSensorGroundCollision().isColliding()){
+			
 			if(groundPounding){
 				this.groundPounding = false;
 				dizzyIncrease = -1;
 			}
 			this.jumpingFromWall = false;
+			wasLasering = false;
+			
 		}
 		
 
@@ -527,7 +532,7 @@ public class Player {
 			}
 		}	
 		
-		if( laserCounter > LASER_DURATION ){
+		if( laserCounter == LASER_DURATION ){
 			destroyLaser();
 		}
 		
@@ -684,7 +689,7 @@ public class Player {
 	}
 	public void groundpoundInit(){
 		
-		if (locked) {
+		if (locked || wasLasering) {
 	 		return;
 	 	} else {
 	 		lock();
@@ -712,8 +717,8 @@ public class Player {
 	}
 	
 	private void groundpound(){
-		
-		if(this.groundPoundCounter > GROUNDPOUND_AIRTIME ) {
+
+		if( this.groundPoundCounter > GROUNDPOUND_AIRTIME ) {
 			this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, groundPoundPower));
 			unlock();
 		} else {
@@ -935,7 +940,9 @@ public class Player {
 		this.laserStarted = false;
 		this.laserActive = false;
 		this.laserAble = false;
+		wasLasering = true;
 		godmode = false;
+		
 		unlock();
 
 	}
@@ -1178,5 +1185,20 @@ public class Player {
 	
 	public void unlock(){
 		locked = false;
+	}
+	public boolean isDead() {
+		return dead;
+	}
+	public int getBoltCounter() {
+		return boltCounter;
+	}
+	public void increaseBoltCounter(){
+		++boltCounter;
+	}
+	public int getPigCounter() {
+		return pigCounter;
+	}
+	public void increasePigCounterCounter(){
+		++pigCounter;
 	}
 }

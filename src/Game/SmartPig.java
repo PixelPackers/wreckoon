@@ -13,6 +13,9 @@ public class SmartPig extends Enemy {
 	private static final float AGGRO_DISTANCE = 5f; 
 	private float jumpPower;
 	private boolean aggro = false;
+
+	private static final int MIN_SWITCH_TIME = 20;
+	private int switchTimeCounter = 0;
 	
 	public SmartPig(Game game, float posX, float posY, float width, float height, float density, float friction, float restitution, String imgPath,
 			BodyType bodyType) throws SlickException {
@@ -36,23 +39,30 @@ public class SmartPig extends Enemy {
 		
 		float distance = (float) (Math.sqrt( (p.x - e.x)*(p.x - e.x) + (p.y - e.y)*(p.y - e.y) ) );
 		
-		if( distance < AGGRO_DISTANCE ){
+		if( !player.isDead() &&  ((distance < AGGRO_DISTANCE && aggro) ||
+				(distance < AGGRO_DISTANCE && playerIsLeft() == left) ) ){
 			aggro = true;
 		} else {
-			aggro = false;
+			if(aggro) {
+				aggro = false;
+				if(Math.random() < 0.5){
+					left = !left;
+				}
+			}
 		}
 		
 		if (!isDead() && !dizzy ){
 			if(aggro){
 			
-				float x = speed;
-				left = false; 
+				float x; 
 				
-				if(player.getBody().getPosition().x	< this.getBody().getPosition().x){
+				if(playerIsLeft() ){
 					x = -speed;
-					left = true;
+					setLeft(true);
+				} else {
+					x = speed;
+					setLeft(false); 
 				}
-				
 				if(this.isOnGround()){
 					this.getBody().setLinearVelocity(new Vec2(x, this.getBody().getLinearVelocity().y) );
 	//				this.getBody().applyLinearImpulse( new Vec2(x, 0*this.getBody().getLinearVelocity().y), this.getBody().getWorldCenter());
@@ -69,7 +79,7 @@ public class SmartPig extends Enemy {
 				
 				if ( (this.leftWallColliding() && !left) || (this.rightWallColliding() && left)){
 				
-					left=!left;
+					setLeft(!left);
 	
 				}
 				float x = (left) ? -speed*0.5f : speed*0.5f;
@@ -80,6 +90,8 @@ public class SmartPig extends Enemy {
 				
 			}
 		}
+
+		++switchTimeCounter;
 	}
 
 	@Override
@@ -109,4 +121,20 @@ public class SmartPig extends Enemy {
 		currentAnimation = animations.get("die");
 	}
 	
+	private void setLeft(boolean left) {
+		if(switchTimeCounter > MIN_SWITCH_TIME) {
+			switchTimeCounter = 0;
+			this.left = left;
+		}
+	}
+	
+	private boolean playerIsLeft(){
+		return this.game.getPlayer().getBody().getPosition().x	< this.getBody().getPosition().x;
+		
+	}
+	@Override
+	public void throwBack() {
+		super.throwBack();
+		aggro = false;
+	}
 }
