@@ -54,18 +54,21 @@ public class Game extends BasicGame {
 	private static ArrayList<Part>			parts			= new ArrayList<Part>();
 	private static ArrayList<Girder>		girders			= new ArrayList<Girder>();
 	private static Generator 				generator;
-	private static ArrayList<Spike>		spikes			= new ArrayList<Spike>();
-	private static ArrayList<Conveyor>		conveyor 		= new ArrayList<Conveyor>();
-	private static ArrayList<Bolt>			bolts 			= new ArrayList<Bolt>();
-	private static ArrayList<Nut>			nuts 			= new ArrayList<Nut>();
-	private static ArrayList<Shred>			shreds 			= new ArrayList<Shred>();
+	private static ArrayList<Spike>			spikes		= new ArrayList<Spike>();
+	private static ArrayList<Conveyor>		conveyor 	= new ArrayList<Conveyor>();
+//	private static ArrayList<Bolt>			bolts 		= new ArrayList<Bolt>();
+//	private static ArrayList<Nut>			nuts 		= new ArrayList<Nut>();
+//	private static ArrayList<Shred>			shreds 		= new ArrayList<Shred>();
+	private static ArrayList<DropItem>		dropItems	= new ArrayList<DropItem>();
+	private static ArrayList<DropItem>		dropItemsToRemove = new ArrayList<DropItem>();
+	
 
 
 	private static ArrayList<GameObject>	objectsToAdd	 = new ArrayList<GameObject>();
 	
 	private static ArrayList<GameObject>	objectsToRemove = new ArrayList<GameObject>();
 	private static ArrayList<Enemy>			enemiesToRemove = new ArrayList<Enemy>();
-	private static ArrayList<Shred>			shredsToRemove 	= new ArrayList<Shred>();
+//	private static ArrayList<Shred>			shredsToRemove 	= new ArrayList<Shred>();
 
 
 	private static House house;
@@ -249,15 +252,18 @@ public class Game extends BasicGame {
 						
 						Nut nut = new Nut(this, getWorld(), o.getBody().getPosition().add(new Vec2(0,0)), "images/nut"+ ((int) (Math.random()*3)+1)+".png" );
 						nut.getBody().setLinearVelocity( direction);
-						getNuts().add(nut);
+//						getNuts().add(nut);
+						getDropItems().add(nut);
 						
 						Bolt bolt = new Bolt(this, getWorld(), o.getBody().getPosition().add(new Vec2(0,0)), "images/bolt"+ ((int) (Math.random()*3)+1)+".png" );
 						bolt.getBody().setLinearVelocity( direction);
-						getBolts().add(bolt);
+//						getBolts().add(bolt);
+						getDropItems().add(bolt);
 	
 						Shred shred = new Shred(this, getWorld(), o.getBody().getPosition().add(new Vec2(0,0)), "images/shred"+ ((int) (Math.random()*3)+1)+".png", ((Enemy) o).getPigSize());
 						shred.getBody().setLinearVelocity(direction);
-						getShreds().add(shred);
+//						getShreds().add(shred);
+						getDropItems().add(shred);
 						
 					}
 				}
@@ -270,16 +276,17 @@ public class Game extends BasicGame {
 			}		
 			enemiesToRemove.clear();
 			
-			for (Shred s : shredsToRemove){
-				shreds.remove(s);
+			for (DropItem d : dropItemsToRemove){
+				dropItems.remove(d);
 			}
-			
-			for (Shred s : shreds) {
-				s.increaseCounter();
-			}
-			
+			dropItemsToRemove.clear();
+						
 			for (Part p : parts) {
 				p.update();
+			}
+			
+			for (DropItem d : dropItems){
+				d.update();
 			}
 			
 	//		for (GameObject o :  objectsToAdd){
@@ -370,14 +377,18 @@ public class Game extends BasicGame {
 			c.draw(g, debugView);
 		}
 		
-		for(Bolt b : bolts){
-			b.draw(g, debugView);
-		}
-		for(Nut n : nuts){
-			n.draw(g, debugView);
-		}
-		for(Shred s : shreds){
-			s.draw(g, debugView);
+//		for(Bolt b : bolts){
+//			b.draw(g, debugView);
+//		}
+//		for(Nut n : nuts){
+//			n.draw(g, debugView);
+//		}
+//		for(Shred s : shreds){
+//			s.draw(g, debugView);
+//		}
+		
+		for (DropItem d : dropItems){
+			d.draw(g, debugView);
 		}
 
 		house.drawFront(g, debugView);
@@ -633,8 +644,8 @@ public class Game extends BasicGame {
 			for (int i = 0; i < 4; ++i) {
 
 //				dynamicObjects.add( new GameObjectCircle(world, player.getBody().getPosition().x, player.getBody().getPosition().y - size * 2, size, 1f, 0.5f, 0f, "images/player.png", BodyType.DYNAMIC));
-				bolts.add(new Bolt(this, world, player.getBody().getPosition().add(new Vec2(0,-1)), "images/bolt"+ ((int) (Math.random()*3)+1)+".png" ));
-				nuts.add(new Nut(this, world, player.getBody().getPosition().add(new Vec2(0,-1)), "images/nut"+ ((int) (Math.random()*3)+1)+".png" ));
+				dropItems.add(new Bolt(this, world, player.getBody().getPosition().add(new Vec2(0,-1)), "images/bolt"+ ((int) (Math.random()*3)+1)+".png" ));
+				dropItems.add(new Nut(this, world, player.getBody().getPosition().add(new Vec2(0,-1)), "images/nut"+ ((int) (Math.random()*3)+1)+".png" ));
 			}
 		}
 
@@ -762,13 +773,13 @@ public class Game extends BasicGame {
 		return conveyor;
 	}
 	
-	public static ArrayList<Bolt> getBolts() {
-		return bolts;
-	}
+//	public static ArrayList<Bolt> getBolts() {
+//		return bolts;
+//	}
 	
-	public static ArrayList<Nut> getNuts() {
-		return nuts;
-	}
+//	public static ArrayList<Nut> getNuts() {
+//		return nuts;
+//	}
 	
 	public static ArrayList<GameObject> getObjectsToAdd() {
 		return objectsToAdd;
@@ -782,11 +793,18 @@ public class Game extends BasicGame {
 		return enemiesToRemove;
 	}
 	
-	public static ArrayList<Shred> getShreds() {
-		return shreds;
-	}
+//	public static ArrayList<Shred> getShreds() {
+//		return shreds;
+//	}
+//	
+//	public static ArrayList<Shred> getShredsToRemove() {
+//		return shredsToRemove;
+//	}
 	
-	public static ArrayList<Shred> getShredsToRemove() {
-		return shredsToRemove;
+	public static ArrayList<DropItem> getDropItems() {
+		return dropItems;
+	}
+	public static ArrayList<DropItem> getDropItemsToRemove() {
+		return dropItemsToRemove;
 	}
 }
