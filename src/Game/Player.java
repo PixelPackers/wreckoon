@@ -463,9 +463,10 @@ public class Player {
 //		if(getSensorGroundCollision().isColliding() && this.body.getLinearVelocity().y < 0f){
 		if(getSensorGroundCollision().isColliding()){
 			
-			if(groundPounding){
+			if(groundPounding || wasLasering){
 				this.groundPounding = false;
 				dizzyIncrease = -1;
+				unlock();
 			}
 			this.jumpingFromWall = false;
 			wasLasering = false;
@@ -691,12 +692,13 @@ public class Player {
 		
 		if (locked || wasLasering) {
 	 		return;
-	 	} else {
+	 	} 
+		
+		if(groundPoundCounter > 50 && !groundPounding){
+			
+
 	 		lock();
 //			FIXME wegen movement evtl doch nicht locken? spzeial lock für movement?
-		}
-		
-		if(groundPoundCounter > 50){
 			
 			this.currentAnimation = animations.get("groundpound");
 			this.currentAnimation.restart();

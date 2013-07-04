@@ -73,7 +73,7 @@ public class SmartPig extends Enemy {
 					this.getBody().setLinearVelocity( new Vec2(this.getBody().getLinearVelocity().x, jumpPower) );
 				}
 				
-				this.currentAnimation = animations.get("walk");
+				this.currentAnimation = animations.get("run");
 				
 			} else { // patroullieren
 				
@@ -82,11 +82,11 @@ public class SmartPig extends Enemy {
 					setLeft(!left);
 	
 				}
-				float x = (left) ? -speed*0.5f : speed*0.5f;
+				float x = (left) ? -speed*0.3f : speed*0.3f;
 				
 				this.getBody().setLinearVelocity(new Vec2(x, this.getBody().getLinearVelocity().y) );
 			
-				this.currentAnimation = animations.get("idle");
+				this.currentAnimation = animations.get("walk");
 				
 			}
 		}
@@ -97,19 +97,27 @@ public class SmartPig extends Enemy {
 	@Override
 	protected void initAnimations() throws SlickException {
 
-		SpriteSheet sheetWalk = new SpriteSheet("images/smartpigrun.png", 	580, 610);
+		SpriteSheet sheetWalk= new SpriteSheet("images/smartpigWalk.png", 	550, 600);
+		SpriteSheet sheetRun = new SpriteSheet("images/smartpigrun.png", 	580, 610);
 		SpriteSheet sheetIdle = new SpriteSheet("images/smartpigIdle.png", 	550, 600);
 		SpriteSheet sheetDie  = new SpriteSheet("images/smartpigdeath.png", 	550, 600);
+		SpriteSheet sheetDisabled  = new SpriteSheet("images/smartpigdisable.png", 	550, 500);
 		
-		Animation animationWalk = new Animation(sheetWalk, 80);
 		
-		Animation animationIdle= new Animation(sheetIdle, 150);
+		Animation animationWalk = new Animation(sheetWalk, 120);
+		Animation animationRun = new Animation(sheetRun, 80);
+
+		Animation animationIdle = new Animation(sheetIdle, 150);
+
+		Animation animationDisabled = new Animation(sheetDisabled, 150);
 		
 		Animation animationDie= new Animation(sheetDie, DIE_TIME);
 		animationDie.setLooping(false);
 
 		animations.put("walk", animationWalk);
+		animations.put("run", animationRun);
 		animations.put("idle", animationIdle);
+		animations.put("disabled", animationDisabled);
 		animations.put("die", animationDie);
 		
 		currentAnimation = animationWalk;
@@ -136,5 +144,6 @@ public class SmartPig extends Enemy {
 	public void throwBack() {
 		super.throwBack();
 		aggro = false;
+		this.currentAnimation = animations.get("disabled");
 	}
 }

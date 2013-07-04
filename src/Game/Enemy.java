@@ -11,6 +11,7 @@ import org.jbox2d.dynamics.FixtureDef;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Polygon;
 
@@ -28,6 +29,8 @@ public abstract class Enemy extends GameObjectBox {
 	
 	protected int dieCounter = 0;
 	protected int dizzyCounter = 0;
+	private int dizzyRotationCounter = 0;
+	
 
 	protected static final int DIZZY_TIME 			= 300;
 	
@@ -43,6 +46,7 @@ public abstract class Enemy extends GameObjectBox {
 	private boolean dead = false;
 	protected boolean left = false;
 	protected boolean dizzy = false;
+	private boolean firstTimeRotation = true;
 	
 	private float conveyorSpeed = 0f;
 	
@@ -211,6 +215,8 @@ public abstract class Enemy extends GameObjectBox {
 
 		dizzy = true;
 		dizzyCounter = 0;
+		dizzyRotationCounter = 0;
+		firstTimeRotation = true;
 		
 		float force = 7.5f;
 		float x = (game.getPlayer().movesLeft()) ? -force : force;
@@ -230,6 +236,7 @@ public abstract class Enemy extends GameObjectBox {
 		
 		this.dead = true;
 		this.dieCounter = 0;
+		game.getPlayer().increasePigCounterCounter();
 	}
 
 	public boolean isDead() {
@@ -256,16 +263,35 @@ public abstract class Enemy extends GameObjectBox {
 		
 		++dieCounter;
 		++dizzyCounter;
+		++dizzyRotationCounter;
 	}
 
 	public void drawImage() {
 		float drawWidth = (left) ? -pigSize : pigSize;
-		float drawHeight= (dizzy) ? -pigSize : pigSize;
-		currentAnimation.draw( 
-				getBody().getPosition().x-drawWidth*0.5f,
-				getBody().getPosition().y-drawHeight*0.5f, 
-				drawWidth * PIG_CLASS_SIZE_FACTOR, 
-				drawHeight * PIG_CLASS_SIZE_FACTOR);
+//		float drawHeight= (dizzy) ? -pigSize : pigSize;
+		float drawHeight= pigSize;
+		
+//		int rotDir = (game.getPlayer().movesLeft()) ? -1 : 1;
+		int rotDir = 1;
+		
+		if(!this.isOnGround() && dizzy && (dizzyRotationCounter*12 % 540 != 0) && firstTimeRotation ){
+			Image tmpImg = currentAnimation.getCurrentFrame();
+			tmpImg.setRotation( rotDir * dizzyRotationCounter*12);
+			tmpImg.draw( 
+					getBody().getPosition().x-drawWidth*0.5f,
+					getBody().getPosition().y-drawHeight*0.5f, 
+					drawWidth * PIG_CLASS_SIZE_FACTOR, 
+					drawHeight * PIG_CLASS_SIZE_FACTOR);
+			tmpImg.setRotation( 0);
+			
+		} else {
+			firstTimeRotation = true;
+			currentAnimation.draw( 
+					getBody().getPosition().x-drawWidth*0.5f,
+					getBody().getPosition().y-drawHeight*0.5f, 
+					drawWidth * PIG_CLASS_SIZE_FACTOR, 
+					drawHeight * PIG_CLASS_SIZE_FACTOR);
+		}
 	}
 	
 	public float getPigSize() {
