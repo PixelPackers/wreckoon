@@ -31,8 +31,8 @@ public class Girder {
 	
 	public Girder(World world, float posX, float posY, float length) throws SlickException {
 
-		tiedRopes = new Image("images/ropeTriangle.png");
-		longRope = new Image("images/Rope.png");
+		tiedRopes = Images.getInstance().getImage("images/ropeTriangle.png");
+		longRope = Images.getInstance().getImage("images/Rope.png");
 		
 		upperLength = length;
 

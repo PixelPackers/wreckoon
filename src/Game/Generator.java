@@ -29,7 +29,7 @@ public class Generator extends GameObjectBox {
 		SpriteSheet spriteSheet = null;
 		
 		try {
-			spriteSheet = new SpriteSheet("images/generatoranimated.png", 	770, 1135);
+			spriteSheet = Images.getInstance().getSpriteSheet("images/generatoranimated.png", 	770, 1135);
 		} catch (SlickException e) {
 			e.printStackTrace();
 		}
@@ -37,6 +37,10 @@ public class Generator extends GameObjectBox {
 		animation = new Animation(spriteSheet, 100);
 		animation.setPingPong(true);
 		animation.start();
+	}
+	
+	public Animation getAnimation() {
+		return animation;
 	}
 	
 	@Override

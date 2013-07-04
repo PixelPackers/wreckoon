@@ -31,7 +31,7 @@ public class Nut extends GameObjectPolygon {
 		super(world, pos.x, pos.y, verts, 0.5f, 0.5f, 0.5f, imgPath, BodyType.DYNAMIC);
 		
 		this.game = game;
-		this.image = new Image(imgPath);
+		this.image = Images.getInstance().getImage(imgPath);
 		
 	}
 	

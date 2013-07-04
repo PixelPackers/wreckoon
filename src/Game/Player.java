@@ -301,6 +301,10 @@ public class Player {
 		this.adjustHitboxes();		
 	}
 	
+	public Animation getCurrentAnimation() {
+		return currentAnimation;
+	}
+	
 	public void setLaser(Laser laser) {
 		this.laser = laser;
 	}

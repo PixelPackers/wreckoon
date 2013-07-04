@@ -24,7 +24,7 @@ public class SmartPig extends Enemy {
 		
 		PIG_CLASS_SIZE_FACTOR = 1.5f;
 		this.getBody().setFixedRotation(true);
-		this.setImage(new Image("images/smartpig.png"));
+		this.setImage(Images.getInstance().getImage("images/smartpig.png"));
 		initAnimations();
 		
 	}

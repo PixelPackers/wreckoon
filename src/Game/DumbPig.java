@@ -29,7 +29,7 @@ public class DumbPig extends Enemy{
 		
 		initAnimations();
 		
-		this.setImage(new Image("images/dumbpig.png"));
+		this.setImage(Images.getInstance().getImage("images/dumbpig.png"));
 		this.getBody().setFixedRotation(true);
 	}
 

@@ -31,7 +31,7 @@ public class Shred extends GameObjectPolygon {
 		super(world, pos.x, pos.y, verts, 1f, 0.5f, 0f, imgPath, BodyType.DYNAMIC);
 		
 		this.game = game;
-		this.image = new Image(imgPath);
+		this.image = Images.getInstance().getImage(imgPath);
 		this.pigSizeFactor = pigSizeFactor;
 	}
 	
@@ -40,15 +40,19 @@ public class Shred extends GameObjectPolygon {
 
 		float angle = this.getBody().getAngle();
 		image.setRotation(-(float) Math.toDegrees(angle));
-		// TODO magic number und frame / millisec passt nicht 
-		image.setAlpha(1f - (counter-MIN_TIME*0.5f)/(float)MIN_TIME );
+		// TODO magic number und frame / millisec passt nicht
+		image.setAlpha(1f - (counter-MIN_TIME*0.5f)/MIN_TIME*2f);
 		
 		image.draw(this.getBody().getPosition().x - radius, this.getBody().getPosition().y -radius, radius*2f, radius*2f);
 		
-		if(++counter == MIN_TIME){
+		if (counter == MIN_TIME){
 			game.getObjectsToRemove().add(this);
 			game.getShredsToRemove().add(this);
 		}
+	}
+	
+	public void increaseCounter() {
+		++counter;
 	}
 	
 	public void collect(){

@@ -31,7 +31,7 @@ public class DropItem extends GameObjectPolygon {
 		super(world, pos.x, pos.y, verts, 1f, 0.5f, 0f, imgPath, BodyType.DYNAMIC);
 		
 		this.game = game;
-		this.image = new Image(imgPath);		
+		this.image = Images.getInstance().getImage(imgPath);		
 	}
 	
 	public void drawImage(){

@@ -54,7 +54,7 @@ public class Game extends BasicGame {
 	private static ArrayList<Part>			parts			= new ArrayList<Part>();
 	private static ArrayList<Girder>		girders			= new ArrayList<Girder>();
 	private static Generator 				generator;
-	private static ArrayList<Spikes>		spikes			= new ArrayList<Spikes>();
+	private static ArrayList<Spike>		spikes			= new ArrayList<Spike>();
 	private static ArrayList<Conveyor>		conveyor 		= new ArrayList<Conveyor>();
 	private static ArrayList<Bolt>			bolts 			= new ArrayList<Bolt>();
 	private static ArrayList<Nut>			nuts 			= new ArrayList<Nut>();
@@ -79,7 +79,15 @@ public class Game extends BasicGame {
 	private int angleshit;
 	private static Image[] trashpile = new Image[5];
 	
+	private static Image pauseImage;
+	
 	private static Laser laser;
+	
+	private static enum Mode {
+		PLAY,
+		PAUSE
+	}
+	private Mode curMode = Mode.PLAY;
 
 	public Game() {
 		super("The Raccooning");
@@ -94,6 +102,8 @@ public class Game extends BasicGame {
 		for (int i = 0; i <= 4; ++i) {
 			trashpile[i] = new Image("images/background" + (i + 1) + ".png");
 		}
+		
+		pauseImage = Images.getInstance().getImage("images/Pause.png");
 
 		world = new World(new Vec2(0f, 20f), false);
 
@@ -114,6 +124,12 @@ public class Game extends BasicGame {
 				if (b.getType() > 0) {
 					Tile newTile = new Tile(world, x, y, b.getType(), 180 + b.getAngle(), !b.isFlipped());
 					tiles.add(newTile);
+					
+					//SPIKES
+					if (isSpike(b.getType())) {
+						Spike newSpike = new Spike(world, x, y, b.getType(), 180 + b.getAngle(), !b.isFlipped());
+						spikes.add(newSpike);
+					}
 				}
 			}
 		}
@@ -129,8 +145,6 @@ public class Game extends BasicGame {
 		girders.add(new Girder(world, 35f, -10f, 7.75f));
 
 		generator = new Generator(world, 5f, 15f, 5f*0.25f, 6f*0.25f);
-
-		spikes.add(new Spikes(world, 10, 0, 5, 1));
 
 		//conveyor.add(new Conveyor(world, 7f, 4f, 11f, 0.1f, 0.5f, 0.5f, 0.5f));
 
@@ -160,6 +174,15 @@ public class Game extends BasicGame {
 
 	}
 
+	private boolean isSpike(int type) {
+		if ((type >= 50 && type <= 55) ||
+			(type == 58) ||
+			(type == 41)) {
+			return true;
+		}
+		return false;
+	}
+
 	private String readFile( String file ) throws IOException {
 	    BufferedReader reader = new BufferedReader( new FileReader (file));
 	    String line = null;
@@ -174,77 +197,115 @@ public class Game extends BasicGame {
 
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
-		processInput(gc);
-		
-		laserTargetAngle = (float) Math.toRadians(xbox.getLeftThumbDirection() - 90d);
-		
-//		if (laserAngle < 360f) {
-//			laserAngle -= 360f;
-//		}
-		laserAngle = cam.curveValue(laserTargetAngle, laserAngle, 10);
-		laser.position(
-				player.getBody().getPosition().x,
-				player.getBody().getPosition().y,
-				laserAngle);
-		
-		player.update();
-
-		for(Enemy enemy : enemies){
-			enemy.update();
-		}
-		
-		cam.follow(	(float) (player.getBody().getPosition().x + xbox.getRightThumbX() * 3),
-					(float) (player.getBody().getPosition().y + xbox.getRightThumbY() * 3),
-					10);
-		
-		
-		for (GameObject o :  objectsToRemove){
-			world.destroyBody(o.getBody());
-			
-			if(o instanceof Enemy){
-				for(int i=0; i<7; ++i){
-					
-					float power = 10f;
-					Vec2 direction = new Vec2( 
-							(float)(Math.random()*power*2-power),
-							-((float)(Math.random()*power)) );
-					
-					
-					Nut nut = new Nut(this, getWorld(), o.getBody().getPosition().add(new Vec2(0,0)), "images/nut"+ ((int) (Math.random()*3)+1)+".png" );
-					nut.getBody().setLinearVelocity( direction);
-					getNuts().add(nut);
-					
-					Bolt bolt = new Bolt(this, getWorld(), o.getBody().getPosition().add(new Vec2(0,0)), "images/bolt"+ ((int) (Math.random()*3)+1)+".png" );
-					bolt.getBody().setLinearVelocity( direction);
-					getBolts().add(bolt);
-
-					Shred shred = new Shred(this, getWorld(), o.getBody().getPosition().add(new Vec2(0,0)), "images/shred"+ ((int) (Math.random()*3)+1)+".png", ((Enemy) o).getPigSize());
-					shred.getBody().setLinearVelocity(direction);
-					getShreds().add(shred);
-					
-					
-				}
+		Input input = gc.getInput();
+		if (xbox.isButtonStartDown() || input.isKeyPressed(Input.KEY_ESCAPE)) {
+			if (curMode == Mode.PLAY) {
+				curMode = Mode.PAUSE;
+				pauseAnimations();
+			} else {
+				curMode = Mode.PLAY;
+				restartAnimations();
 			}
-		}		
-		objectsToRemove.clear();
-		
-		for (Enemy e :  enemiesToRemove){
-
-			enemies.remove(e);
-		}		
-		enemiesToRemove.clear();
-		
-		for (Shred s : shredsToRemove){
-			shreds.remove(s);
 		}
 		
-//		for (GameObject o :  objectsToAdd){
-//			world.destroyBody(o.getBody());
-//		}		
-//		objectsToAdd.clear();
+		if (curMode == Mode.PLAY) {
+			processInput(input);
 		
-		
-		world.step(delta / 1000f, 18, 6);
+			house.updateAnimations();
+			
+			laserTargetAngle = (float) Math.toRadians(xbox.getLeftThumbDirection() - 90d);
+			
+	//		if (laserAngle < 360f) {
+	//			laserAngle -= 360f;
+	//		}
+			laserAngle = laser.curveAngle(laserTargetAngle, laserAngle, 10);
+			laser.position(
+					player.getBody().getPosition().x,
+					player.getBody().getPosition().y,
+					laserAngle);
+			
+			player.update();
+	
+			for(Enemy enemy : enemies){
+				enemy.update();
+			}
+			
+			cam.follow(	(float) (player.getBody().getPosition().x + xbox.getRightThumbX() * 3),
+						(float) (player.getBody().getPosition().y + xbox.getRightThumbY() * 3),
+						10);
+			
+			
+			for (GameObject o :  objectsToRemove){
+				world.destroyBody(o.getBody());
+				
+				if(o instanceof Enemy){
+					for(int i = 0; i < 7; ++i){
+						
+						float power = 10f;
+						Vec2 direction = new Vec2( 
+								(float)(Math.random()*power*2-power),
+								-((float)(Math.random()*power)) );
+						
+						
+						Nut nut = new Nut(this, getWorld(), o.getBody().getPosition().add(new Vec2(0,0)), "images/nut"+ ((int) (Math.random()*3)+1)+".png" );
+						nut.getBody().setLinearVelocity( direction);
+						getNuts().add(nut);
+						
+						Bolt bolt = new Bolt(this, getWorld(), o.getBody().getPosition().add(new Vec2(0,0)), "images/bolt"+ ((int) (Math.random()*3)+1)+".png" );
+						bolt.getBody().setLinearVelocity( direction);
+						getBolts().add(bolt);
+	
+						Shred shred = new Shred(this, getWorld(), o.getBody().getPosition().add(new Vec2(0,0)), "images/shred"+ ((int) (Math.random()*3)+1)+".png", ((Enemy) o).getPigSize());
+						shred.getBody().setLinearVelocity(direction);
+						getShreds().add(shred);
+						
+					}
+				}
+			}		
+			objectsToRemove.clear();
+			
+			for (Enemy e :  enemiesToRemove){
+	
+				enemies.remove(e);
+			}		
+			enemiesToRemove.clear();
+			
+			for (Shred s : shredsToRemove){
+				shreds.remove(s);
+			}
+			
+			for (Shred s : shreds) {
+				s.increaseCounter();
+			}
+			
+			for (Part p : parts) {
+				p.update();
+			}
+			
+	//		for (GameObject o :  objectsToAdd){
+	//			world.destroyBody(o.getBody());
+	//		}		
+	//		objectsToAdd.clear();
+			
+			
+			world.step(delta / 1000f, 18, 6);
+		}
+	}
+
+	private void restartAnimations() {
+		generator.getAnimation().start();
+		for (Enemy e : enemies) {
+			e.getCurrentAnimation().start();
+		}
+		player.getCurrentAnimation().start();
+	}
+
+	private void pauseAnimations() {
+		generator.getAnimation().stop();
+		for (Enemy e : enemies) {
+			e.getCurrentAnimation().stop();
+		}
+		player.getCurrentAnimation().stop();
 	}
 
 	@Override
@@ -281,13 +342,16 @@ public class Game extends BasicGame {
 		}
 
 		player.draw(g, debugView);
-		for(Enemy enemy : enemies){
+		for (Enemy enemy : enemies) {
 			enemy.draw(g, debugView);	
 		}
 
-
 		for (Tile tile : tiles) {
 			tile.draw(g, debugView);
+		}
+		
+		for (Spike spike : spikes) {
+			spike.draw(g, debugView);
 		}
 
 		for (Part part : parts){
@@ -298,7 +362,7 @@ public class Game extends BasicGame {
 			sb.draw(g, debugView);
 		}
 
-		for (Spikes s : spikes){
+		for (Spike s : spikes){
 			s.draw(g, debugView);
 		}
 
@@ -322,20 +386,26 @@ public class Game extends BasicGame {
 		
 		g.popTransform();
 		
+		if (curMode == Mode.PAUSE) {
+			g.setColor(new Color(0f, 0f, 0f, 0.3f));
+			g.fillRect(0, 0, screenWidth, screenHeight);
+			pauseImage.drawCentered(screenWidth * 0.5f, screenHeight * 0.4f);
+		}
+		
 		//drawZoomAreas(g);
 
 		// GUI
-		
-		// scale pixel size : box2d:size
-		g.drawString("10px", 0, 50);
-		g.drawRect(50, 50, 10, 1);
-		g.drawRect(50, 55, 10 * zoom, 1);
-		g.setColor(Color.white);
-		g.drawString("Count: " + world.getBodyCount(), 0, 0);
-
-		g.drawString("ShootingDirection: " + player.getShootingDirection(), 200, 10);
-		g.drawString("ShootingPower: " + player.getShootingPower(), 200, 30);
-		g.drawString("pos: " + player.getBody().getPosition(), 200, 50);
+//		g.setColor(Color.white);
+//		// scale pixel size : box2d:size
+//		g.drawString("10px", 0, 50);
+//		g.drawRect(50, 50, 10, 1);
+//		g.drawRect(50, 55, 10 * zoom, 1);
+//		g.setColor(Color.white);
+//		g.drawString("Count: " + world.getBodyCount(), 0, 0);
+//
+//		g.drawString("ShootingDirection: " + player.getShootingDirection(), 200, 10);
+//		g.drawString("ShootingPower: " + player.getShootingPower(), 200, 30);
+//		g.drawString("pos: " + player.getBody().getPosition(), 200, 50);
 		
 	}
 
@@ -386,8 +456,7 @@ public class Game extends BasicGame {
 		}
 	}
 
-	public void processInput(GameContainer gc) throws SlickException{
-		Input input = gc.getInput();
+	public void processInput(Input input) throws SlickException{
 
 		if (xbox.isButtonADown() || input.isKeyPressed(Input.KEY_SPACE) || input.isKeyPressed(Input.KEY_W) || input.isKeyPressed(Input.KEY_UP)) {
 
@@ -421,7 +490,13 @@ public class Game extends BasicGame {
 //					player.setLeft(false);					
 //				}
 			}
-		} 
+		}
+		
+		if (input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
+			if (player.movesLeft()) {
+				player.accelerate(1f);
+			}
+		}
 
 		if (xbox.isLeftThumbTiltedRight() || input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D)) {
 
@@ -441,7 +516,13 @@ public class Game extends BasicGame {
 //					player.setLeft(true);					
 //				}
 			}
-		}  
+		}
+		
+		if (input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D)) {
+			if (!player.movesLeft()) {
+				player.accelerate(1f);
+			}
+		}
 
 		if (xbox.getLeftThumbY() > 0.5f || input.isKeyPressed(Input.KEY_DOWN) || input.isKeyPressed(Input.KEY_S)) {
 			if( !player.isCharging() && !player.isOnGround()) {
@@ -682,7 +763,7 @@ public class Game extends BasicGame {
 		return generator;
 	}
 
-	public static ArrayList<Spikes> getSpikes() {
+	public static ArrayList<Spike> getSpikes() {
 		return spikes;
 	}
 

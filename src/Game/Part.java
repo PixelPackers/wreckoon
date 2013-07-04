@@ -76,9 +76,7 @@ public class Part {
 			this.drawOutline(g);
 		} else { 
 			this.drawImage();
-		}
-		
-		update();		
+		}		
 	}
 	
 	public float getX() {

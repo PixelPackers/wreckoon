@@ -174,6 +174,10 @@ public abstract class Enemy extends GameObjectBox {
 //				drawHeight);
 //	}
 	
+	public Animation getCurrentAnimation() {
+		return currentAnimation;
+	}
+	
 	public boolean isOnGround(){
 		return this.sensorGroundCollision.isColliding();
 	}

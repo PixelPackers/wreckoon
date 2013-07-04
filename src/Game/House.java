@@ -31,6 +31,10 @@ public class House {
 	private Image housefront;
 	private Image washer;
 	private Image washy;
+
+	private float washerX;
+
+	private float washerY;
 	
 	public House (World world, float x, float y) throws SlickException {
 		
@@ -38,10 +42,10 @@ public class House {
 		this.x			= x;
 		this.y			= y;
 		
-		this.housebasic = new Image("images/housebasic.png");
-		this.housefront = new Image("images/housefront.png");
-		this.washer = new Image("images/washer.png");
-		this.washy = new Image("images/washy.png");
+		this.housebasic = Images.getInstance().getImage("images/housebasic.png");
+		this.housefront = Images.getInstance().getImage("images/housefront.png");
+		this.washer = Images.getInstance().getImage("images/washer.png");
+		this.washy = Images.getInstance().getImage("images/washy.png");
 		washy.setCenterOfRotation(washy.getWidth()/2, washy.getHeight()/2);
 		
 		BodyDef bodyDef = new BodyDef();
@@ -415,13 +419,19 @@ public class House {
 		g.scale(FACTOR, FACTOR);
 			housebasic.draw(0, 0, 1 * 1.5873016f, 1);
 			g.pushTransform();
-				g.translate(0.74867725f + (float) Math.random() * 0.001f - 0.0005f,
-							0.4099f + (float) Math.random() * 0.001f - 0.0005f);
-				washy.setRotation(waterAngle += 7.5f);
+				g.translate(0.74867725f + washerX,
+							0.4099f + washerY);
+				washy.setRotation(waterAngle);
 				washy.draw(0.15f, 0.12f, 0.11f, 0.11f);
 				washer.draw(0, 0, 0.35f, 0.33346036f);
 			g.popTransform();
 		g.popTransform();
+	}
+	
+	public void updateAnimations() {
+		waterAngle += 7.5f;
+		washerX = (float) Math.random() * 0.001f - 0.0005f;
+		washerY = (float) Math.random() * 0.001f - 0.0005f;
 	}
 	
 	public void drawFront(Graphics g, boolean debugView) {

@@ -36,4 +36,13 @@ public class Laser extends GameObjectPolygon {
 	public ArrayList<Enemy> getLaserContacts() {
 		return laserContacts;
 	}
+	
+	public float curveAngle(float dest, float current, float smoothness) {
+		if (dest - current < 180f) {
+			return current + (dest - current) / smoothness;
+		} else {
+			return current + (360f - dest - current) / smoothness;
+		}
+		
+	}
 }

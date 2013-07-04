@@ -37,7 +37,7 @@ public abstract class GameObject {
 		this.fixtureDef.isSensor = isSensor;
 
 		if(imgPath != null)
-			this.img = new Image(imgPath);
+			this.img = Images.getInstance().getImage(imgPath);
 	}
 
 	protected void getReadyToRumble(World world) {
