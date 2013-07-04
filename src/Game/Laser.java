@@ -30,7 +30,6 @@ public class Laser extends GameObjectPolygon {
 	
 	public void drawOutline(Graphics g) {
 		super.drawOutline(g);
-//		System.out.println(getBody().getPosition().x);
 	}
 	
 	public ArrayList<Enemy> getLaserContacts() {

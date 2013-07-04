@@ -226,7 +226,7 @@ public class Spike {
 
 	public void drawOutline(Graphics g) {
 		Fixture fixtureList = this.body.getFixtureList();
-		// System.out.println(f.m_shape);
+		
 		while (fixtureList != null) {
 			Polygon polygon = new Polygon();
 			PolygonShape polygonShape = (PolygonShape) fixtureList.getShape();
@@ -234,10 +234,7 @@ public class Spike {
 			Vec2[] verts = polygonShape.getVertices();
 			for (int i = 0; i < polygonShape.getVertexCount(); ++i) {
 				Vec2 worldPoint = body.getWorldPoint(verts[i]);
-				System.out.println(worldPoint.x);
 				polygon.addPoint(worldPoint.x, worldPoint.y);
-				// p.addPoint(b.getPosition().x+ verts[i].x,
-				// -(b.getPosition().y +verts[i].y));
 			}
 			g.draw(polygon);
 			fixtureList = fixtureList.getNext();

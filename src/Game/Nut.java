@@ -49,7 +49,6 @@ public class Nut extends GameObjectPolygon {
 	}
 
 	public void collect(){
-//		System.out.println("nut collected");
 	}
 
 	public boolean isCollectable() {

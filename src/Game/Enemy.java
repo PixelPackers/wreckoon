@@ -29,7 +29,7 @@ public abstract class Enemy extends GameObjectBox {
 	protected int dieCounter = 0;
 	protected int dizzyCounter = 0;
 
-	protected static final int DIZZY_TIME 			= 100;
+	protected static final int DIZZY_TIME 			= 300;
 	
 	private static final float	MIN_SPEED		= 1f;
 	private static final float	MAX_SPEED		= 1.5f;
@@ -266,5 +266,9 @@ public abstract class Enemy extends GameObjectBox {
 	
 	public float getPigSize() {
 		return pigSize;
+	}
+	
+	public boolean isDizzy() {
+		return dizzy;
 	}
 }

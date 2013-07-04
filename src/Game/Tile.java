@@ -731,7 +731,7 @@ public class Tile {
 
 	public void drawOutline(Graphics g) {
 		Fixture fixtureList = this.body.getFixtureList();
-		// System.out.println(f.m_shape);
+
 		while (fixtureList != null) {
 			Polygon polygon = new Polygon();
 			PolygonShape polygonShape = (PolygonShape) fixtureList.getShape();

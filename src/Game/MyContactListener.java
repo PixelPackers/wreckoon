@@ -114,7 +114,7 @@ public class MyContactListener implements ContactListener{
 		
 //			+ enemy contact
 			for( Enemy enemy : game.getEnemies()){
-				if ( !enemy.isDead() && !game.getPlayer().isGroundPounding() ){
+				if ( !enemy.isDead() && !enemy.isDizzy() && !game.getPlayer().isGroundPounding() ){
 					if (enemy.getFixture() == contact.getFixtureA() || enemy.getFixture() == contact.getFixtureB() ){
 						game.getPlayer().die();
 						break;
