@@ -16,6 +16,7 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.SpriteSheet;
 
 import com.google.gson.Gson;
 
@@ -78,9 +79,11 @@ public class Game extends BasicGame {
 	private Color backgroundColor = new Color(112, 149, 163);
 	private float BACKGROUND_SCALE = 0.008f;
 	private int angleshit;
+	private float targetAngleshit;
 	private static Image[] trashpile = new Image[5];
 	
 	private static Image pauseImage;
+	private static SpriteSheet digits;
 	
 	private static Laser laser;
 	
@@ -107,6 +110,7 @@ public class Game extends BasicGame {
 		}
 		
 		pauseImage = Images.getInstance().getImage("images/Pause.png");
+		digits = Images.getInstance().getSpriteSheet("images/digits.png", 100, 160);
 
 		world = new World(new Vec2(0f, 20f), false);
 
@@ -141,8 +145,7 @@ public class Game extends BasicGame {
 		for (Part p : level.getParts()) {
 			parts.add(new Part(world, this, p.getX(), p.getY()));
 		}
-	
-
+		
 		girders.add(new Girder(world, 30f,  -5f, 7.75f));
 		girders.add(new Girder(world, 25f,  -6f, 7.75f));
 		girders.add(new Girder(world, 35f, -10f, 7.75f));
@@ -316,6 +319,17 @@ public class Game extends BasicGame {
 		}
 		player.getCurrentAnimation().stop();
 	}
+	
+	private void drawRightAlignedDigits(int number, int x, int y, float scale) {
+		String text = Integer.toString(number);
+		while (text.length() < 4) {
+			text = "0" + text;
+		}
+		for (int i = 0; i < text.length(); ++i) {
+			int c = text.charAt(i) - 48;
+			digits.getSprite(c, 0).draw(x + (i * 100 - text.length() * 100) * scale, y, scale);
+		}
+	}
 
 	@Override
 	public void render(GameContainer gc, Graphics g) throws SlickException {
@@ -402,6 +416,8 @@ public class Game extends BasicGame {
 		
 		g.popTransform();
 		
+		drawBoltCounter();
+		
 		if (curMode == Mode.PAUSE) {
 			g.setColor(new Color(0f, 0f, 0f, 0.3f));
 			g.fillRect(0, 0, screenWidth, screenHeight);
@@ -413,6 +429,9 @@ public class Game extends BasicGame {
 		//drawZoomAreas(g);
 
 		// GUI
+		
+		g.drawString("isLocked: " + player.isLocked(), 10, 10);
+		
 //		g.setColor(Color.white);
 //		// scale pixel size : box2d:size
 //		g.drawString("10px", 0, 50);
@@ -427,6 +446,15 @@ public class Game extends BasicGame {
 		
 	}
 
+	private void drawBoltCounter() throws SlickException {
+		Image nut = Images.getInstance().getImage("images/nut2.png");
+		targetAngleshit = cam.curveValue(angleshit, targetAngleshit, 10);
+		nut.setRotation(targetAngleshit * 30);
+		nut.setAlpha(1f);
+		nut.draw(screenWidth - 130, 36);
+		drawRightAlignedDigits(angleshit, screenWidth - 150, 40, 0.5f);
+	}
+
 	public static void main(String[] args) throws SlickException {
 		AppGameContainer game = new AppGameContainer(new Game());
 		game.setDisplayMode(screenWidth, screenHeight, fullScreen);
@@ -436,11 +464,6 @@ public class Game extends BasicGame {
 		game.setShowFPS(false);
 		game.start();
 	}
-
-
-
-
-
 
 	private void drawZoomAreas(Graphics g) {
 		if (level.getZoomAreas() != null) {
@@ -658,7 +681,7 @@ public class Game extends BasicGame {
 			enemies.add(new SmartPig(this, player.getBody().getPosition().x + 5f, player.getBody().getPosition().y - 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
 		}
 
-		if (input.isKeyPressed(Input.KEY_ENTER)) {
+		if (xbox.isButtonRightThumbDown() || input.isKeyPressed(Input.KEY_ENTER)) {
 			debugView = !debugView;			
 		}
 

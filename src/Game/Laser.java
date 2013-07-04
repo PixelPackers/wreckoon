@@ -14,8 +14,7 @@ public class Laser extends GameObjectPolygon {
 	private ArrayList<Enemy> laserContacts = new ArrayList<Enemy>();
 	
 	private static Vec2[] verts = new Vec2[] {
-			new Vec2( 0.5f, 0.1f),
-			new Vec2( 0.5f, -0.1f),
+			new Vec2( 0.3f, -0f),
 			new Vec2( 8f, -0.5f),
 			new Vec2( 8f, 0.5f)
 		};
