@@ -750,7 +750,6 @@ public class Player {
 			this.doTailwhip = true;
 			this.tailwhipCounter = 0;
 			
-
 			float tailWidth 	= 0.7f;
 			float tailHeight	= 0.2f;
 			float direction = this.width;

@@ -43,6 +43,7 @@ public abstract class Enemy extends GameObjectBox {
 	private static final float	MAX_SIZE		= 1.25f;
 	private static float staticPigSize = (float)(Math.random() *  (MAX_SIZE-MIN_SIZE) + MIN_SIZE);
 	private float pigSize;
+	private int rotDir = 0;
 	
 	private boolean dead = false;
 	protected boolean left = false;
@@ -223,7 +224,18 @@ public abstract class Enemy extends GameObjectBox {
 		dizzy = true;
 		dizzyCounter = 0;
 		dizzyRotationCounter = 0;
+		
+		initRotation();
+	}
+	
+
+	public void initRotation(){
+		this.rotDir = (game.getPlayer().movesLeft()) ? -1 : 1;;
 		firstTimeRotation = true;
+		rotate();
+	}
+	
+	public void rotate(){
 		
 		float force = 7.5f;
 		float x = (game.getPlayer().movesLeft()) ? -force : force;
@@ -277,9 +289,6 @@ public abstract class Enemy extends GameObjectBox {
 		float drawWidth = (left) ? -pigSize : pigSize;
 //		float drawHeight= (dizzy) ? -pigSize : pigSize;
 		float drawHeight= pigSize;
-		
-//		int rotDir = (game.getPlayer().movesLeft()) ? -1 : 1;
-		int rotDir = 1;
 		
 		if(!this.isOnGround() && dizzy && (dizzyRotationCounter*12 % 540 != 0) && firstTimeRotation ){
 			Image tmpImg = currentAnimation.getCurrentFrame();
