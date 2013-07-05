@@ -1252,7 +1252,7 @@ public class Player {
 		return lastCheckpoint;
 	}
 	
-	public void partCollected(int amount){
+	public void boltsCollected(int amount){
 		this.tmpBoltAmount += amount;
 		
 	}

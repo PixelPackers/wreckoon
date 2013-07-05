@@ -24,7 +24,7 @@ public class Bolt extends DropItem {
 	}
 	
 	public void collect() {
-		game.getPlayer().increaseBoltCounter();
+		game.getPlayer().boltsCollected(1);
 	}
 	
 }

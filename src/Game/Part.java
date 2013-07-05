@@ -62,7 +62,7 @@ public class Part {
 			this.world.destroyBody(this.body);
 			this.game.getRidOfPart(this);
 //			this.game.getPlayer().increaseBoltCounter(BOLT_VALUE);
-			this.game.getPlayer().partCollected(BOLT_VALUE);
+			this.game.getPlayer().boltsCollected(BOLT_VALUE);
 			
 			this.collected = true;
 			// show counter
