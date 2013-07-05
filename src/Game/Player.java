@@ -591,6 +591,7 @@ public class Player {
 		body.setTransform(lastCheckpoint.getMidPoint(), 0f);
 		body.setLinearVelocity(new Vec2(0f, 0f));
 		dead = false;
+		deadAndOnGround = false;
 		unlock();
 	}
 
@@ -936,18 +937,20 @@ public class Player {
 	
 	// laser
 	public void initializeLaser(){
-		if(dead){
-			unlock();
-			dead=false;
-			return;
-		}
+
+//		 FIXME weg mit dem
+//		if(dead){
+//			unlock();
+//			dead=false;
+//			return;
+//		}
 		if (locked){
 			return;
 		} else {
 			lock();
 		}
 		
-		if (true || !this.laserStarted && this.laserAble) {
+		if (!this.laserStarted && this.laserAble) {
 		
 			this.laserStarted = true;
 			
@@ -986,20 +989,30 @@ public class Player {
 	
 
 
-	public void bite(){
-		if(locked){
-			return;
-		} else if (this.ableToGetLaser){
-			lock();
-//			TODO wird this.biting ühaupt gebraucht, jetzt mit lock()?
-			if(!this.biting){
-				this.biting = true;
-				this.biteCounter = 0;
+	public boolean bite(){
+	
+		
+		if(!locked && !laserAble){
+			
+			if (this.ableToGetLaser && this.isOnGround()){
+				lock();
 				
-				this.currentAnimation = animations.get("bite");
-				this.currentAnimation.restart();	
+				if(!this.biting){
+					this.biting = true;
+					this.biteCounter = 0;
+					
+					this.body.setLinearVelocity( new Vec2(0f,0f) );
+					
+					this.currentAnimation = animations.get("bite");
+					this.currentAnimation.restart();	
+				}
+				return true;
+			} else {
+				return false;
 			}
+			
 		}
+		return false;
 		
 	}
 	
@@ -1255,5 +1268,9 @@ public class Player {
 	public void boltsCollected(int amount){
 		this.tmpBoltAmount += amount;
 		
+	}
+	
+	public boolean isLaserAble() {
+		return laserAble;
 	}
 }

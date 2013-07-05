@@ -811,15 +811,18 @@ public class Game extends BasicGame {
 		}	
 
 		if(xbox.isButtonYDown() || input.isKeyPressed(input.KEY_J)){
-			player.initializeLaser();
+
+			if( !player.bite() && player.isLaserAble()) {
+				player.initializeLaser();	
+			}
 		}
-		if(input.isKeyPressed(input.KEY_K)){
-			player.destroyLaser();
+		
+		if(xbox.isButtonYUp()){
+			if(player.isLaserActive()){
+				player.destroyLaser();
+			}
 		}
 
-		if(input.isKeyPressed(input.KEY_P)){
-			player.bite();
-		}
 		
 	}
 
