@@ -7,6 +7,7 @@ import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.contacts.Contact;
+import org.newdawn.slick.SlickException;
 
 public class MyContactListener implements ContactListener{
 
@@ -299,6 +300,23 @@ public class MyContactListener implements ContactListener{
 //					break;
 				}
 			}
+			
+			Iterator iterator = game.getDropItems().iterator();
+			while (iterator.hasNext()){
+				DropItem dropItem = (DropItem) iterator.next();
+				
+				if( dropItem instanceof Shred ){
+					Shred shred = (Shred) dropItem;
+					try {
+						shred.grilled();
+					} catch (SlickException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				
+			}
+			
 		}
 		
 	}

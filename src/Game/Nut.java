@@ -22,7 +22,7 @@ public class Nut extends DropItem {
 	}
 	
 	public void collect(){
-		game.getPlayer().increaseBoltCounter();
+		game.getPlayer().boltsCollected(1);
 	}
 	
 }

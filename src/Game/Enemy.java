@@ -290,7 +290,7 @@ public abstract class Enemy extends GameObjectBox {
 //		float drawHeight= (dizzy) ? -pigSize : pigSize;
 		float drawHeight= pigSize;
 		
-		if(!this.isOnGround() && dizzy && (dizzyRotationCounter*12 % 540 != 0) && firstTimeRotation ){
+		if(!this.dead && !this.isOnGround() && dizzy && (dizzyRotationCounter*12 % 540 != 0) && firstTimeRotation ){
 			Image tmpImg = currentAnimation.getCurrentFrame();
 			tmpImg.setRotation( rotDir * dizzyRotationCounter*12);
 			tmpImg.draw( 

@@ -106,6 +106,7 @@ public class Game extends BasicGame {
 	private Color multiplierColor = new Color(245, 179, 141);
 	private Color earthColor = new Color(164, 74, 13);
 
+	
 	public Game() {
 		super("The Raccooning");
 	}
@@ -313,6 +314,9 @@ public class Game extends BasicGame {
 	//		}		
 	//		objectsToAdd.clear();
 			
+			if(player.isWaitingForLaserToBeKilled()){
+				killLaser();
+			}
 			
 			world.step(delta / 1000f, 18, 6);
 			
@@ -811,18 +815,31 @@ public class Game extends BasicGame {
 		}	
 
 		if(xbox.isButtonYDown() || input.isKeyPressed(input.KEY_J)){
-			player.initializeLaser();
+
+			player.setWaitingForLaserToBeKilled(false);
+			if( !player.bite() && player.isLaserAble()) {
+				player.initializeLaser();	
+			}
 		}
-		if(input.isKeyPressed(input.KEY_K)){
-			player.destroyLaser();
+		
+		if(xbox.isButtonYUp()){
+			if(player.isLaserAble()){ 
+				player.setWaitingForLaserToBeKilled(true);
+			}
 		}
 
-		if(input.isKeyPressed(input.KEY_P)){
-			player.bite();
-		}
 		
 	}
 
+	public void killLaser(){
+		if(player.isLaserActive()){
+
+			player.destroyLaser();
+			player.setWaitingForLaserToBeKilled(false);
+			
+		}
+	}
+	
 	public GameObject chooseTelekinesisTarget() {
 		for (GameObject object : dynamicObjects) {
 
@@ -906,5 +923,7 @@ public class Game extends BasicGame {
 	public static ArrayList<DropItem> getDropItemsToRemove() {
 		return dropItemsToRemove;
 	}
+	
+	
 	
 }

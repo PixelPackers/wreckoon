@@ -51,7 +51,7 @@ public abstract class DropItem extends GameObjectPolygon {
 //			float blub = 1f - (counter - (MAX_TIME - FADE_TIME)) / FADE_TIME;
 //			System.out.println(blub);
 //			image.setAlpha(blub  );
-			float factor = 0.7f;
+			float factor = 0.5f;
 			image.setAlpha(1f - (counter-MAX_TIME*factor)/MAX_TIME/factor);
 //		}
 		image.draw(this.getBody().getPosition().x - radius, this.getBody().getPosition().y -radius, radius*2f, radius*2f);

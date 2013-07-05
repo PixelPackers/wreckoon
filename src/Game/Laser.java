@@ -68,8 +68,13 @@ public class Laser extends GameObjectPolygon {
 	    Vec2 toVector = new Vec2((float)Math.cos(to), (float)Math.sin(to));
 
 	    Vec2 currentVector = slerp(fromVector, toVector, step);
-
-	    return (float)Math.atan2(currentVector.y, currentVector.x);
+	    
+	    double returnValue = Math.atan2(currentVector.y, currentVector.x);
+	    
+//	    System.out.println((float)returnValue + "f");
+//	    System.out.println(returnValue+"d");
+	    
+	    return (float) returnValue;
 	}
 
 	public static Vec2 slerp(Vec2 from, Vec2 to, float step)

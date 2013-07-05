@@ -65,6 +65,9 @@ public class Player {
 	private boolean laserAble		= false;
 	private boolean laserStarted	= false;
 	private boolean wasLasering		= false;
+	private boolean waitingForLaserToBeKilled = false;
+	private boolean frontflipping = false;
+	
 	
 	private boolean locked = false;
 	private boolean godmode = false;
@@ -512,8 +515,12 @@ public class Player {
 				this.currentAnimation = animations.get("runJump");
 			}
 			
-			if(!this.isOnGround() && !this.isJumpingFromWall() && !this.groundPounding && !this.dead && !this.laserStarted) {
+			if(!isOnGround() && !isJumpingFromWall() && !groundPounding && !dead && !laserStarted && !doTailwhip && !frontflipping) {
 				this.currentAnimation = animations.get("runJump");
+			}
+			
+			if(frontflipping && currentAnimation.isStopped()){
+				frontflipping=false;
 			}
 			
 			if (this.isGroundPounding() && !this.isOnGround() && this.currentAnimation.isStopped()) {
@@ -574,7 +581,7 @@ public class Player {
 	private void accountTmpBoltAmount() {
 		
 		
-		int max = 5;
+		int max = 7;
 //		int max = (int) (tmpBoltAmount/20)+1; // "curve value" je kleiner desto weniger wird verrechnet
 		
 		int currAmount = (tmpBoltAmount >= max) ? max : tmpBoltAmount;
@@ -590,6 +597,7 @@ public class Player {
 		body.setTransform(lastCheckpoint.getMidPoint(), 0f);
 		body.setLinearVelocity(new Vec2(0f, 0f));
 		dead = false;
+		deadAndOnGround = false;
 		unlock();
 	}
 
@@ -720,6 +728,7 @@ public class Player {
 			}
 			
 			this.body.setLinearVelocity(new Vec2(jumpSpeedX, jumpSpeedY));
+//			frontflip();
 		}
 		
 	}
@@ -935,18 +944,20 @@ public class Player {
 	
 	// laser
 	public void initializeLaser(){
-		if(dead){
-			unlock();
-			dead=false;
-			return;
-		}
+
+//		 FIXME weg mit dem
+//		if(dead){
+//			unlock();
+//			dead=false;
+//			return;
+//		}
 		if (locked){
 			return;
 		} else {
 			lock();
 		}
 		
-		if (true || !this.laserStarted && this.laserAble) {
+		if (!this.laserStarted && this.laserAble) {
 		
 			this.laserStarted = true;
 			
@@ -958,24 +969,33 @@ public class Player {
 	
 	private void createLaser(){
 
-		this.laserActive = true;	
-		
-		Iterator<Enemy> iterator = laser.getLaserContacts().iterator();
-		while (iterator.hasNext()){
-			Enemy enemy = (Enemy) iterator.next();
-			enemy.die();
-			iterator.remove();
+		if(!waitingForLaserToBeKilled){
+			this.laserActive = true;	
+			
+			Iterator<Enemy> iterator = laser.getLaserContacts().iterator();
+			while (iterator.hasNext()){
+				Enemy enemy = (Enemy) iterator.next();
+				enemy.die();
+				iterator.remove();
+			}
+			
+			godmode = true;
+		} else {
+			destroyLaser();
 		}
-		
-		godmode = true;
 	
 	}
 	
 	public void destroyLaser(){
 
+		
+
+		if(laserActive){ // wenn laser taste gedrückt wurde, aber bevor geschossen wurde, abgebrochen
+			this.laserAble = false;
+		}
+		
 		this.laserStarted = false;
 		this.laserActive = false;
-		this.laserAble = false;
 		wasLasering = true;
 		godmode = false;
 		
@@ -985,20 +1005,30 @@ public class Player {
 	
 
 
-	public void bite(){
-		if(locked){
-			return;
-		} else if (this.ableToGetLaser){
-			lock();
-//			TODO wird this.biting ühaupt gebraucht, jetzt mit lock()?
-			if(!this.biting){
-				this.biting = true;
-				this.biteCounter = 0;
+	public boolean bite(){
+	
+		
+		if(!locked && !laserAble){
+			
+			if (this.ableToGetLaser && this.isOnGround()){
+				lock();
 				
-				this.currentAnimation = animations.get("bite");
-				this.currentAnimation.restart();	
+				if(!this.biting){
+					this.biting = true;
+					this.biteCounter = 0;
+					
+					this.body.setLinearVelocity( new Vec2(0f,0f) );
+					
+					this.currentAnimation = animations.get("bite");
+					this.currentAnimation.restart();	
+				}
+				return true;
+			} else {
+				return false;
 			}
+			
 		}
+		return false;
 		
 	}
 	
@@ -1251,8 +1281,25 @@ public class Player {
 		return lastCheckpoint;
 	}
 	
-	public void partCollected(int amount){
+	public void boltsCollected(int amount){
 		this.tmpBoltAmount += amount;
 		
+	}
+	
+	public boolean isLaserAble() {
+		return laserAble;
+	}
+	
+	public boolean isWaitingForLaserToBeKilled() {
+		return waitingForLaserToBeKilled;
+	}
+	public void setWaitingForLaserToBeKilled(boolean waitingForLaserToBeKilled) {
+		this.waitingForLaserToBeKilled = waitingForLaserToBeKilled;
+	}
+	
+	public void frontflip(){
+		frontflipping = true;
+		this.currentAnimation = animations.get("groundpound");
+		this.currentAnimation.restart();
 	}
 }
