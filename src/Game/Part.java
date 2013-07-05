@@ -15,6 +15,8 @@ import org.newdawn.slick.SlickException;
 
 public class Part {
 
+	private final int BOLT_VALUE = 500;
+	
 	private static final float radius = 0.5f;
 	private World world;
 	private Game game;
@@ -59,7 +61,8 @@ public class Part {
 			//MusicManager.getInstance().itemCollected();
 			this.world.destroyBody(this.body);
 			this.game.getRidOfPart(this);
-			this.game.getPlayer().increaseBoltCounter(500);
+//			this.game.getPlayer().increaseBoltCounter(BOLT_VALUE);
+			this.game.getPlayer().partCollected(BOLT_VALUE);
 			
 			this.collected = true;
 			// show counter
