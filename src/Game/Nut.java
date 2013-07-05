@@ -16,8 +16,8 @@ public class Nut extends DropItem {
 		DRAW_FACTOR = 0.1f;
 		
 		Filter filter = new Filter();
-		filter.maskBits = 1;
-		filter.categoryBits = 1;
+		filter.maskBits = 1 + 2 + 8 + 16;
+		filter.categoryBits = 8;
 		this.getFixture().setFilterData(filter);
 	}
 	

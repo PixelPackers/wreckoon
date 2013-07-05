@@ -72,8 +72,8 @@ public abstract class Enemy extends GameObjectBox {
 		
 
 		Filter filter = new Filter();
-		filter.maskBits = 1;
-		filter.categoryBits = 2;
+		filter.categoryBits = 4;
+		filter.maskBits = 1 + 2 + 4;
 		this.getFixture().setFilterData(filter);
 		
 		createSensors();
@@ -88,11 +88,11 @@ public abstract class Enemy extends GameObjectBox {
 	
 		// wall collision sensors
 		float sensorSizeWidth	= width  * 0.1f;
-		float sensorSizeHeight	= height * 0.3f;
+		float sensorSizeHeight	= height * 0.45f;
 		
 		float xSpace = width*0.5f;
-		float ySpace = height*0.25f;
-		float putDown = 0.3f;
+		float ySpace = height*0.0f;
+		float putDown = 0.0f;
 		{
 		// left sensor
 		Vec2[] vertsSensor = new Vec2[]{

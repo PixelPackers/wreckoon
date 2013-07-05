@@ -17,13 +17,13 @@ public class Shred extends DropItem {
 		
 		this.pigSizeFactor = pigSizeFactor;
 		MIN_TIME = 115;
-		MAX_TIME = 1150;
+		MAX_TIME = 180;
 		
 		DRAW_FACTOR = 0.17f * pigSizeFactor;
 		
 		Filter filter = new Filter();
-		filter.maskBits = 1;
-		filter.categoryBits = 2;
+		filter.maskBits = 1 + 8 + 16;
+		filter.categoryBits = 16;
 		this.getFixture().setFilterData(filter);
 	}
 	

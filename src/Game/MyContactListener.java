@@ -116,7 +116,7 @@ public class MyContactListener implements ContactListener{
 			for( Enemy enemy : game.getEnemies()){
 				if ( !enemy.isDead() && !enemy.isDizzy() && !game.getPlayer().isGroundPounding() ){
 					if (enemy.getFixture() == contact.getFixtureA() || enemy.getFixture() == contact.getFixtureB() ){
-						game.getPlayer().die();
+						game.getPlayer().die(true);
 						break;
 					}
 				}
@@ -139,7 +139,7 @@ public class MyContactListener implements ContactListener{
 //			+ spikes
 			for (Spike spike : game.getSpikes() ){
 				if (spike.getFixture() == contact.getFixtureA() || spike.getFixture() == contact.getFixtureB() ) {
-					game.getPlayer().die();
+					game.getPlayer().die(false);
 				}
 			}
 			
