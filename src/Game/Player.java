@@ -65,6 +65,8 @@ public class Player {
 	private boolean laserAble		= false;
 	private boolean laserStarted	= false;
 	private boolean wasLasering		= false;
+	private boolean waitingForLaserToBeKilled = false;
+	
 	
 	private boolean locked = false;
 	private boolean godmode = false;
@@ -575,7 +577,7 @@ public class Player {
 	private void accountTmpBoltAmount() {
 		
 		
-		int max = 5;
+		int max = 7;
 //		int max = (int) (tmpBoltAmount/20)+1; // "curve value" je kleiner desto weniger wird verrechnet
 		
 		int currAmount = (tmpBoltAmount >= max) ? max : tmpBoltAmount;
@@ -962,24 +964,33 @@ public class Player {
 	
 	private void createLaser(){
 
-		this.laserActive = true;	
-		
-		Iterator<Enemy> iterator = laser.getLaserContacts().iterator();
-		while (iterator.hasNext()){
-			Enemy enemy = (Enemy) iterator.next();
-			enemy.die();
-			iterator.remove();
+		if(!waitingForLaserToBeKilled){
+			this.laserActive = true;	
+			
+			Iterator<Enemy> iterator = laser.getLaserContacts().iterator();
+			while (iterator.hasNext()){
+				Enemy enemy = (Enemy) iterator.next();
+				enemy.die();
+				iterator.remove();
+			}
+			
+			godmode = true;
+		} else {
+			destroyLaser();
 		}
-		
-		godmode = true;
 	
 	}
 	
 	public void destroyLaser(){
 
+		
+
+		if(laserActive){ // wenn laser taste gedrückt wurde, aber bevor geschossen wurde, abgebrochen
+			this.laserAble = false;
+		}
+		
 		this.laserStarted = false;
 		this.laserActive = false;
-		this.laserAble = false;
 		wasLasering = true;
 		godmode = false;
 		
@@ -1272,5 +1283,12 @@ public class Player {
 	
 	public boolean isLaserAble() {
 		return laserAble;
+	}
+	
+	public boolean isWaitingForLaserToBeKilled() {
+		return waitingForLaserToBeKilled;
+	}
+	public void setWaitingForLaserToBeKilled(boolean waitingForLaserToBeKilled) {
+		this.waitingForLaserToBeKilled = waitingForLaserToBeKilled;
 	}
 }

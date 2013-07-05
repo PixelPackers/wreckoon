@@ -71,8 +71,8 @@ public class Laser extends GameObjectPolygon {
 	    
 	    double returnValue = Math.atan2(currentVector.y, currentVector.x);
 	    
-	    System.out.println((float)returnValue + "f");
-	    System.out.println(returnValue+"d");
+//	    System.out.println((float)returnValue + "f");
+//	    System.out.println(returnValue+"d");
 	    
 	    return (float) returnValue;
 	}
