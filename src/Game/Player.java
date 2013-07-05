@@ -122,6 +122,7 @@ public class Player {
 	private ArrayList<MySensor> sensorList			= new ArrayList<MySensor>();
 	
 	private HashMap<String, Animation> animations = new HashMap<String, Animation>();
+	private HashMap<String, Vec2> animationOffsets = new HashMap<String, Vec2>();
 	private Animation currentAnimation;
 	private Checkpoint lastCheckpoint = new Checkpoint(2f, 10f, 3f, 11f);
 
@@ -135,7 +136,7 @@ public class Player {
 		SpriteSheet sheetIdle		= new SpriteSheet("images/idle.png", 		227, 288);
 		SpriteSheet sheetGroundpoundRoll	= new SpriteSheet("images/groundpoundroll.png", 300, 270);
 		SpriteSheet sheetGroundpoundAir		= new SpriteSheet("images/groundpoundair.png", 300, 270);
-		SpriteSheet sheetGroundpoundImpact	= new SpriteSheet("images/groundpoundimpact.png", 300, 270);
+		SpriteSheet sheetGroundpoundImpact	= new SpriteSheet("images/groundpoundimpact.png", 300, 271);
 		SpriteSheet sheetDeath		= new SpriteSheet("images/death.png", 		364, 160);
 		SpriteSheet sheetDeathAir	= new SpriteSheet("images/deathair.png", 	365, 160);
 		SpriteSheet sheetWalkJump	= new SpriteSheet("images/jump.png", 		337, 288);
@@ -144,6 +145,8 @@ public class Player {
 		SpriteSheet sheetBite		= new SpriteSheet("images/bite.png", 		227, 288);
 		SpriteSheet sheetShock		= new SpriteSheet("images/shock.png", 		227, 288);
 		SpriteSheet sheetLaser		= new SpriteSheet("images/lasercycle.png", 	300, 270);
+		
+		
 		
 		Animation animationWallJump = new Animation(sheetWallJump, 	70);
 		animationWallJump.setLooping(false);
@@ -170,7 +173,6 @@ public class Player {
 		Animation animationBite = new Animation(sheetBite, 100);
 		animationBite.setLooping(false);
 		
-		
 		animations.put("run", 			new Animation(sheetRun,			100));
 		animations.put("walk", 			new Animation(sheetWalk,		100));
 		animations.put("wallJump", 		animationWallJump);
@@ -183,12 +185,31 @@ public class Player {
 		animations.put("death", 		animationDeath);
 		animations.put("deathAir", 		new Animation(sheetDeathAir,	 150));
 		
-		animations.put("walkJump",		animationWalkJump);
-		animations.put("walkJumpAir",	new Animation(sheetWalkJumpAir, 100));
+//		animations.put("walkJump",		animationWalkJump);
+//		animations.put("walkJumpAir",	new Animation(sheetWalkJumpAir, 100));
 		animations.put("runJump",		new Animation(sheetRunJump, 	100));
 		animations.put("bite",			animationBite);
 		animations.put("shock",			new Animation(sheetShock, 	100));
 		animations.put("laser",			new Animation(sheetLaser, 	100));
+		
+		animationOffsets.put("images/runcycle.png", 		new Vec2(-0.65f, -0.3f));
+		animationOffsets.put("images/walkcycle.png", 		new Vec2(-0.55f, -0.7f));
+		animationOffsets.put("images/walljump.png", 		new Vec2(-0.7f, -0.5f));
+		animationOffsets.put("images/wallidle.png", 		new Vec2(-0.7f, -0.5f));
+		animationOffsets.put("images/tailwhip.png", 		new Vec2(-0.65f, -0.3f));
+		animationOffsets.put("images/idle.png", 			new Vec2(-0.45f, -0.7f));
+		animationOffsets.put("images/groundpoundroll.png",	new Vec2(-0.5f, -0.6f));
+		animationOffsets.put("images/groundpoundair.png",	new Vec2(-0.5f, -0.6f));
+		animationOffsets.put("images/groundpoundimpact.png",new Vec2(-0.5f, -0.6f));
+		animationOffsets.put("images/death.png", 			new Vec2(-0.6f, -0.3f));
+		animationOffsets.put("images/deathair.png", 		new Vec2(-0.6f, -0.3f));
+		
+//		animationOffsets.put("images/walkjump.png",			new Vec2(0f, 0f));
+//		animationOffsets.put("images/walkjumpAir.png",		new Vec2(0f, 0f));
+		animationOffsets.put("images/flycycle.png",			new Vec2(-0.65f, -0.3f)); //runjump
+		animationOffsets.put("images/bite.png",				new Vec2(-0.45f, -0.7f));
+		animationOffsets.put("images/shock.png",			new Vec2(-0.45f, -0.7f));
+		animationOffsets.put("images/lasercycle.png",		new Vec2(-0.7f, -0.62f));
 		
 		currentAnimation = animations.get("idle");
 	}
@@ -398,10 +419,13 @@ public class Player {
 		float drawHeight = currentAnimation.getHeight() / 150f;
 		drawWidth= (left) ? drawWidth: -drawWidth;
 		
-		currentAnimation.draw( position.x + drawWidth*0.5f,
-				position.y - drawHeight*0.5f - 0.5f*0.5f, // -0.5f --> sonst wuerde sprite in den boden hinein stehen 
-				-drawWidth, 
-				drawHeight);	
+		System.out.println(currentAnimation.getImage(0).getResourceReference());
+		Vec2 offset = animationOffsets.get(currentAnimation.getImage(0).getResourceReference());
+		float scale = 0.5f;
+		currentAnimation.draw( position.x + 0*drawWidth*0.5f + ((left) ? -offset.x : offset.x),
+				position.y - 0*drawHeight*0.5f + offset.y, // -0.5f --> sonst wuerde sprite in den boden hinein stehen 
+				-drawWidth * scale , 
+				drawHeight * scale);
 	}
 	
 	public void drawOutline(Graphics g) {
