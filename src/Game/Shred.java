@@ -10,6 +10,7 @@ import org.newdawn.slick.SlickException;
 public class Shred extends DropItem {
 	
 	private float pigSizeFactor;
+	private boolean grilled = false;
 		
 	public Shred(Game game, World world, Vec2 pos, String imgPath, float pigSizeFactor)
 			throws SlickException {
@@ -17,7 +18,7 @@ public class Shred extends DropItem {
 		
 		this.pigSizeFactor = pigSizeFactor;
 		MIN_TIME = 115;
-		MAX_TIME = 180;
+		MAX_TIME = 1800;
 		
 		DRAW_FACTOR = 0.17f * pigSizeFactor;
 		
@@ -40,4 +41,11 @@ public class Shred extends DropItem {
 	public boolean isCollectable() {
 		return false;
 	}
+	
+	public void grilled() throws SlickException{
+		// FIXME wenn grilled bilder drin sind --> einkommentieren
+//		setImage(new Image( image.getResourceReference().replace(".png", "laser.png") ) );
+		this.grilled = true;
+	}
+	
 }
