@@ -38,6 +38,7 @@ public class Game extends BasicGame {
 	//*/
 
 	private static boolean debugView = false;
+	private static boolean DOOMSDAY = false;
 
 	private static boolean useZoomAreas = false;
 	private static float tragetZoom = 128f;
@@ -74,11 +75,11 @@ public class Game extends BasicGame {
 //	private static ArrayList<Shred>			shredsToRemove 	= new ArrayList<Shred>();
 
 //	private Color backgroundColor = new Color(112, 149, 163);
-	private static Color skyGradientColor1 = new Color(112, 149, 163);
-	private static Color skyGradientColor2 = new Color(152, 199, 193);
+	private static Color skyGradientColor1;
+	private static Color skyGradientColor2;
 	
-	private static Rectangle skyRect = new Rectangle(0, 0, screenWidth, screenHeight);
-	private static ShapeFill skyGradient = new GradientFill(0, 0, skyGradientColor1, 0, screenHeight, skyGradientColor2);
+	private static Rectangle skyRect;
+	private static ShapeFill skyGradient;
 	
 	private static House house;
 	private static Camera cam = new Camera(0, 0);
@@ -187,6 +188,7 @@ public class Game extends BasicGame {
 //			enemies.add( new DumbPig(this, 1*i +10f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
 //			enemies.add( new SmartPig(this, 1f*i, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
 //		}
+		initNormalSky();
 
 	}
 
@@ -248,7 +250,11 @@ public class Game extends BasicGame {
 			float targetCamY = (float) (player.getBody().getPosition().y + xbox.getRightThumbY() * 3f);
 			//if (targetCamY > level.getHeight() - screenHeight/2/zoom) targetCamY = level.getHeight() - screenHeight/2/zoom;
 			cam.follow(targetCamX, targetCamY, 10);
-			cam.wiggle((player.isLaserActive()) ? 1f : 0f);
+			if(DOOMSDAY){
+				cam.wiggle((player.isLaserActive()) ? 1f : 0.5f);
+			} else {
+				cam.wiggle((player.isLaserActive()) ? 1f : 0f);	
+			}
 			//if (cam.getY() > level.getHeight() - screenHeight/2/zoom) cam.setY(level.getHeight() - screenHeight/2/zoom); 
 			
 			for (GameObject o :  objectsToRemove){
@@ -311,8 +317,41 @@ public class Game extends BasicGame {
 			world.step(delta / 1000f, 18, 6);
 			
 		}
+		if(DOOMSDAY){
+			doomsdaySky();
+		} else {
+			initNormalSky();
+		}
 		
 		xbox.resetStates();
+	}
+	
+
+	private void initNormalSky() {
+		skyGradientColor1 = new Color(112, 149, 163);
+		skyGradientColor2 = new Color(152, 199, 193);
+		
+		skyRect = new Rectangle(0, 0, screenWidth, screenHeight);
+		skyGradient = new GradientFill(0, 0, skyGradientColor1, 0, screenHeight, skyGradientColor2);
+		
+	}
+
+
+	public double skyColorGlow = 0;
+	
+	private void doomsdaySky() {
+		
+		int max = 30;
+		skyColorGlow += 0.01;
+		double x = Math.sin(skyColorGlow) * max;
+		System.out.println(100+x);
+		
+		
+		Color skyGradientColor1 = new Color((int)(100+x), 0, 0);
+		Color skyGradientColor2 = new Color(0, 0, 0);
+		
+		skyGradient = new GradientFill(0, 0, skyGradientColor1, 0, screenHeight, skyGradientColor2);
+		
 	}
 
 	private void restartAnimations() {
@@ -712,6 +751,7 @@ public class Game extends BasicGame {
 
 		if (xbox.isButtonRightThumbDown() || input.isKeyPressed(Input.KEY_ENTER)) {
 			debugView = !debugView;			
+//			DOOMSDAY = !DOOMSDAY;
 		}
 
 
