@@ -14,7 +14,8 @@ import org.newdawn.slick.SpriteSheet;
 
 public class Laser extends GameObjectPolygon {
 
-	private ArrayList<Enemy> laserContacts = new ArrayList<Enemy>();
+	private ArrayList<GameObject> laserContacts = new ArrayList<GameObject>();
+	
 	private SpriteSheet laserSheet = Images.getInstance().getSpriteSheet("images/laser.png", 1500, 100);
 	private Animation laserAnimation;
 	
@@ -58,7 +59,7 @@ public class Laser extends GameObjectPolygon {
 		g.popTransform();
 	}
 	
-	public ArrayList<Enemy> getLaserContacts() {
+	public ArrayList<GameObject> getLaserContacts() {
 		return laserContacts;
 	}
 

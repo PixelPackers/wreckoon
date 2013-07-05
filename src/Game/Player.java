@@ -47,7 +47,7 @@ public class Player {
 	private int laserCounter 		= 0;
 	private int biteCounter 		= 0;
 	private int floatingCounter 	= 0;
-	private int boltCounter			= 0;
+	private int boltCounter			= 1110;
 	private int tmpBoltAmount		= 0;
 	private int pigCounter			= 0;
 	private int deathTimeCounter	= 0;
@@ -1000,11 +1000,25 @@ public class Player {
 		if(!waitingForLaserToBeKilled){
 			this.laserActive = true;	
 			
-			Iterator<Enemy> iterator = laser.getLaserContacts().iterator();
+			Iterator<GameObject> iterator = laser.getLaserContacts().iterator();
 			while (iterator.hasNext()){
-				Enemy enemy = (Enemy) iterator.next();
-				enemy.die();
+				GameObject gameObject = (GameObject) iterator.next();
+				if(gameObject instanceof Enemy) {
+					Enemy enemy = (Enemy) gameObject;
+					enemy.laserHit();
+				}
+				
+				if(gameObject instanceof Shred){
+					Shred shred = (Shred) gameObject;
+					try {
+						shred.grilled();
+					} catch (SlickException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 				iterator.remove();
+				
 			}
 			
 			godmode = true;

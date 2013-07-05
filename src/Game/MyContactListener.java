@@ -58,21 +58,21 @@ public class MyContactListener implements ContactListener{
 		// eye laser
 		if (	(contact.getFixtureA() == game.getPlayer().getLaser().getFixture()
 			|| 	contact.getFixtureB() == game.getPlayer().getLaser().getFixture())) {
-			
+
+			// + enemies
 			for( Enemy enemy : game.getEnemies()){
 				if( enemy.getFixture() == contact.getFixtureA() ||
 					enemy.getFixture() == contact.getFixtureB()
 				){
 					if(game.getPlayer().isLaserActive() ){
-						enemy.throwBack();
-						enemy.die();
+						enemy.laserHit();
 					} else {
-
 						game.getPlayer().getLaser().getLaserContacts().add(enemy);
 					}
 				}
 			}
 			
+			// + gameObject
 			for (GameObject gameObject : game.getDynamicObjects()){
 				if (	gameObject.getBody().getFixtureList() == contact.getFixtureB() 
 					||	gameObject.getBody().getFixtureList() == contact.getFixtureA()){
@@ -81,6 +81,35 @@ public class MyContactListener implements ContactListener{
 //							break;
 				}
 			}
+			
+			// shreds grill party
+			Iterator iterator = game.getDropItems().iterator();
+			while (iterator.hasNext()){
+				DropItem dropItem = (DropItem) iterator.next();
+				
+				if( dropItem instanceof Shred ){
+					Shred shred = (Shred) dropItem;
+					
+
+					if (	shred.getFixture() == contact.getFixtureB() 
+						||	shred.getFixture() == contact.getFixtureA()){
+
+
+						if(game.getPlayer().isLaserActive()){
+							try {
+								shred.grilled();
+							} catch (SlickException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						} else {
+							game.getPlayer().getLaser().getLaserContacts().add(shred);
+						}
+					}
+				}
+			}
+			
+			
 		}
 		
 		// groundpounding
@@ -293,7 +322,7 @@ public class MyContactListener implements ContactListener{
 				if( enemy.getFixture() == contact.getFixtureA() ||
 					enemy.getFixture() == contact.getFixtureB()
 				){
-					if( !game.getPlayer().isLaserActive() ){
+					if( !game.getPlayer().isLaserActive() ){ // damit 
 						game.getPlayer().getLaser().getLaserContacts().remove(enemy);
 					}
 				}
@@ -307,21 +336,21 @@ public class MyContactListener implements ContactListener{
 //					break;
 				}
 			}
-			
+			// shreds grill party end
 			Iterator iterator = game.getDropItems().iterator();
 			while (iterator.hasNext()){
 				DropItem dropItem = (DropItem) iterator.next();
 				
 				if( dropItem instanceof Shred ){
 					Shred shred = (Shred) dropItem;
-					try {
-						shred.grilled();
-					} catch (SlickException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					if (	shred.getFixture() == contact.getFixtureB() 
+						||	shred.getFixture() == contact.getFixtureA()){
+
+						if(!game.getPlayer().isLaserActive()){
+							game.getPlayer().getLaser().getLaserContacts().remove(shred);
+						}
 					}
 				}
-				
 			}
 			
 		}
