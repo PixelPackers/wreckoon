@@ -43,6 +43,7 @@ public class Player {
 	private int biteCounter 		= 0;
 	private int floatingCounter 	= 0;
 	private int boltCounter			= 0;
+	private int tmpBoltAmount		= 0;
 	private int pigCounter			= 0;
 	private int deathTimeCounter	= 0;
 	
@@ -566,7 +567,24 @@ public class Player {
 			}
 		}
 		
+		accountTmpBoltAmount();
+		
 		increaseCounters();
+	}
+
+	private void accountTmpBoltAmount() {
+		
+		
+		int max = 5;
+//		int max = (int) (tmpBoltAmount/20)+1; // "curve value" je kleiner desto weniger wird verrechnet
+		
+		int currAmount = (tmpBoltAmount >= max) ? max : tmpBoltAmount;
+	
+		for (int i = 0; i<currAmount; ++i){
+			increaseBoltCounter();
+			tmpBoltAmount -= 1;
+		}	
+		
 	}
 
 	private void revive() {
@@ -1232,5 +1250,10 @@ public class Player {
 
 	public Checkpoint getCheckpoint() {
 		return lastCheckpoint;
+	}
+	
+	public void partCollected(int amount){
+		this.tmpBoltAmount += amount;
+		
 	}
 }
