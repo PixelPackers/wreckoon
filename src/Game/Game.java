@@ -459,7 +459,10 @@ public class Game extends BasicGame {
 
 		house.drawFront(g, debugView);
 		
-		//laser.draw(g, debugView);
+		if (player.isLaserActive()) {
+			laser.draw(g, debugView);
+		}
+		
 		
 		g.setColor(earthColor);
 		g.fillRect(-21.5f, level.getHeight() - 1f, level.getWidth() + 21f, 10f);

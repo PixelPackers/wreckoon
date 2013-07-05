@@ -5,13 +5,22 @@ import java.util.ArrayList;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.World;
+import org.newdawn.slick.Animation;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.SpriteSheet;
 
 
 public class Laser extends GameObjectPolygon {
 
 	private ArrayList<Enemy> laserContacts = new ArrayList<Enemy>();
+	private SpriteSheet laserSheet = Images.getInstance().getSpriteSheet("images/laser.png", 1500, 100);
+	private Animation laserAnimation;
+	
+	private static float DRAW_WIDTH = 8f;
+	private static float DRAW_HEIGHT = 1f;
+	
 	
 	private static Vec2[] verts = new Vec2[] {
 			new Vec2( 0.3f, -0f),
@@ -21,14 +30,32 @@ public class Laser extends GameObjectPolygon {
 	
 	public Laser(World world, float posX, float posY) throws SlickException {
 		super(world, posX, posY, verts, 0f, 0f, 0f, null, BodyType.KINEMATIC, true);
+		
+		laserAnimation = new Animation(laserSheet, 80);
+		laserAnimation.start();
 	}
 	
 	public void position(float x, float y, float angle) {
 		this.getBody().setTransform(new Vec2(x, y), angle);
 	}
 	
-	public void drawOutline(Graphics g) {
-		super.drawOutline(g);
+	public void draw(Graphics g, boolean debugView){
+		if(debugView)
+			this.drawOutline(g);
+		else 
+			this.drawImage(g);
+	}
+	
+	public void drawImage(Graphics g) {
+		g.pushTransform();
+		g.rotate(getBody().getPosition().x, getBody().getPosition().y, (float) Math.toDegrees(getBody().getAngle()));
+		g.translate(0.15f, -DRAW_HEIGHT / 2);
+		laserAnimation.draw(
+				getBody().getPosition().x,
+				getBody().getPosition().y, 
+				DRAW_WIDTH, 
+				DRAW_HEIGHT);
+		g.popTransform();
 	}
 	
 	public ArrayList<Enemy> getLaserContacts() {
