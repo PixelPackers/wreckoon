@@ -518,7 +518,7 @@ public class Player {
 				this.currentAnimation = animations.get("runJump");
 			}
 			
-			if(!this.isOnGround() && !this.isJumpingFromWall() && !this.groundPounding && !this.dead && !this.laserStarted) {
+			if(!this.isOnGround() && !this.isJumpingFromWall() && !this.groundPounding && !this.dead && !this.laserStarted && !this.doTailwhip) {
 				this.currentAnimation = animations.get("runJump");
 			}
 			
