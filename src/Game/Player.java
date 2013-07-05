@@ -23,14 +23,10 @@ public class Player {
 	private static final float	TAILWHIP_DISTANCE	= 5f;
 	private static final int	TAILWHIP_TIME		= 110;
 	private static final int 	GROUNDPOUND_AIRTIME = 30;
-	private static final int 	LASER_DURATION 		= 50;
+	private static final int 	LASER_DURATION 		= 120;
 	private static final int 	SHOCK_DURATION		= 200;
-//	private final float MAX_VELOCITY_WALKING = 7f;
-//	private final float MAX_VELOCITY_RUNNING = 20f;
-//	private final float ACC_WALKING = 0.5f;
-//	private final float ACC_RUNNING = 0.75f;
-//	
-	// XXX more friction test
+	private static final int 	DEATH_WAIT_TIME		= 70;
+
 	private final float MAX_VELOCITY_WALKING = 1.75f;
 	private final float MAX_VELOCITY_RUNNING = 5f;
 	private final float ACC_WALKING = 0.375f;
@@ -48,7 +44,7 @@ public class Player {
 	private int floatingCounter 	= 0;
 	private int boltCounter			= 0;
 	private int pigCounter			= 0;
-	
+	private int deathTimeCounter	= 0;
 	
 	private float jumpPower				= -10f;
 	private float wallJumpPowerFactor	= 0.3f;
@@ -242,9 +238,9 @@ public class Player {
 //		this.secondFixtureDef.restitution = 0f;
 		this.secondFixtureDef.shape = secondPolygonShape;
 		this.secondPolygonShape = secondPolygonShape;
-
-		secondFixtureDef.filter.maskBits = 1;
-		secondFixtureDef.filter.categoryBits = 1;
+		
+		secondFixtureDef.filter.categoryBits = 2;
+		secondFixtureDef.filter.maskBits = 1 + 4 + 8;
 		
 		this.secondFixture = this.body.createFixture(secondFixtureDef);
 					
@@ -334,14 +330,22 @@ public class Player {
 		sensorTopRight 		= sensorList.get(3);
 	}
 	
-	public void die() {
-		if (!godmode) {
-			this.currentAnimation = animations.get("deathAir");
-			this.dead = true;
-			this.deadAndOnGround = false;
+	public void die(boolean throwback) {
+		if (!dead) {
+			if (!godmode) {
+				this.currentAnimation = animations.get("deathAir");
+				this.dead = true;
+				this.deadAndOnGround = false;
+			}
+			
+			if (throwback) {
+				float force = 5f;		
+				this.getBody().setLinearVelocity(new Vec2 (body.getLinearVelocity().x, -force) );
+			}
+			
+			deathTimeCounter = 0;
+			lock();
 		}
-		lock();
-		body.setTransform(lastCheckpoint.getMidPoint(), 0f);
 	}
 
 	public void draw(Graphics g, boolean debugView){
@@ -488,7 +492,7 @@ public class Player {
 			}
 	//		this.adjustHitboxes();
 			
-			increaseCounters();
+			
 			
 			// FIXME das oder fixed rotation verwenden?
 			//this.body.m_sweep.a = 0;
@@ -562,10 +566,19 @@ public class Player {
 				this.getBody().setLinearVelocity( new Vec2(getBody().getLinearVelocity().x + conveyorSpeed, getBody().getLinearVelocity().y) );
 			}
 		} else {
-			body.setTransform(lastCheckpoint.getMidPoint(), 0f);
-			dead = false;
-			unlock();
+			if (deathTimeCounter > DEATH_WAIT_TIME) {
+				revive();
+			}
 		}
+		
+		increaseCounters();
+	}
+
+	private void revive() {
+		body.setTransform(lastCheckpoint.getMidPoint(), 0f);
+		body.setLinearVelocity(new Vec2(0f, 0f));
+		dead = false;
+		unlock();
 	}
 
 	public void accelerate(float magnitude) {
@@ -1004,6 +1017,7 @@ public class Player {
 		++jumpCounter;
 		++laserCounter;
 		++biteCounter;
+		++deathTimeCounter;
 	}
 	
 	

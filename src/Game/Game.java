@@ -15,8 +15,12 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
+import org.newdawn.slick.ShapeFill;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
+import org.newdawn.slick.fills.GradientFill;
+import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.geom.Shape;
 
 import com.google.gson.Gson;
 
@@ -69,14 +73,19 @@ public class Game extends BasicGame {
 	private static ArrayList<Enemy>			enemiesToRemove = new ArrayList<Enemy>();
 //	private static ArrayList<Shred>			shredsToRemove 	= new ArrayList<Shred>();
 
-
+//	private Color backgroundColor = new Color(112, 149, 163);
+	private static Color skyGradientColor1 = new Color(112, 149, 163);
+	private static Color skyGradientColor2 = new Color(152, 199, 193);
+	
+	private static Rectangle skyRect = new Rectangle(0, 0, screenWidth, screenHeight);
+	private static ShapeFill skyGradient = new GradientFill(0, 0, skyGradientColor1, 0, screenHeight, skyGradientColor2);
+	
 	private static House house;
 	private static Camera cam = new Camera(0, 0);
 	private static Level level;
 
 	private static Xbox360Controller xbox;
-
-	private Color backgroundColor = new Color(112, 149, 163);
+	
 	private float BACKGROUND_SCALE = 0.008f;
 	private float smoothBoltGUIAngle;
 	private static Image[] trashpile = new Image[5];
@@ -238,7 +247,8 @@ public class Game extends BasicGame {
 			float targetCamX = (float) (player.getBody().getPosition().x + xbox.getRightThumbX() * 3f);
 			float targetCamY = (float) (player.getBody().getPosition().y + xbox.getRightThumbY() * 3f);
 			//if (targetCamY > level.getHeight() - screenHeight/2/zoom) targetCamY = level.getHeight() - screenHeight/2/zoom;
-			cam.follow(	targetCamX,	targetCamY, 10);
+			cam.follow(targetCamX, targetCamY, 10);
+			cam.wiggle((player.isLaserActive()) ? 1f : 0f);
 			//if (cam.getY() > level.getHeight() - screenHeight/2/zoom) cam.setY(level.getHeight() - screenHeight/2/zoom); 
 			
 			for (GameObject o :  objectsToRemove){
@@ -335,7 +345,7 @@ public class Game extends BasicGame {
 	@Override
 	public void render(GameContainer gc, Graphics g) throws SlickException {
 		
-		g.setBackground(backgroundColor);
+		g.fill(skyRect, skyGradient);
 
 		drawBackgroundObjects(g);
 
@@ -446,7 +456,6 @@ public class Game extends BasicGame {
 		g.drawString("pigs: " + player.getPigCounter(), 10, 30);
 		
 		g.drawString("left thumbstick angle: " +  xbox.getLeftThumbDirection(), 10, 50);
-		
 	}
 
 	private void drawBoltCounter() throws SlickException {
@@ -582,7 +591,7 @@ public class Game extends BasicGame {
 			}
 		}
 
-		if (xbox.getLeftThumbY() > 0.5f || input.isKeyPressed(Input.KEY_DOWN) || input.isKeyPressed(Input.KEY_S)) {
+		if (xbox.isButtonBDown() || input.isKeyPressed(Input.KEY_DOWN) || input.isKeyPressed(Input.KEY_S)) {
 			if( !player.isCharging() && !player.isOnGround()) {
 				player.groundpoundInit();
 			}
@@ -768,10 +777,7 @@ public class Game extends BasicGame {
 		if(input.isKeyPressed(input.KEY_P)){
 			player.bite();
 		}
-
-		if(input.isKeyPressed(input.KEY_L)){
-			player.die();
-		}
+		
 	}
 
 	public GameObject chooseTelekinesisTarget() {
