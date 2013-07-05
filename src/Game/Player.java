@@ -66,6 +66,7 @@ public class Player {
 	private boolean laserStarted	= false;
 	private boolean wasLasering		= false;
 	private boolean waitingForLaserToBeKilled = false;
+	private boolean frontflipping = false;
 	
 	
 	private boolean locked = false;
@@ -515,8 +516,12 @@ public class Player {
 				this.currentAnimation = animations.get("runJump");
 			}
 			
-			if(!this.isOnGround() && !this.isJumpingFromWall() && !this.groundPounding && !this.dead && !this.laserStarted && !this.doTailwhip) {
+			if(!isOnGround() && !isJumpingFromWall() && !groundPounding && !dead && !laserStarted && !doTailwhip && !frontflipping) {
 				this.currentAnimation = animations.get("runJump");
+			}
+			
+			if(frontflipping && currentAnimation.isStopped()){
+				frontflipping=false;
 			}
 			
 			if (this.isGroundPounding() && !this.isOnGround() && this.currentAnimation.isStopped()) {
@@ -724,6 +729,7 @@ public class Player {
 			}
 			
 			this.body.setLinearVelocity(new Vec2(jumpSpeedX, jumpSpeedY));
+//			frontflip();
 		}
 		
 	}
@@ -1290,5 +1296,11 @@ public class Player {
 	}
 	public void setWaitingForLaserToBeKilled(boolean waitingForLaserToBeKilled) {
 		this.waitingForLaserToBeKilled = waitingForLaserToBeKilled;
+	}
+	
+	public void frontflip(){
+		frontflipping = true;
+		this.currentAnimation = animations.get("groundpound");
+		this.currentAnimation.restart();
 	}
 }
