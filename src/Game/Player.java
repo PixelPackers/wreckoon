@@ -406,11 +406,6 @@ public class Player {
 			}
 			g.draw(polygonTailwhipToDraw);
 		}
-		
-		// laser
-		if (laserActive) {
-			laser.drawOutline(g);
-		}
 			
 	}
 	

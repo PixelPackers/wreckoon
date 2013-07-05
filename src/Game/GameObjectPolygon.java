@@ -43,7 +43,7 @@ public class GameObjectPolygon extends GameObject {
 		float angle = this.getBody().getAngle();
 		
 		this.getImage().setRotation(-(float) Math.toDegrees(angle));
-		this.getImage().draw(position.x, -position.y, sizeX, sizeY);
+		this.getImage().draw(position.x, position.y, sizeX, sizeY);
 	}
 
 	@Override
