@@ -1,6 +1,7 @@
 package Game;
 
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Filter;
 import org.jbox2d.dynamics.World;
 import org.newdawn.slick.SlickException;
 
@@ -13,6 +14,11 @@ public class Nut extends DropItem {
 
 		MIN_TIME = 50;
 		DRAW_FACTOR = 0.1f;
+		
+		Filter filter = new Filter();
+		filter.maskBits = 1;
+		filter.categoryBits = 1;
+		this.getFixture().setFilterData(filter);
 	}
 	
 	public void collect(){

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.Filter;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.newdawn.slick.Animation;
@@ -67,6 +68,12 @@ public abstract class Enemy extends GameObjectBox {
 		
 		pigSize = staticPigSize; 
 		staticPigSize = (float)(Math.random() *  (MAX_SIZE-MIN_SIZE) + MIN_SIZE);
+		
+
+		Filter filter = new Filter();
+		filter.maskBits = 1;
+		filter.categoryBits = 2;
+		this.getFixture().setFilterData(filter);
 		
 		createSensors();
 	}

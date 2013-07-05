@@ -2,6 +2,7 @@ package Game;
 
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.Filter;
 import org.jbox2d.dynamics.World;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
@@ -16,9 +17,14 @@ public class Shred extends DropItem {
 		
 		this.pigSizeFactor = pigSizeFactor;
 		MIN_TIME = 115;
-		MAX_TIME = 115;
+		MAX_TIME = 1150;
 		
 		DRAW_FACTOR = 0.17f * pigSizeFactor;
+		
+		Filter filter = new Filter();
+		filter.maskBits = 1;
+		filter.categoryBits = 2;
+		this.getFixture().setFilterData(filter);
 	}
 	
 	public void collect(){
@@ -28,5 +34,10 @@ public class Shred extends DropItem {
 	@Override
 	public void update() {
 		super.update();
+	}
+	
+	@Override
+	public boolean isCollectable() {
+		return false;
 	}
 }

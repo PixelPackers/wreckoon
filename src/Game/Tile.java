@@ -56,6 +56,9 @@ public class Tile {
 //		fixtureDef.friction		= 0.8f;
 		fixtureDef.restitution	= 0f;
 		
+		fixtureDef.filter.categoryBits = 1;
+//		fixtureDef.filter.maskBits = 1;
+		
 		for(Vec2[] verts : arrayList){
 
 			PolygonShape polygonShape = new PolygonShape();

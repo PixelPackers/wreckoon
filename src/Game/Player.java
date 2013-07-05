@@ -243,6 +243,9 @@ public class Player {
 		this.secondFixtureDef.shape = secondPolygonShape;
 		this.secondPolygonShape = secondPolygonShape;
 
+		secondFixtureDef.filter.maskBits = 1;
+		secondFixtureDef.filter.categoryBits = 1;
+		
 		this.secondFixture = this.body.createFixture(secondFixtureDef);
 					
 		this.createSensors();
