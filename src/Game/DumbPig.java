@@ -29,7 +29,6 @@ public class DumbPig extends Enemy{
 		
 		initAnimations();
 		
-		this.setImage(Images.getInstance().getImage("images/dumbpig.png"));
 		this.getBody().setFixedRotation(true);
 	}
 
@@ -73,10 +72,10 @@ public class DumbPig extends Enemy{
 	@Override
 	protected void initAnimations() throws SlickException {
 
-		SpriteSheet sheetWalk = new SpriteSheet("images/dumbpigwalk.png", 	550, 550);
-		SpriteSheet sheetIdle = new SpriteSheet("images/dumbpigidle.png", 	550, 550);
-		SpriteSheet sheetIdle2 = new SpriteSheet("images/dumbpigidlescratch.png", 	550, 550);
-		SpriteSheet sheetDie  = new SpriteSheet("images/smartpigdeath.png", 	550, 550);
+		SpriteSheet sheetWalk = new SpriteSheet("images/dumbpigwalk.png", 	275, 276);
+		SpriteSheet sheetIdle = new SpriteSheet("images/dumbpigidle.png", 	275, 275);
+		SpriteSheet sheetIdle2 = new SpriteSheet("images/dumbpigidlescratch.png", 	275, 275);
+		SpriteSheet sheetDie  = new SpriteSheet("images/smartpigdeath.png", 	275, 275);
 		
 		Animation animationWalk = new Animation(sheetWalk, 80);
 

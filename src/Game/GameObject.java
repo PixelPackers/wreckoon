@@ -46,7 +46,7 @@ public abstract class GameObject {
 	}
 
 	public void draw(Graphics g, boolean debugView){
-		if(debugView || this.img == null)
+		if(debugView /*|| this.img == null*/)
 			this.drawOutline(g);
 		else 
 			this.drawImage();

@@ -16,7 +16,7 @@ public class Generator extends GameObjectBox {
 	private Animation animation;
 	
 	public Generator(World world, float posX, float posY, float width, float height) throws SlickException {
-		super(world, posX, posY, width, height, 0, 0, 0, "images/generator.png", BodyType.STATIC, true);
+		super(world, posX, posY, width, height, 0, 0, 0, null, BodyType.STATIC, true);
 
 		this.position.x = posX;
 		this.position.y = posY;
@@ -29,7 +29,7 @@ public class Generator extends GameObjectBox {
 		SpriteSheet spriteSheet = null;
 		
 		try {
-			spriteSheet = Images.getInstance().getSpriteSheet("images/generatoranimated.png", 	770, 1135);
+			spriteSheet = Images.getInstance().getSpriteSheet("images/generatoranimated.png", 	385, 568);
 		} catch (SlickException e) {
 			e.printStackTrace();
 		}

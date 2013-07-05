@@ -25,7 +25,6 @@ public class SmartPig extends Enemy {
 		
 		PIG_CLASS_SIZE_FACTOR = 1.5f;
 		this.getBody().setFixedRotation(true);
-		this.setImage(Images.getInstance().getImage("images/smartpig.png"));
 		initAnimations();
 		
 	}
@@ -97,11 +96,11 @@ public class SmartPig extends Enemy {
 	@Override
 	protected void initAnimations() throws SlickException {
 
-		SpriteSheet sheetWalk= new SpriteSheet("images/smartpigWalk.png", 	550, 600);
-		SpriteSheet sheetRun = new SpriteSheet("images/smartpigrun.png", 	580, 610);
-		SpriteSheet sheetIdle = new SpriteSheet("images/smartpigIdle.png", 	550, 600);
-		SpriteSheet sheetDie  = new SpriteSheet("images/smartpigdeath.png", 	550, 600);
-		SpriteSheet sheetDisabled  = new SpriteSheet("images/smartpigdisable.png", 	550, 500);
+		SpriteSheet sheetWalk= new SpriteSheet("images/smartpigWalk.png", 	275, 330);
+		SpriteSheet sheetRun = new SpriteSheet("images/smartpigrun.png", 	290, 306);
+		SpriteSheet sheetIdle = new SpriteSheet("images/smartpigIdle.png", 	275, 300);
+		SpriteSheet sheetDie  = new SpriteSheet("images/smartpigdeath.png", 	275, 300);
+		SpriteSheet sheetDisabled  = new SpriteSheet("images/smartpigdisable.png", 	275, 250);
 		
 		
 		Animation animationWalk = new Animation(sheetWalk, 120);

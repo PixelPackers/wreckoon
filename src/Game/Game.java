@@ -121,7 +121,7 @@ public class Game extends BasicGame {
 		}
 		
 		pauseImage = Images.getInstance().getImage("images/Pause.png");
-		digits = Images.getInstance().getSpriteSheet("images/digits.png", 100, 160);
+		digits = Images.getInstance().getSpriteSheet("images/digits.png", 50, 80);
 
 		world = new World(new Vec2(0f, 20f), false);
 
@@ -370,14 +370,14 @@ public class Game extends BasicGame {
 		player.getCurrentAnimation().stop();
 	}
 	
-	private void drawRightAlignedDigits(int number, int x, int y, float scale) {
+	private void drawRightAlignedDigits(int number, int x, int y) {
 		String text = Integer.toString(number);
 		while (text.length() < 4) {
 			text = "0" + text;
 		}
 		for (int i = 0; i < text.length(); ++i) {
 			int c = text.charAt(i) - 48;
-			digits.getSprite(c, 0).draw(x + (i * 100 - text.length() * 100) * scale, y, scale);
+			digits.getSprite(c, 0).draw(x + (i * 50 - text.length() * 50), y);
 		}
 	}
 
@@ -507,7 +507,7 @@ public class Game extends BasicGame {
 		nut.setRotation(smoothBoltGUIAngle * 30);
 		nut.setAlpha(1f);
 		nut.draw(screenWidth - 130, 36);
-		drawRightAlignedDigits(boltGUIAngle, screenWidth - 150, 40, 0.5f);
+		drawRightAlignedDigits(boltGUIAngle, screenWidth - 150, 40);
 	}
 
 	public static void main(String[] args) throws SlickException {
