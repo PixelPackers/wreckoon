@@ -43,9 +43,10 @@ public class Shred extends DropItem {
 	}
 	
 	public void grilled() throws SlickException{
-		// FIXME wenn grilled bilder drin sind --> einkommentieren
-//		setImage(new Image( image.getResourceReference().replace(".png", "laser.png") ) );
-		this.grilled = true;
+		if(!grilled){
+			super.image = new Image( image.getResourceReference().replace(".png", "laser.png") ) ;
+			this.grilled = true;
+		}
 	}
 	
 }

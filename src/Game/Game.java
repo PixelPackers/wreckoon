@@ -500,7 +500,8 @@ public class Game extends BasicGame {
 //		g.drawString("ShootingDirection: " + player.getShootingDirection(), 200, 10);
 //		g.drawString("ShootingPower: " + player.getShootingPower(), 200, 30);
 //		g.drawString("pos: " + player.getBody().getPosition(), 200, 50);
-		g.drawString("pigs: " + player.getPigCounter(), 10, 30);
+//		g.drawString("pigs: " + player.getPigCounter(), 10, 30);
+		g.drawString("laserc: " + player.getLaserTime(), 10, 30);
 		
 		g.drawString("left thumbstick angle: " +  xbox.getLeftThumbDirection(), 10, 50);
 	}

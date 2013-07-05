@@ -317,4 +317,9 @@ public abstract class Enemy extends GameObjectBox {
 	public boolean isDizzy() {
 		return dizzy;
 	}
+	
+	public void laserHit(){
+		this.throwBack();
+		this.die();
+	}
 }

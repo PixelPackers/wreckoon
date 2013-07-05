@@ -35,6 +35,8 @@ public class Player {
 	private final float ACC_WALKING = 0.375f;
 	private final float ACC_RUNNING = 0.4375f;
 	private final float FRICTION = 1f;
+    private static final int         BOLT_PRICE_FOR_LASER= 10;
+
 	
 	private int groundPoundCounter	= 0;
 	private int tailwhipCounter		= 0;
@@ -45,10 +47,11 @@ public class Player {
 	private int laserCounter 		= 0;
 	private int biteCounter 		= 0;
 	private int floatingCounter 	= 0;
-	private int boltCounter			= 0;
+	private int boltCounter			= 1110;
 	private int tmpBoltAmount		= 0;
 	private int pigCounter			= 0;
 	private int deathTimeCounter	= 0;
+	private int laserTime           = 0;
 	
 	private float jumpPower				= -10f*2f;
 	private float wallJumpPowerFactor	= 0.3f;
@@ -470,6 +473,8 @@ public class Player {
 		
 		if(!dead) {
 		
+			adjustLaserTime();
+			
 //			// slow down player if no directionmovment button is pressed
 //			if( this.conveyorSpeed == 0 && !this.movementButtonIsDown){
 //				float slowDownForce = 0.5f;
@@ -585,15 +590,6 @@ public class Player {
 				this.currentAnimation = animations.get("wallIdle");
 			}
 			
-			if (this.dead && this.isOnGround() ) {
-				
-				if ( !this.deadAndOnGround ) {
-					this.deadAndOnGround = true;
-					
-					this.currentAnimation = animations.get("death");
-					this.currentAnimation.restart();
-				}
-			}	
 			
 			if( laserCounter == LASER_DURATION ){
 				destroyLaser();
@@ -621,6 +617,11 @@ public class Player {
 			if (deathTimeCounter > DEATH_WAIT_TIME) {
 				revive();
 			}
+			 if (this.isOnGround() && !this.deadAndOnGround ) {
+				 this.deadAndOnGround = true;
+				 this.currentAnimation = animations.get("death");
+				 this.currentAnimation.restart();
+				}
 		}
 		
 		accountTmpBoltAmount();
@@ -1023,11 +1024,25 @@ public class Player {
 		if(!waitingForLaserToBeKilled){
 			this.laserActive = true;	
 			
-			Iterator<Enemy> iterator = laser.getLaserContacts().iterator();
+			Iterator<GameObject> iterator = laser.getLaserContacts().iterator();
 			while (iterator.hasNext()){
-				Enemy enemy = (Enemy) iterator.next();
-				enemy.die();
+				GameObject gameObject = (GameObject) iterator.next();
+				if(gameObject instanceof Enemy) {
+					Enemy enemy = (Enemy) gameObject;
+					enemy.laserHit();
+				}
+				
+				if(gameObject instanceof Shred){
+					Shred shred = (Shred) gameObject;
+					try {
+						shred.grilled();
+					} catch (SlickException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 				iterator.remove();
+				
 			}
 			
 			godmode = true;
@@ -1059,7 +1074,7 @@ public class Player {
 	public boolean bite(){
 	
 		
-		if(!locked && !laserAble){
+		if(!locked && !laserAble && boltCounter >= BOLT_PRICE_FOR_LASER){
 			
 			if (this.ableToGetLaser && this.isOnGround()){
 				lock();
@@ -1087,6 +1102,8 @@ public class Player {
 		this.biting = false;
 		this.currentAnimation = animations.get("idle");
 		this.laserAble = true;
+        boltCounter -= BOLT_PRICE_FOR_LASER;
+
 		unlock();
 	}
 	
@@ -1356,5 +1373,18 @@ public class Player {
 
 	public GameObjectCircle getWheel() {
 		return wheel;
+	}
+	
+    public void adjustLaserTime(){
+    	if(laserActive){
+    		--laserTime;        
+    	}
+    	if(biting){
+    		++laserTime;
+    	}
+    }
+
+    public int getLaserTime() {
+		return laserTime;
 	}
 }
