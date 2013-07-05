@@ -422,7 +422,6 @@ public class Player {
 		float drawHeight = currentAnimation.getHeight() / 150f;
 		drawWidth= (left) ? drawWidth: -drawWidth;
 		
-		System.out.println(currentAnimation.getImage(0).getResourceReference());
 		Vec2 offset = animationOffsets.get(currentAnimation.getImage(0).getResourceReference());
 		float scale = 0.5f;
 		currentAnimation.draw( position.x + 0*drawWidth*0.5f + ((left) ? -offset.x : offset.x),
@@ -761,22 +760,23 @@ public class Player {
 				
 			} else {
 
-				this.currentAnimation = animations.get("wallJump");
-				this.currentAnimation.restart();
 				
 				if(leftWallColliding()){
 					
-					this.left = false;
 					jumpSpeedX = -this.jumpPower * 0.5f;
 					this.jumpingFromWall = true;
+					this.left = false;
 					
 				} else if(rightWallColliding()){
 					
-					this.left = true;
 					jumpSpeedX = this.jumpPower * 0.5f;
 					this.jumpingFromWall = true;
+					this.left = true;
 				
 				}
+
+				this.currentAnimation = animations.get("wallJump");
+				this.currentAnimation.restart();
 			}
 			
 			this.body.setLinearVelocity(new Vec2(jumpSpeedX, jumpSpeedY));
@@ -1205,7 +1205,7 @@ public class Player {
 	}
 
 	public void setLeft ( boolean left){
-		if( locked ) {
+		if( locked && !laserActive) {
 			return;
 		}
 		
