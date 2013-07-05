@@ -1258,7 +1258,6 @@ public class Player {
 	}
 	
 	public void partCollected(int amount){
-		System.out.println("part collected: "+amount);
 		this.tmpBoltAmount += amount;
 		
 	}
