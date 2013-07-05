@@ -111,7 +111,7 @@ public class MyContactListener implements ContactListener{
 		}
 		
 //		player contact
-		if( game.getPlayer().getFixture() == contact.getFixtureA() || game.getPlayer().getFixture() == contact.getFixtureB() ){
+		if( playerContact(contact)){
 		
 //			+ enemy contact
 			for( Enemy enemy : game.getEnemies()){
@@ -225,6 +225,13 @@ public class MyContactListener implements ContactListener{
 			}
 		}
 	}
+
+	private boolean playerContact(Contact contact) {
+		return game.getPlayer().getFixture() == contact.getFixtureA() ||
+			game.getPlayer().getFixture() == contact.getFixtureB() ||
+			game.getPlayer().getWheel().getFixture() == contact.getFixtureA() ||
+			game.getPlayer().getWheel().getFixture() == contact.getFixtureB();
+	}
 	
 	@Override	
 	public void endContact(Contact contact) {
@@ -247,7 +254,7 @@ public class MyContactListener implements ContactListener{
 	
 
 //		 player contact
-		if( game.getPlayer().getFixture() == contact.getFixtureA() || game.getPlayer().getFixture() == contact.getFixtureB() ){
+		if( playerContact(contact) ){
 						
 //			+ generator
 			if(game.getGenerator().getFixture() == contact.getFixtureA() || game.getGenerator().getFixture() == contact.getFixtureB() ){

@@ -9,9 +9,11 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.Filter;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
@@ -20,6 +22,7 @@ import org.newdawn.slick.geom.Polygon;
 
 public class Player {
 
+	private static final float DENSITY = 11f;
 	private static final float	TAILWHIP_DISTANCE	= 5f;
 	private static final int	TAILWHIP_TIME		= 110;
 	private static final int 	GROUNDPOUND_AIRTIME = 30;
@@ -31,7 +34,7 @@ public class Player {
 	private final float MAX_VELOCITY_RUNNING = 5f;
 	private final float ACC_WALKING = 0.375f;
 	private final float ACC_RUNNING = 0.4375f;
-	private final float playerFriction = 1f;
+	private final float FRICTION = 1f;
 	
 	private int groundPoundCounter	= 0;
 	private int tailwhipCounter		= 0;
@@ -47,7 +50,7 @@ public class Player {
 	private int pigCounter			= 0;
 	private int deathTimeCounter	= 0;
 	
-	private float jumpPower				= -10f;
+	private float jumpPower				= -10f*2f;
 	private float wallJumpPowerFactor	= 0.3f;
 	private float groundPoundPower		= 12.5f;
 
@@ -78,6 +81,7 @@ public class Player {
 	private float	accelerationX = ACC_WALKING;
 	private float	maxVelocity = MAX_VELOCITY_WALKING;
 	
+	private GameObjectCircle wheel;
 
 	private GameObject 	lockedObject			= null;
 	private boolean		charging				= false;
@@ -203,9 +207,29 @@ public class Player {
 		};
 		
 		initAnimations();
-		
 
 		this.body = world.createBody(bodyDef);
+		
+		wheel = new GameObjectCircle(world, 0f, 0f, width *0.5f, 5f, FRICTION, 0f, null, BodyType.DYNAMIC);
+		wheel.getBody().setAngularDamping(100000000f);
+		
+		Filter filter = new Filter();
+		filter.maskBits = 1 + 4 + 8;
+		filter.categoryBits = 8;
+		wheel.getFixture().setFilterData(filter);
+		
+		RevoluteJointDef revoluteJointDef = new RevoluteJointDef();
+		
+//		revoluteJointDef.enableMotor = true;
+//		revoluteJointDef.motorSpeed = 200;
+//		revoluteJointDef.maxMotorTorque = 100;
+		
+		revoluteJointDef.bodyA = getBody();
+		revoluteJointDef.bodyB = wheel.getBody();
+		revoluteJointDef.collideConnected = false;
+		revoluteJointDef.localAnchorA.set(new Vec2(0f, 0f));
+		revoluteJointDef.localAnchorB.set(new Vec2(0f, 0f));
+		world.createJoint(revoluteJointDef);
 		
 		// FIXME das oder body.sweep verwenden?
 		this.body.setFixedRotation(true);
@@ -215,10 +239,10 @@ public class Player {
 		
 		// player body hitbox
 		Vec2[] vertsSensor = new Vec2[]{
-			new Vec2(-height * 0.5f,  width * 0.5f),
+			new Vec2(-height * 0.5f,  width * 0*0.5f),
 			new Vec2(-height * 0.5f, -width * 0.5f),
 			new Vec2( height * 0.5f, -width * 0.5f),
-			new Vec2( height * 0.5f,  width * 0.5f)
+			new Vec2( height * 0.5f,  width * 0*0.5f)
 		};
 		
 //		Vec2[] vertsSensor = new Vec2[]{				
@@ -235,8 +259,8 @@ public class Player {
 		PolygonShape secondPolygonShape = new PolygonShape();
 		secondPolygonShape.set(vertsSensor, vertsSensor.length);
 		
-		this.secondFixtureDef.density 	= 11f;
-		this.secondFixtureDef.friction 	= playerFriction;
+		this.secondFixtureDef.density 	= DENSITY;
+		this.secondFixtureDef.friction 	= FRICTION;
 		// XXX braucht ma das? evtl wegen vom reifen wegbouncen? selbes wie oben
 //		this.secondFixtureDef.restitution = 0f;
 		this.secondFixtureDef.shape = secondPolygonShape;
@@ -362,6 +386,8 @@ public class Player {
 		this.drawImage();
 		this.drawOutline(g);
 		
+		wheel.drawOutline(g);
+		
 	}
 	
 	public void drawImage(){
@@ -420,20 +446,20 @@ public class Player {
 		
 		if(!dead) {
 		
-	//		// slow down player if no directionmovment button is pressed
-	//		if( this.conveyorSpeed == 0 && !this.movementButtonIsDown){
-	//			float slowDownForce = 0.5f;
-	//			float slowDownThreshold = 0.15f;
-	//			// left
-	//			if(this.getBody().getLinearVelocity().x < -slowDownThreshold && this.isOnGround() ) {
-	//				this.getBody().applyLinearImpulse(new Vec2(slowDownForce,0), this.getBody().getPosition());
-	//			} else
-	//			
-	//			// right
-	//			if(this.getBody().getLinearVelocity().x > slowDownThreshold && this.isOnGround() ) {
-	//				this.getBody().applyLinearImpulse(new Vec2(-slowDownForce,0), this.getBody().getPosition());
-	//			}
-	//		}
+//			// slow down player if no directionmovment button is pressed
+//			if( this.conveyorSpeed == 0 && !this.movementButtonIsDown){
+//				float slowDownForce = 0.5f;
+//				float slowDownThreshold = 0.15f;
+//				// left
+//				if(this.getBody().getLinearVelocity().x < -slowDownThreshold && this.isOnGround() ) {
+//					this.getBody().applyLinearImpulse(new Vec2(slowDownForce,0), this.getBody().getPosition());
+//				} else
+//				
+//				// right
+//				if(this.getBody().getLinearVelocity().x > slowDownThreshold && this.isOnGround() ) {
+//					this.getBody().applyLinearImpulse(new Vec2(-slowDownForce,0), this.getBody().getPosition());
+//				}
+//			}
 			
 			// float in air while shooting laser
 			if ( this.laserStarted ){
@@ -595,6 +621,7 @@ public class Player {
 
 	private void revive() {
 		body.setTransform(lastCheckpoint.getMidPoint(), 0f);
+		wheel.getBody().setTransform(lastCheckpoint.getMidPoint(), 0f);
 		body.setLinearVelocity(new Vec2(0f, 0f));
 		dead = false;
 		deadAndOnGround = false;
@@ -1301,5 +1328,9 @@ public class Player {
 		frontflipping = true;
 		this.currentAnimation = animations.get("groundpound");
 		this.currentAnimation.restart();
+	}
+
+	public GameObjectCircle getWheel() {
+		return wheel;
 	}
 }

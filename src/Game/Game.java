@@ -328,6 +328,7 @@ public class Game extends BasicGame {
 		}
 		
 		xbox.resetStates();
+
 	}
 	
 
