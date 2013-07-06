@@ -162,8 +162,6 @@ public abstract class Enemy extends GameObjectBox {
 	@Override
 	public void drawOutline(Graphics g){
 		
-		drawImage();
-		
 		Polygon polygonToDraw = new Polygon();
 		Vec2[] verts = this.polygonShape.getVertices();
 		for (int i=0; i< this.polygonShape.m_vertexCount; ++i) {
@@ -176,7 +174,6 @@ public abstract class Enemy extends GameObjectBox {
 			g.setColor(Color.red);
 		g.draw(polygonToDraw);
 		g.setColor(Color.white);
-		
 		
 		// draw sensors
 		for (MySensor mySensor : sensorList){

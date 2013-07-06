@@ -8,7 +8,8 @@ import org.newdawn.slick.SlickException;
 
 public class GameObjectBox extends GameObjectPolygon {
 
-	private float width, height;
+	protected float width;
+	protected float height;
 
 	public GameObjectBox(World world, float posX, float posY, float width, float height, float density, float friction, float restitution,
 			String imgPath, BodyType bodyType) throws SlickException {

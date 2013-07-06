@@ -152,15 +152,13 @@ public class Game extends BasicGame {
 		}
 
 		// create the parts
-		for (Part p : level.getParts()) {
-			parts.add(new Part(world, this, p.getX(), p.getY()));
+		for (Girder gi : level.getGirders()) {
+			girders.add(new Girder(world, gi.getX(), gi.getY(), 7.75f));
 		}
 		
-		girders.add(new Girder(world, 30f,  -5f, 7.75f));
-		girders.add(new Girder(world, 25f,  -6f, 7.75f));
-		girders.add(new Girder(world, 35f, -10f, 7.75f));
-
-		generators.add(new Generator(world, 5f, 14.6f, 5f*0.25f, 6f*0.25f));
+		for (Generator ge : level.getGenerators()) {
+			generators.add(new Generator(world, ge.getX(), ge.getY(), 1.25f, 1.5f));
+		}
 
 		//conveyor.add(new Conveyor(world, 7f, 4f, 11f, 0.1f, 0.5f, 0.5f, 0.5f));
 
@@ -448,7 +446,9 @@ public class Game extends BasicGame {
 		}
 		
 		for (Enemy enemy : enemies) {
-			enemy.draw(g, debugView);	
+			if (!enemy.getsGrilled) {
+				enemy.draw(g, debugView);	
+			}
 		}
 		
 		player.draw(g, debugView);
@@ -491,6 +491,12 @@ public class Game extends BasicGame {
 		
 		if (player.isLaserActive()) {
 			laser.draw(g, debugView);
+		}
+		
+		for (Enemy enemy : enemies) {
+			if (enemy.getsGrilled) {
+				enemy.draw(g, debugView);
+			}
 		}
 		
 		g.popTransform();

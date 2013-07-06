@@ -10,8 +10,7 @@ import org.newdawn.slick.SpriteSheet;
 public class Generator extends GameObjectBox {
 
 	private Vec2 position = new Vec2();
-	private float width;
-	private float height;
+	private float x, y;
 	
 	private Animation animation;
 	
@@ -41,6 +40,14 @@ public class Generator extends GameObjectBox {
 	
 	public Animation getAnimation() {
 		return animation;
+	}
+	
+	public float getX() {
+		return x;
+	}
+	
+	public float getY() {
+		return y;
 	}
 	
 	@Override

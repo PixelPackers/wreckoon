@@ -10,8 +10,6 @@ import org.newdawn.slick.SpriteSheet;
 public class Conveyor extends GameObjectBox {
 	
 	private Vec2 position = new Vec2();
-	private float width;
-	private float height;
 	private float speed = 0.3f;
 	
 	private Animation animation;
