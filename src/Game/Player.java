@@ -848,8 +848,8 @@ public class Player {
 			this.doTailwhip = true;
 			this.tailwhipCounter = 0;
 			
-			float tailWidth 	= 0.7f;
-			float tailHeight	= 0.2f;
+			float tailWidth 	= 0.7f*0.25f;
+			float tailHeight	= 0.2f*0.25f;
 			float direction = this.width;
 			float distance = TAILWHIP_DISTANCE;
 			

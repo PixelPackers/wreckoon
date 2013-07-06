@@ -81,6 +81,8 @@ public class Game extends BasicGame {
 	private static Rectangle skyRect;
 	private static ShapeFill skyGradient;
 	
+	private static int doomsdayCounter = 0;
+	
 	private static House house;
 	private static Camera cam = new Camera(0, 0);
 	private static Level level;
@@ -260,6 +262,13 @@ public class Game extends BasicGame {
 			cam.follow(targetCamX, targetCamY, 10);
 			if(DOOMSDAY){
 				cam.wiggle((player.isLaserActive()) ? 1f : 0.5f);
+				
+				if (doomsdayCounter > 450 ) {
+					enemies.add(new SmartPig(this, player.getBody().getPosition().x - 5f, player.getBody().getPosition().y - 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+					doomsdayCounter = 0;
+				}
+				++doomsdayCounter;
+				
 			} else {
 				cam.wiggle((player.isLaserActive()) ? 1f : 0f);	
 			}
