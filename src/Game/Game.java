@@ -847,6 +847,9 @@ public class Game extends BasicGame {
 		}
 		
 		if(xbox.isButtonYUp()){
+			if(player.isBiting()){
+				player.stopBiting();
+			}
 			if(player.isLaserStarted()){ 
 				player.setWaitingForLaserToBeKilled(true);
 			}

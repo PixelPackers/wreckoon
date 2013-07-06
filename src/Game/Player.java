@@ -26,7 +26,7 @@ public class Player {
 	private static final float	TAILWHIP_DISTANCE	= 5f;
 	private static final int	TAILWHIP_TIME		= 110;
 	private static final int 	GROUNDPOUND_AIRTIME = 30;
-	private static final int 	LASER_DURATION 		= 12000;
+	private static final int 	LASER_DURATION 		= 120;
 	private static final int 	SHOCK_DURATION		= 200;
 	private static final int 	DEATH_WAIT_TIME		= 70;
 
@@ -74,6 +74,7 @@ public class Player {
 	private boolean wasLasering		= false;
 	private boolean waitingForLaserToBeKilled = false;
 	private boolean frontflipping = false;
+	private boolean stopBiting = false;
 	
 	
 	private boolean locked = false;
@@ -588,12 +589,14 @@ public class Player {
 				this.currentAnimation = animations.get("groundpoundImpact");
 			}
 	
-			if (this.isOnWall() && !this.isJumpingFromWall() && !this.isOnGround() ) {
+			if (this.isOnWall() && !this.isJumpingFromWall() && !this.isOnGround() && !laserStarted) {
 				this.currentAnimation = animations.get("wallIdle");
 			}
 			
 			
-			if( laserCounter == LASER_DURATION ){
+//			if( laserCounter == LASER_DURATION ){
+			if(laserTime <= 0	){
+				laserTime = 0;
 				destroyLaser();
 			}
 			
@@ -601,7 +604,8 @@ public class Player {
 				this.currentAnimation = animations.get("shock");
 			}
 	
-			if	(this.biting && biteCounter == SHOCK_DURATION ) {
+			if	(this.biting && /*biteCounter == SHOCK_DURATION*/ stopBiting) {
+				stopBiting = false;
 				biteFinalize();		
 			}
 	
@@ -1010,11 +1014,11 @@ public class Player {
 //		}
 		if (locked){
 			return;
-		} else {
-			lock();
 		}
 
 		if (ENDLESS_LASER || !this.laserStarted && this.laserAble) {
+
+			lock();
 		
 			this.laserStarted = true;
 			
@@ -1077,9 +1081,9 @@ public class Player {
 
 
 	public void bite(){
-		if(!this.biting && !locked && !laserAble && boltCounter >= BOLT_PRICE_FOR_LASER){
+		if(!this.biting && !locked && !laserAble && boltCounter >0/*>= BOLT_PRICE_FOR_LASER*/){
 
-			if (this.ableToGetLaser && this.isOnGround()){
+			if (this.ableToGetLaser && this.isOnGround() ){
 				
 				lock();
 				
@@ -1375,11 +1379,14 @@ public class Player {
 	}
 	
     public void adjustLaserTime(){
+    	
     	if(laserActive){
     		--laserTime;        
     	}
-    	if(biting){
+    	
+    	if(biting && currentAnimation == animations.get("shock") ){
     		++laserTime;
+        	--boltCounter;
     	}
     }
     public boolean isBiting() {
@@ -1395,4 +1402,8 @@ public class Player {
     public ArrayList<DropItem> getDropItemsToCollect() {
 		return dropItemsToCollect;
 	}
+    
+    public void stopBiting(){
+    	stopBiting = true;
+    }
 }
