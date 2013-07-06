@@ -18,7 +18,7 @@ public class Shred extends DropItem {
 		
 		this.pigSizeFactor = pigSizeFactor;
 		MIN_TIME = 115;
-		MAX_TIME = 1800;
+		MAX_TIME = (int) ( 1800 * Math.random() );
 		
 		DRAW_FACTOR = 0.17f * pigSizeFactor;
 		

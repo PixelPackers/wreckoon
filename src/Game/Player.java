@@ -524,7 +524,7 @@ public class Player {
 			}
 			
 	//		if(getSensorGroundCollision().isColliding() && this.body.getLinearVelocity().y < 0f){
-			if(getSensorGroundCollision().isColliding()){
+			if(isOnGround() || isOnWall()){
 				
 				if(groundPounding || wasLasering){
 					this.groundPounding = false;
@@ -761,22 +761,23 @@ public class Player {
 				
 			} else {
 
-				this.currentAnimation = animations.get("wallJump");
-				this.currentAnimation.restart();
 				
 				if(leftWallColliding()){
 					
-					this.left = false;
 					jumpSpeedX = -this.jumpPower * 0.5f;
 					this.jumpingFromWall = true;
+					this.left = false;
 					
 				} else if(rightWallColliding()){
 					
-					this.left = true;
 					jumpSpeedX = this.jumpPower * 0.5f;
 					this.jumpingFromWall = true;
+					this.left = true;
 				
 				}
+
+				this.currentAnimation = animations.get("wallJump");
+				this.currentAnimation.restart();
 			}
 			
 			this.body.setLinearVelocity(new Vec2(jumpSpeedX, jumpSpeedY));
@@ -1071,30 +1072,24 @@ public class Player {
 	
 
 
-	public boolean bite(){
-	
-		
-		if(!locked && !laserAble && boltCounter >= BOLT_PRICE_FOR_LASER){
-			
+	public void bite(){
+		if(!this.biting && !locked && !laserAble && boltCounter >= BOLT_PRICE_FOR_LASER){
+
 			if (this.ableToGetLaser && this.isOnGround()){
+				
 				lock();
 				
-				if(!this.biting){
-					this.biting = true;
-					this.biteCounter = 0;
-					
-					this.body.setLinearVelocity( new Vec2(0f,0f) );
-					
-					this.currentAnimation = animations.get("bite");
-					this.currentAnimation.restart();	
-				}
-				return true;
-			} else {
-				return false;
+				this.biting = true;
+				this.biteCounter = 0;
+				
+				this.body.setLinearVelocity( new Vec2(0f,0f) );
+				
+				this.currentAnimation = animations.get("bite");
+				this.currentAnimation.restart();
+				
 			}
 			
 		}
-		return false;
 		
 	}
 	
@@ -1205,7 +1200,7 @@ public class Player {
 	}
 
 	public void setLeft ( boolean left){
-		if( locked ) {
+		if( locked && !laserActive) {
 			return;
 		}
 		
@@ -1383,6 +1378,9 @@ public class Player {
     		++laserTime;
     	}
     }
+    public boolean isBiting() {
+		return biting;
+	}
 
     public int getLaserTime() {
 		return laserTime;

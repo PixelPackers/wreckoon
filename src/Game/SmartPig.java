@@ -69,9 +69,10 @@ public class SmartPig extends Enemy {
 	//				this.getBody().applyLinearImpulse( new Vec2(x, 0*this.getBody().getLinearVelocity().y), this.getBody().getWorldCenter());
 				}
 				
-				if(this.isOnWall() && this.isOnGround()) {
-	//				this.body.applyForce( new Vec2(this.body.getLinearVelocity().x, jumpPower), this.body.getWorldCenter() );
-					this.getBody().setLinearVelocity( new Vec2(this.getBody().getLinearVelocity().x, jumpPower) );
+				if(this.isOnGround()) {
+					if ( (this.leftWallColliding() && !left) || (this.rightWallColliding() && left)){
+						this.getBody().setLinearVelocity( new Vec2(this.getBody().getLinearVelocity().x, jumpPower) );
+					}
 				}
 				
 				this.currentAnimation = animations.get("run");
