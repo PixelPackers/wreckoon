@@ -21,7 +21,6 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.fills.GradientFill;
 import org.newdawn.slick.geom.Rectangle;
-import org.newdawn.slick.geom.Shape;
 
 import com.google.gson.Gson;
 
@@ -58,9 +57,9 @@ public class Game extends BasicGame {
 	private static Player 					player;
 	private static ArrayList<Part>			parts			= new ArrayList<Part>();
 	private static ArrayList<Girder>		girders			= new ArrayList<Girder>();
-	private static Generator 				generator;
+	private static ArrayList<Generator>		generators		= new ArrayList<Generator>();
 	private static ArrayList<Spike>			spikes		= new ArrayList<Spike>();
-	private static ArrayList<Conveyor>		conveyor 	= new ArrayList<Conveyor>();
+	private static ArrayList<Conveyor>		conveyors 	= new ArrayList<Conveyor>();
 //	private static ArrayList<Bolt>			bolts 		= new ArrayList<Bolt>();
 //	private static ArrayList<Nut>			nuts 		= new ArrayList<Nut>();
 //	private static ArrayList<Shred>			shreds 		= new ArrayList<Shred>();
@@ -94,8 +93,6 @@ public class Game extends BasicGame {
 	
 	private static Image pauseImage;
 	private static SpriteSheet digits;
-	
-	private int lastCheckpoint;
 	
 	private static Laser laser;
 	
@@ -163,7 +160,7 @@ public class Game extends BasicGame {
 		girders.add(new Girder(world, 25f,  -6f, 7.75f));
 		girders.add(new Girder(world, 35f, -10f, 7.75f));
 
-		generator = new Generator(world, 5f, 14.6f, 5f*0.25f, 6f*0.25f);
+		generators.add(new Generator(world, 5f, 14.6f, 5f*0.25f, 6f*0.25f));
 
 		//conveyor.add(new Conveyor(world, 7f, 4f, 11f, 0.1f, 0.5f, 0.5f, 0.5f));
 
@@ -205,7 +202,8 @@ public class Game extends BasicGame {
 	}
 
 	private String readFile( String file ) throws IOException {
-	    BufferedReader reader = new BufferedReader( new FileReader (file));
+	    @SuppressWarnings("resource")
+		BufferedReader reader = new BufferedReader( new FileReader (file));
 	    String line = null;
 	    StringBuilder stringBuilder = new StringBuilder();
 	    String ls = System.getProperty("line.separator");
@@ -378,19 +376,21 @@ public class Game extends BasicGame {
 	}
 
 	private void restartAnimations() {
-		generator.getAnimation().start();
+		generators.get(0).getAnimation().start();
 		for (Enemy e : enemies) {
 			e.getCurrentAnimation().start();
 		}
 		player.getCurrentAnimation().start();
+		player.getLaser().getAnimation().start();
 	}
 
 	private void pauseAnimations() {
-		generator.getAnimation().stop();
+		generators.get(0).getAnimation().stop();
 		for (Enemy e : enemies) {
 			e.getCurrentAnimation().stop();
 		}
 		player.getCurrentAnimation().stop();
+		player.getLaser().getAnimation().stop();
 	}
 	
 	private void drawRightAlignedDigits(int number, int x, int y) {
@@ -420,7 +420,10 @@ public class Game extends BasicGame {
 
 		house.draw(g, debugView);
 
-		generator.draw(g, debugView);
+		for (Generator ge : generators) {
+			ge.draw(g, debugView);
+		}
+		
 
 		for (GameObject staticObj : staticObjects) {
 			staticObj.draw(g, debugView);
@@ -440,10 +443,15 @@ public class Game extends BasicGame {
 
 		}
 
-		player.draw(g, debugView);
+		for (Part part : parts){
+			part.draw(g, debugView);
+		}
+		
 		for (Enemy enemy : enemies) {
 			enemy.draw(g, debugView);	
 		}
+		
+		player.draw(g, debugView);
 
 		for (Tile tile : tiles) {
 			tile.draw(g, debugView);
@@ -451,10 +459,6 @@ public class Game extends BasicGame {
 		
 		for (Spike spike : spikes) {
 			spike.draw(g, debugView);
-		}
-
-		for (Part part : parts){
-			part.draw(g, debugView);
 		}
 
 		for (Girder sb : girders) {
@@ -465,7 +469,7 @@ public class Game extends BasicGame {
 			s.draw(g, debugView);
 		}
 
-		for (Conveyor c : conveyor){
+		for (Conveyor c : conveyors){
 			c.draw(g, debugView);
 		}
 		
@@ -904,17 +908,17 @@ public class Game extends BasicGame {
 	public void getRidOfPart(Part part) {
 //		this.parts.remove(part);		
 	}
-
-	public static Generator getGenerator() {
-		return generator;
+	
+	public static ArrayList<Generator> getGenerators() {
+		return generators;
 	}
 
 	public static ArrayList<Spike> getSpikes() {
 		return spikes;
 	}
 
-	public static ArrayList<Conveyor> getConveyor() {
-		return conveyor;
+	public static ArrayList<Conveyor> getConveyors() {
+		return conveyors;
 	}
 	
 //	public static ArrayList<Bolt> getBolts() {

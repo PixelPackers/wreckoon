@@ -14,6 +14,8 @@ public class Girder {
 	private static float FRICTION = 0.5f;
 	private static float RESTITUTION = 0.2f;
 	
+	private float x, y;
+
 	private static final float GIRDER_HEIGHT = 0.375f;
 	private static final float GIRDER_WIDTH = 2f;
 	private static final float ROPE_WIDTH = 0.05f;
@@ -30,6 +32,9 @@ public class Girder {
 	private RevoluteJointDef revoluteJointDef = new RevoluteJointDef();
 	
 	public Girder(World world, float posX, float posY, float length) throws SlickException {
+		
+		this.x = posX;
+		this.y = posY;
 
 		tiedRopes = Images.getInstance().getImage("images/ropeTriangle.png");
 		longRope = Images.getInstance().getImage("images/Rope.png");
@@ -81,6 +86,14 @@ public class Girder {
 			g.popTransform();
 		}
 		
+	}
+	
+	public float getX() {
+		return x;
+	}
+
+	public float getY() {
+		return y;
 	}
 	
 }

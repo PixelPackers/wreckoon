@@ -47,7 +47,7 @@ public class DumbPig extends Enemy{
 			if( updateCounter > DIRECTION_SWITCH_MIN_TIME && !idle){
 				if ( (this.leftWallColliding() && !left) || (this.rightWallColliding() && left)){
 					idle = true;
-					updateCounter=0;
+					updateCounter = 0;
 					if(Math.random() < 0.75){
 						this.currentAnimation = animations.get("idle");
 					} else {

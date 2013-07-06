@@ -7,6 +7,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.World;
 import org.newdawn.slick.Animation;
+import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
@@ -104,6 +105,10 @@ public class Laser extends GameObjectPolygon {
 
 	    double sinTheta = Math.sin(theta);
 	    return from.mult((Math.sin((1 - step) * theta) / sinTheta)).add(to.mult((Math.sin(step * theta) / sinTheta)));
+	}
+
+	public Animation getAnimation() {
+		return laserAnimation;
 	}
 
 }

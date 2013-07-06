@@ -162,8 +162,11 @@ public class MyContactListener implements ContactListener{
 			}
 			
 //			player + generator
-			if(game.getGenerator().getFixture() == contact.getFixtureA() || game.getGenerator().getFixture() == contact.getFixtureB() ){
-				game.getPlayer().setAbleToGetLaser(true);
+			for (Generator gen : Game.getGenerators() ){
+				if (gen.getFixture() == contact.getFixtureA() || gen.getFixture() == contact.getFixtureB() ) {
+					game.getPlayer().setAbleToGetLaser(true);
+					break;
+				}
 			}
 			
 //			player + spikes
@@ -175,7 +178,7 @@ public class MyContactListener implements ContactListener{
 			
 			
 //			player + conveyor
-			for (Conveyor conveyor : game.getConveyor() ){
+			for (Conveyor conveyor : game.getConveyors() ){
 				if (conveyor.getFixture() == contact.getFixtureA() || conveyor.getFixture() == contact.getFixtureB() ) {
 					game.getPlayer().setConveyorSpeed(conveyor.getSpeed());
 				}
@@ -235,7 +238,7 @@ public class MyContactListener implements ContactListener{
 			} // not dead end
 			
 //			enemy + conveyor
-			for (Conveyor conveyor : game.getConveyor() ){
+			for (Conveyor conveyor : game.getConveyors() ){
 				if (enemy.getFixture() == contact.getFixtureA() || enemy.getFixture() == contact.getFixtureB() ){
 					if (conveyor.getFixture() == contact.getFixtureA() || conveyor.getFixture() == contact.getFixtureB() ) {
 						enemy.setConveyorSpeed(conveyor.getSpeed());
@@ -276,12 +279,15 @@ public class MyContactListener implements ContactListener{
 		if( playerContact(contact) ){
 						
 //			player + generator
-			if(game.getGenerator().getFixture() == contact.getFixtureA() || game.getGenerator().getFixture() == contact.getFixtureB() ){
-				game.getPlayer().setAbleToGetLaser(false);
+			for (Generator gen : Game.getGenerators() ){
+				if (gen.getFixture() == contact.getFixtureA() || gen.getFixture() == contact.getFixtureB() ) {
+					game.getPlayer().setAbleToGetLaser(false);
+					break;
+				}
 			}
 			
 //			player + conveyor
-			for (Conveyor conveyor : game.getConveyor() ){
+			for (Conveyor conveyor : game.getConveyors() ){
 				if (conveyor.getFixture() == contact.getFixtureA() || conveyor.getFixture() == contact.getFixtureB() ) {
 					game.getPlayer().setConveyorSpeed(0);
 				}
@@ -313,7 +319,7 @@ public class MyContactListener implements ContactListener{
 		// enemy
 		for( Enemy enemy : game.getEnemies()){									
 //			enemy + conveyor
-			for (Conveyor conveyor : game.getConveyor() ){
+			for (Conveyor conveyor : game.getConveyors() ){
 				if (enemy.getFixture() == contact.getFixtureA() || enemy.getFixture() == contact.getFixtureB() ){
 					if (conveyor.getFixture() == contact.getFixtureA() || conveyor.getFixture() == contact.getFixtureB() ) {
 						enemy.setConveyorSpeed( 0 );
