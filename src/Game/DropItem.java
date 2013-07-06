@@ -20,12 +20,14 @@ public abstract class DropItem extends GameObjectPolygon {
 	private boolean collectable = false;
 	
 	private static Vec2[] verts = new Vec2[]{
-		new Vec2(-0.1875f 		* FACTOR, 	-0.38671875f 	* FACTOR),
-		new Vec2(0.265625f		* FACTOR,	-0.40234375f 	* FACTOR),
-		new Vec2(0.48046875f	* FACTOR,	 0.07421875f 	* FACTOR),
-		new Vec2(0.2578125f		* FACTOR, 	 0.40429688f 	* FACTOR),
-		new Vec2(-0.20507812f 	* FACTOR, 	 0.359375f		* FACTOR),
-		new Vec2(-0.47851562f 	* FACTOR, 	 0.0078125f 	* FACTOR)
+		new Vec2(-0.45117188f * FACTOR, -0.28125f * FACTOR),
+		new Vec2(-0.29882812f * FACTOR, -0.47265625f * FACTOR),
+		new Vec2(0.16015625f * FACTOR, -0.5f * FACTOR),
+		new Vec2(0.5f * FACTOR, -0.12695312f * FACTOR),
+		new Vec2(0.45703125f * FACTOR, 0.27734375f * FACTOR),
+		new Vec2(0.265625f * FACTOR, 0.43554688f * FACTOR),
+		new Vec2(-0.15625f * FACTOR, 0.49023438f * FACTOR),
+		new Vec2(-0.5f * FACTOR, 0.17382812f * FACTOR)
 	};
 		
 	public DropItem(Game game, World world, Vec2 pos, String imgPath)
@@ -41,7 +43,7 @@ public abstract class DropItem extends GameObjectPolygon {
 		float radius = DRAW_FACTOR;
 
 		float angle = this.getBody().getAngle();
-		image.setRotation(-(float) Math.toDegrees(angle));
+		image.setRotation((float) Math.toDegrees(angle));
 		
 		
 //		if(counter > MAX_TIME-FADE_TIME){
@@ -54,7 +56,7 @@ public abstract class DropItem extends GameObjectPolygon {
 			float factor = 0.5f;
 			image.setAlpha(1f - (counter-MAX_TIME*factor)/MAX_TIME/factor);
 //		}
-		image.draw(this.getBody().getPosition().x - radius, this.getBody().getPosition().y -radius, radius*2f, radius*2f);
+		image.draw(this.getBody().getPosition().x - radius, this.getBody().getPosition().y - radius, radius * 2f, radius * 2f);
 		
 	}
 	

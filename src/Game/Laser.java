@@ -1,6 +1,7 @@
 package Game;
 
 import java.util.ArrayList;
+import java.util.Vector;
 
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
@@ -24,7 +25,7 @@ public class Laser extends GameObjectPolygon {
 	
 	
 	private static Vec2[] verts = new Vec2[] {
-			new Vec2( 0.3f, -0f),
+			new Vec2( 0f, 0f),
 			new Vec2( 8f, -0.5f),
 			new Vec2( 8f, 0.5f)
 		};
@@ -50,7 +51,7 @@ public class Laser extends GameObjectPolygon {
 	public void drawImage(Graphics g) {
 		g.pushTransform();
 		g.rotate(getBody().getPosition().x, getBody().getPosition().y, (float) Math.toDegrees(getBody().getAngle()));
-		g.translate(0.15f, -DRAW_HEIGHT / 2);
+		g.translate(0f, -DRAW_HEIGHT * 0.5f);
 		laserAnimation.draw(
 				getBody().getPosition().x,
 				getBody().getPosition().y, 
@@ -63,31 +64,46 @@ public class Laser extends GameObjectPolygon {
 		return laserContacts;
 	}
 
-	public static float curveAngle(float from, float to, float step)
+	private static class Vector2d {
+		public double x;
+		public double y;
+		public Vector2d(double x, double y) {
+			this.x = x;
+			this.y = y;
+		}
+		public Vector2d add(Vector2d vector) {
+			return new Vector2d(x + vector.x, y + vector.y);
+		}
+		public Vector2d mult(double s) {
+			return new Vector2d(x * s, y * s);
+		}
+		public double dot(Vector2d vector) {
+			return x * vector.x + y * vector.y;
+		}
+	}
+	
+	public static double curveAngle(double from, double to, double step)
 	{
-	    Vec2 fromVector = new Vec2((float)Math.cos(from), (float)Math.sin(from));
-	    Vec2 toVector = new Vec2((float)Math.cos(to), (float)Math.sin(to));
+	    Vector2d fromVector = new Vector2d(Math.cos(from), Math.sin(from));
+	    Vector2d toVector = new Vector2d(Math.cos(to), Math.sin(to));
 
-	    Vec2 currentVector = slerp(fromVector, toVector, step);
+	    Vector2d currentVector = slerp(fromVector, toVector, step);
 	    
 	    double returnValue = Math.atan2(currentVector.y, currentVector.x);
-	    
-//	    System.out.println((float)returnValue + "f");
-//	    System.out.println(returnValue+"d");
 	    
 	    return (float) returnValue;
 	}
 
-	public static Vec2 slerp(Vec2 from, Vec2 to, float step)
+	public static Vector2d slerp(Vector2d from, Vector2d to, double step)
 	{
 	    if (step == 0) return from;
 	    if (from == to || step == 1) return to;
 
-	    double theta = Math.acos(Vec2.dot(from, to));
+	    double theta = Math.acos(from.dot(to));
 	    if (theta == 0) return to;
 
 	    double sinTheta = Math.sin(theta);
-	    return from.mul((float)(Math.sin((1 - step) * theta) / sinTheta)).add(to.mul((float)(Math.sin(step * theta) / sinTheta)));
+	    return from.mult((Math.sin((1 - step) * theta) / sinTheta)).add(to.mult((Math.sin(step * theta) / sinTheta)));
 	}
 
 }

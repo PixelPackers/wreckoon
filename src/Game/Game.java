@@ -45,8 +45,8 @@ public class Game extends BasicGame {
 	private static float zoom = tragetZoom;
 	private static final float MANUAL_ZOOM_STEP = 4f;
 	
-	private static float laserAngle;
-	private static float laserTargetAngle;
+	private static double laserAngle;
+	private static double laserTargetAngle;
 
 	private static World world;
 
@@ -232,12 +232,12 @@ public class Game extends BasicGame {
 		
 			house.updateAnimations();
 			
-			laserTargetAngle = (float) Math.toRadians(xbox.getLeftThumbDirection() - 90d);
+			laserTargetAngle = Math.toRadians(xbox.getLeftThumbDirection() - 90d);
 			laserAngle = Laser.curveAngle(laserAngle, laserTargetAngle, 0.1f);
 			laser.position(
 					player.getBody().getPosition().x,
-					player.getBody().getPosition().y - 0.2f,
-					laserAngle);
+					player.getBody().getPosition().y - 0.4f,
+					(float) laserAngle);
 			
 			player.update();
 	
@@ -502,7 +502,9 @@ public class Game extends BasicGame {
 //		g.drawString("pigs: " + player.getPigCounter(), 10, 30);
 		g.drawString("laserc: " + player.getLaserTime(), 10, 30);
 		
-		g.drawString("left thumbstick angle: " +  xbox.getLeftThumbDirection(), 10, 50);
+		g.drawString("left thumbstick angle: " +  xbox.getLeftThumbDirection() + "\n" +
+						"laser angle: " + laserAngle + "\n" +
+						"laser target angle: " + laserTargetAngle, 10, 50);
 	}
 
 	private void drawBoltCounter() throws SlickException {
