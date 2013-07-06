@@ -66,6 +66,10 @@ public class DumbPig extends Enemy{
 			}
 		}
 		
+		if (getsGrilled) {
+			this.currentAnimation = animations.get("shock");
+		}
+		
 		++updateCounter;
 	}
 
@@ -77,8 +81,11 @@ public class DumbPig extends Enemy{
 		SpriteSheet sheetIdle2 = Images.getInstance().getSpriteSheet("images/dumbpigidlescratch.png", 	275, 275);
 		SpriteSheet sheetDie  = Images.getInstance().getSpriteSheet("images/dumbpigdeath.png", 	275, 275);
 		SpriteSheet sheetDisabled  = Images.getInstance().getSpriteSheet("images/dumbpigdisable.png", 	275, 250);
+		SpriteSheet sheetShock  = Images.getInstance().getSpriteSheet("images/dumbpigshock.png", 	275, 300);
 		
 		Animation animationWalk = new Animation(sheetWalk, 80);
+		
+		Animation animationShock = new Animation(sheetShock, 80);
 		
 		Animation animationDisabled = new Animation(sheetDisabled, 150);
 
@@ -95,12 +102,14 @@ public class DumbPig extends Enemy{
 		animations.put("idle2", animationIdle2);
 		animations.put("die", animationDie);
 		animations.put("disabled", animationDisabled);
+		animations.put("shock", animationShock);
 		
 		animationOffsets.put("images/dumbpigwalk.png", new Vec2(-0.5f, -0.7f));
 		animationOffsets.put("images/dumbpigidle.png", new Vec2(-0.5f, -0.7f));
 		animationOffsets.put("images/dumbpigidlescratch.png", new Vec2(-0.5f, -0.7f));
 		animationOffsets.put("images/dumbpigdeath.png", new Vec2(-0.5f, -0.6f));
 		animationOffsets.put("images/dumbpigdisable.png", new Vec2(-0.5f, -0.6f));
+		animationOffsets.put("images/dumbpigshock.png", new Vec2(-0.5f, -0.6f));
 		
 		currentAnimation = animationWalk;
 	

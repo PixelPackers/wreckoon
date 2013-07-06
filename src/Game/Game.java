@@ -197,7 +197,8 @@ public class Game extends BasicGame {
 	private boolean isSpike(int type) {
 		if ((type >= 50 && type <= 55) ||
 			(type == 58) ||
-			(type == 41)) {
+			(type >= 38 && type <= 41) ||
+			(type >= 45 && type <= 46)) {
 			return true;
 		}
 		return false;

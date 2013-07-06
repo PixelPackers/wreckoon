@@ -114,17 +114,6 @@ public class Tile {
 				fixtures.add(verts);
 				break;
 	
-			case 5:
-				verts = new Vec2[5];
-				crap = (flipped) ? 4 : 0;
-				verts[Math.abs(crap - 0)] = new Vec2(shit * -0.5f, -0.5f);
-				verts[Math.abs(crap - 1)] = new Vec2(shit * 0.5f, -0.5f);
-				verts[Math.abs(crap - 2)] = new Vec2(shit * 0.5f, -0.25f);
-				verts[Math.abs(crap - 3)] = new Vec2(shit * -0.109375f, -0.24609375f);
-				verts[Math.abs(crap - 4)] = new Vec2(shit * -0.5f, -0.25f);
-				fixtures.add(verts);
-				break;
-	
 			case 6:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -140,17 +129,6 @@ public class Tile {
 				verts[Math.abs(crap - 2)] = new Vec2(shit * 0.28515625f, 0.19140625f);
 				verts[Math.abs(crap - 3)] = new Vec2(shit * -0.03515625f, 0.005859375f);
 				verts[Math.abs(crap - 4)] = new Vec2(shit * -0.32421875f, -0.23242188f);
-				fixtures.add(verts);
-				break;
-				
-			case 7:
-				verts = new Vec2[5];
-				crap = (flipped) ? 4 : 0;
-				verts[Math.abs(crap - 0)] = new Vec2(shit * -0.5f, -0.5f);
-				verts[Math.abs(crap - 1)] = new Vec2(shit * 0.5f, -0.5f);
-				verts[Math.abs(crap - 2)] = new Vec2(shit * 0.5f, 0.25f);
-				verts[Math.abs(crap - 3)] = new Vec2(shit * -0.064453125f, 0.2578125f);
-				verts[Math.abs(crap - 4)] = new Vec2(shit * -0.5f, 0.25f);
 				fixtures.add(verts);
 				break;
 	
@@ -692,6 +670,93 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * 0.25390625f, -0.24414062f);
 				fixtures.add(verts);
 				break;
+				
+			case 5:
+				verts = new Vec2[4];
+				crap = (flipped) ? 3 : 0;
+				verts[Math.abs(crap - 0)] = new Vec2(shit * -0.5f, -0.5f);
+				verts[Math.abs(crap - 1)] = new Vec2(shit * 0.5f, -0.5f);
+				verts[Math.abs(crap - 2)] = new Vec2(shit * 0.5f, -0.25f);
+				verts[Math.abs(crap - 3)] = new Vec2(shit * -0.5f, -0.25f);
+				fixtures.add(verts);
+				break;
+
+			case 7:
+				verts = new Vec2[4];
+				crap = (flipped) ? 3 : 0;
+				verts[Math.abs(crap - 0)] = new Vec2(shit * -0.5f, -0.5f);
+				verts[Math.abs(crap - 1)] = new Vec2(shit * 0.5f, -0.5f);
+				verts[Math.abs(crap - 2)] = new Vec2(shit * 0.5f, 0.25f);
+				verts[Math.abs(crap - 3)] = new Vec2(shit * -0.5f, 0.25f);
+				fixtures.add(verts);
+				break;
+
+			case 38:
+				verts = new Vec2[6];
+				crap = (flipped) ? 5 : 0;
+				verts[Math.abs(crap - 0)] = new Vec2(shit * 0.25f, -0.5f);
+				verts[Math.abs(crap - 1)] = new Vec2(shit * 0.5f, -0.5f);
+				verts[Math.abs(crap - 2)] = new Vec2(shit * 0.5f, -0.25f);
+				verts[Math.abs(crap - 3)] = new Vec2(shit * 0.16015625f, -0.24414062f);
+				verts[Math.abs(crap - 4)] = new Vec2(shit * 0.13085938f, -0.29492188f);
+				verts[Math.abs(crap - 5)] = new Vec2(shit * 0.16796875f, -0.39453125f);
+				fixtures.add(verts);
+				break;
+
+			case 39:
+				verts = new Vec2[4];
+				crap = (flipped) ? 3 : 0;
+				verts[Math.abs(crap - 0)] = new Vec2(shit * -0.5f, -0.5f);
+				verts[Math.abs(crap - 1)] = new Vec2(shit * 0.5f, -0.5f);
+				verts[Math.abs(crap - 2)] = new Vec2(shit * 0.5f, -0.25f);
+				verts[Math.abs(crap - 3)] = new Vec2(shit * -0.5f, -0.25f);
+				fixtures.add(verts);
+				break;
+
+			case 40:
+				verts = new Vec2[4];
+				crap = (flipped) ? 3 : 0;
+				verts[Math.abs(crap - 0)] = new Vec2(shit * -0.5f, -0.5f);
+				verts[Math.abs(crap - 1)] = new Vec2(shit * 0.5f, -0.5f);
+				verts[Math.abs(crap - 2)] = new Vec2(shit * 0.5f, -0.25f);
+				verts[Math.abs(crap - 3)] = new Vec2(shit * -0.5f, -0.25f);
+				fixtures.add(verts);
+				break;
+
+			case 45:
+				verts = new Vec2[4];
+				crap = (flipped) ? 3 : 0;
+				verts[Math.abs(crap - 0)] = new Vec2(shit * -0.5f, -0.5f);
+				verts[Math.abs(crap - 1)] = new Vec2(shit * 0.5f, -0.5f);
+				verts[Math.abs(crap - 2)] = new Vec2(shit * -0.26757812f, -0.16210938f);
+				verts[Math.abs(crap - 3)] = new Vec2(shit * -0.5f, -0.25f);
+				fixtures.add(verts);
+				verts = new Vec2[4];
+				crap = (flipped) ? 3 : 0;
+				verts[Math.abs(crap - 0)] = new Vec2(shit * 0.5f, -0.5f);
+				verts[Math.abs(crap - 1)] = new Vec2(shit * 0.5f, 0.5f);
+				verts[Math.abs(crap - 2)] = new Vec2(shit * -0.25f, 0.5f);
+				verts[Math.abs(crap - 3)] = new Vec2(shit * -0.26757812f, -0.16210938f);
+				fixtures.add(verts);
+				break;
+
+			case 46:
+				verts = new Vec2[4];
+				crap = (flipped) ? 3 : 0;
+				verts[Math.abs(crap - 0)] = new Vec2(shit * -0.5f, -0.5f);
+				verts[Math.abs(crap - 1)] = new Vec2(shit * 0.5f, -0.5f);
+				verts[Math.abs(crap - 2)] = new Vec2(shit * 0.24023438f, -0.25585938f);
+				verts[Math.abs(crap - 3)] = new Vec2(shit * -0.5f, -0.25f);
+				fixtures.add(verts);
+				verts = new Vec2[4];
+				crap = (flipped) ? 3 : 0;
+				verts[Math.abs(crap - 0)] = new Vec2(shit * 0.5f, -0.5f);
+				verts[Math.abs(crap - 1)] = new Vec2(shit * 0.5f, 0.5f);
+				verts[Math.abs(crap - 2)] = new Vec2(shit * 0.25f, 0.5f);
+				verts[Math.abs(crap - 3)] = new Vec2(shit * 0.24023438f, -0.25585938f);
+				fixtures.add(verts);
+				break;
+
 			}
 		return fixtures;
 	}

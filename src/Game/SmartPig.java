@@ -93,6 +93,10 @@ public class SmartPig extends Enemy {
 				
 			}
 		}
+		
+		if (getsGrilled) {
+			this.currentAnimation = animations.get("shock");
+		}
 
 		++switchTimeCounter;
 	}
@@ -105,10 +109,13 @@ public class SmartPig extends Enemy {
 		SpriteSheet sheetIdle = Images.getInstance().getSpriteSheet("images/smartpigIdle.png", 	275, 300);
 		SpriteSheet sheetDie  = Images.getInstance().getSpriteSheet("images/smartpigdeath.png", 	275, 300);
 		SpriteSheet sheetDisabled  = Images.getInstance().getSpriteSheet("images/smartpigdisable.png", 	275, 250);
+		SpriteSheet sheetShock  = Images.getInstance().getSpriteSheet("images/smartpigshock.png", 	275, 300);
 		
 		
 		Animation animationWalk = new Animation(sheetWalk, 120);
 		Animation animationRun = new Animation(sheetRun, 80);
+		
+		Animation animationShock = new Animation(sheetShock, 80);
 
 		Animation animationIdle = new Animation(sheetIdle, 150);
 
@@ -122,12 +129,14 @@ public class SmartPig extends Enemy {
 		animations.put("idle", animationIdle);
 		animations.put("disabled", animationDisabled);
 		animations.put("die", animationDie);
+		animations.put("shock", animationShock);
 		
 		animationOffsets.put("images/smartpigWalk.png", new Vec2(-0.5f, -1f));
 		animationOffsets.put("images/smartpigrun.png", new Vec2(-0.6f, -0.9f));
 		animationOffsets.put("images/smartpigIdle.png", new Vec2(-0.5f, -1f));
 		animationOffsets.put("images/smartpigdeath.png", new Vec2(-0.5f, -0.6f));
 		animationOffsets.put("images/smartpigdisable.png", new Vec2(-0.5f, -0.6f));
+		animationOffsets.put("images/smartpigshock.png", new Vec2(-0.5f, -0.6f));
 		
 		currentAnimation = animationWalk;
 		
