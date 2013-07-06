@@ -349,7 +349,6 @@ public class Game extends BasicGame {
 		int max = 30;
 		skyColorGlow += 0.01;
 		double x = Math.sin(skyColorGlow) * max;
-		System.out.println(100+x);
 		
 		
 		Color skyGradientColor1 = new Color((int)(100+x), 0, 0);

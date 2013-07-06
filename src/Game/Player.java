@@ -1072,8 +1072,6 @@ public class Player {
 
 
 	public void bite(){
-
-		System.out.println("locked: " + locked + "; laserAble: " + laserAble);
 		
 		if(!this.biting && !locked && !laserAble && boltCounter >= BOLT_PRICE_FOR_LASER){
 			
