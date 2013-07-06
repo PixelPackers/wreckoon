@@ -36,7 +36,7 @@ public class DumbPig extends Enemy{
 	public void update() {
 		super.update();
 
-		if ( !isDead() && !dizzy ){ 
+		if ( !isDead() && !dizzy && !getsGrilled){ 
 		
 			if(this.isOnGround() && !idle){
 				this.getBody().setLinearVelocity(new Vec2(speed, this.getBody().getLinearVelocity().y) );

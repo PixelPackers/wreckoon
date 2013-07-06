@@ -142,7 +142,7 @@ public class MyContactListener implements ContactListener{
 //		player contact
 		if( playerContact(contact)){
 		
-//			+ enemy contact
+//			player + enemy contact
 			for( Enemy enemy : game.getEnemies()){
 				if ( !enemy.isDead() && !enemy.isDizzy() && !game.getPlayer().isGroundPounding() ){
 					if (enemy.getFixture() == contact.getFixtureA() || enemy.getFixture() == contact.getFixtureB() ){
@@ -152,7 +152,7 @@ public class MyContactListener implements ContactListener{
 				}
 			}
 			
-//			+ item
+//			player + item
 			for (Part part : game.getParts()){
 				if(!part.isCollected()){
 					if(part.getFixture() == contact.getFixtureA() || part.getFixture() == contact.getFixtureB() ){
@@ -161,12 +161,12 @@ public class MyContactListener implements ContactListener{
 				}
 			}
 			
-//			+ generator
+//			player + generator
 			if(game.getGenerator().getFixture() == contact.getFixtureA() || game.getGenerator().getFixture() == contact.getFixtureB() ){
 				game.getPlayer().setAbleToGetLaser(true);
 			}
 			
-//			+ spikes
+//			player + spikes
 			for (Spike spike : game.getSpikes() ){
 				if (spike.getFixture() == contact.getFixtureA() || spike.getFixture() == contact.getFixtureB() ) {
 					game.getPlayer().die(false);
@@ -174,7 +174,7 @@ public class MyContactListener implements ContactListener{
 			}
 			
 			
-//			+ conveyor
+//			player + conveyor
 			for (Conveyor conveyor : game.getConveyor() ){
 				if (conveyor.getFixture() == contact.getFixtureA() || conveyor.getFixture() == contact.getFixtureB() ) {
 					game.getPlayer().setConveyorSpeed(conveyor.getSpeed());
@@ -182,43 +182,33 @@ public class MyContactListener implements ContactListener{
 				break;
 			}
 
-//			+ bolts	
-//			Iterator iterator = game.getBolts().iterator();
+//			player + dropItems	
 			Iterator iterator = game.getDropItems().iterator();
 			while (iterator.hasNext()){
+				
 				DropItem dropItem = (DropItem) iterator.next();
-				if (dropItem.isCollectable()) {
 					
-					if (dropItem.getFixture() == contact.getFixtureA() || dropItem.getFixture() == contact.getFixtureB() ) {
+				if (dropItem.getFixture() == contact.getFixtureA() || dropItem.getFixture() == contact.getFixtureB() ) {
+
+					if (dropItem.isCollectable()) {
 						dropItem.collect();
 						iterator.remove();
 						game.getObjectsToRemove().add(dropItem);
+					} else {
+						game.getPlayer().getDropItemsToCollect().add(dropItem);
 					}
+					
 					
 				}
 			}
 			
-
-////			+ nuts	
-//			iterator = game.getNuts().iterator();
-//			while (iterator.hasNext()){
-//				Nut nut = (Nut) iterator.next();
-//
-//				if (nut.isCollectable()) {
-//					if (nut.getFixture() == contact.getFixtureA() || nut.getFixture() == contact.getFixtureB() ) {
-//						nut.collect();
-//						iterator.remove();
-//						game.getObjectsToRemove().add(nut);
-//					}
-//				}
-//			}
 		}
 		
 		// enemy
 		for( Enemy enemy : game.getEnemies()){
 			if ( !enemy.isDead() ){
 				
-//				 + missile
+//				enemy + missile
 				for(GameObject dynamicObject : game.getDynamicObjects() ){
 					if (enemy.getFixture() == contact.getFixtureA() || enemy.getFixture() == contact.getFixtureB() ){
 						if (dynamicObject.getFixture() == contact.getFixtureA() || dynamicObject.getFixture() == contact.getFixtureB() ){
@@ -231,7 +221,7 @@ public class MyContactListener implements ContactListener{
 					}
 				}
 				
-//				+ spikes
+//				enemy + spikes
 				for (Spike spike : game.getSpikes() ){
 
 					if (enemy.getFixture() == contact.getFixtureA() || enemy.getFixture() == contact.getFixtureB() ){
@@ -244,7 +234,7 @@ public class MyContactListener implements ContactListener{
 				
 			} // not dead end
 			
-//			+ conveyor
+//			enemy + conveyor
 			for (Conveyor conveyor : game.getConveyor() ){
 				if (enemy.getFixture() == contact.getFixtureA() || enemy.getFixture() == contact.getFixtureB() ){
 					if (conveyor.getFixture() == contact.getFixtureA() || conveyor.getFixture() == contact.getFixtureB() ) {
@@ -282,20 +272,39 @@ public class MyContactListener implements ContactListener{
 		}
 	
 
-//		 player contact
+//		player contact
 		if( playerContact(contact) ){
 						
-//			+ generator
+//			player + generator
 			if(game.getGenerator().getFixture() == contact.getFixtureA() || game.getGenerator().getFixture() == contact.getFixtureB() ){
 				game.getPlayer().setAbleToGetLaser(false);
 			}
 			
-//			+ conveyor
+//			player + conveyor
 			for (Conveyor conveyor : game.getConveyor() ){
 				if (conveyor.getFixture() == contact.getFixtureA() || conveyor.getFixture() == contact.getFixtureB() ) {
 					game.getPlayer().setConveyorSpeed(0);
 				}
 				break;
+			}
+			
+//			player + dropItems	
+			Iterator iterator = game.getDropItems().iterator();
+			while (iterator.hasNext()){
+				
+				DropItem dropItem = (DropItem) iterator.next();
+					
+				if (dropItem.getFixture() == contact.getFixtureA() || dropItem.getFixture() == contact.getFixtureB() ) {
+
+					if (!dropItem.isCollectable()) {
+						game.getPlayer().getDropItemsToCollect().remove(dropItem);
+					} else {
+						dropItem.collect();
+//						kA warum das nicht gebraucht wird, aber bitte... es funkt
+//						game.getObjectsToRemove().add(dropItem);
+						iterator.remove();
+					}
+				}
 			}
 		}
 		
@@ -303,7 +312,7 @@ public class MyContactListener implements ContactListener{
 		
 		// enemy
 		for( Enemy enemy : game.getEnemies()){									
-//			+ conveyor
+//			enemy + conveyor
 			for (Conveyor conveyor : game.getConveyor() ){
 				if (enemy.getFixture() == contact.getFixtureA() || enemy.getFixture() == contact.getFixtureB() ){
 					if (conveyor.getFixture() == contact.getFixtureA() || conveyor.getFixture() == contact.getFixtureB() ) {
@@ -321,8 +330,10 @@ public class MyContactListener implements ContactListener{
 			for( Enemy enemy : game.getEnemies()){
 				if( enemy.getFixture() == contact.getFixtureA() ||
 					enemy.getFixture() == contact.getFixtureB()
-				){
-					if( !game.getPlayer().isLaserActive() ){ // damit 
+				){					
+					if(game.getPlayer().isLaserActive() ){
+						enemy.laserHitEnd();
+					} else {
 						game.getPlayer().getLaser().getLaserContacts().remove(enemy);
 					}
 				}

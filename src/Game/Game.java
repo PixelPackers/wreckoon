@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
@@ -307,6 +308,16 @@ public class Game extends BasicGame {
 			
 			for (DropItem d : dropItems){
 				d.update();
+			}
+			
+			Iterator iterator = player.getDropItemsToCollect().iterator();
+			while (iterator.hasNext()){
+				DropItem dropItem = (DropItem) iterator.next();
+				if(dropItem.isCollectable()){
+					dropItem.collect();
+					iterator.remove();
+					getObjectsToRemove().add(dropItem);
+				}
 			}
 			
 	//		for (GameObject o :  objectsToAdd){
@@ -758,10 +769,13 @@ public class Game extends BasicGame {
 			enemies.add(new SmartPig(this, player.getBody().getPosition().x + 5f, player.getBody().getPosition().y - 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
 		}
 
-		if (xbox.isButtonRightThumbDown() || input.isKeyPressed(Input.KEY_ENTER)) {
-			debugView = !debugView;			
-//			DOOMSDAY = !DOOMSDAY;
+		if (xbox.isButtonRightThumbDown()) {
+			DOOMSDAY = !DOOMSDAY;
 		}
+		if(input.isKeyPressed(Input.KEY_ENTER)){
+			debugView = !debugView;			
+		}
+			
 
 
 		// TODO crappy, weils keine keyUp() methode gibt. die reihenfolge muss auch so erhalten bleiben, sonsts is immer false
@@ -822,15 +836,12 @@ public class Game extends BasicGame {
 			
 			if(!player.isBiting()) {
 				player.bite();
-			
-				if(player.isLaserAble()) {
-					player.initializeLaser();	
-				}
+				player.initializeLaser();
 			}
 		}
 		
 		if(xbox.isButtonYUp()){
-			if(player.isLaserAble()){ 
+			if(player.isLaserStarted()){ 
 				player.setWaitingForLaserToBeKilled(true);
 			}
 		}
