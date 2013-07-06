@@ -523,6 +523,10 @@ public class Game extends BasicGame {
 //		g.drawString("pos: " + player.getBody().getPosition(), 200, 50);
 //		g.drawString("pigs: " + player.getPigCounter(), 10, 30);
 		g.drawString("laserc: " + player.getLaserTime(), 10, 30);
+		g.setColor(Color.blue);
+		g.fillRect(50, 50, player.getLaserTime()*5, 50);
+		g.setColor(Color.white);
+		
 		
 		g.drawString("left thumbstick angle: " +  xbox.getLeftThumbDirection() + "\n" +
 						"laser angle: " + laserAngle + "\n" +
@@ -786,7 +790,7 @@ public class Game extends BasicGame {
 		if(input.isKeyPressed(Input.KEY_ENTER)){
 			debugView = !debugView;			
 		}
-			
+		
 
 
 		// TODO crappy, weils keine keyUp() methode gibt. die reihenfolge muss auch so erhalten bleiben, sonsts is immer false

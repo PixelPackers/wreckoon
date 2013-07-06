@@ -59,11 +59,12 @@ public class DumbPig extends Enemy{
 			
 			if ( idle && updateCounter > MIN_IDLE_WAITING_TIME){
 				this.left = !this.left;  
-				speed = -speed;
+				speed = (left) ? (float) -Math.abs(speed) : (float) Math.abs(speed);
 				this.idle = false;
 				updateCounter=0;
-				this.currentAnimation = animations.get("walk");
 			}
+
+			this.currentAnimation = animations.get("walk");
 		}
 		
 		if (getsGrilled) {
