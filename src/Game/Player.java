@@ -588,7 +588,7 @@ public class Player {
 				this.currentAnimation = animations.get("groundpoundImpact");
 			}
 	
-			if (this.isOnWall() && !this.isJumpingFromWall() && !this.isOnGround() ) {
+			if (this.isOnWall() && !this.isJumpingFromWall() && !this.isOnGround() && !laserStarted) {
 				this.currentAnimation = animations.get("wallIdle");
 			}
 			
@@ -1010,11 +1010,11 @@ public class Player {
 //		}
 		if (locked){
 			return;
-		} else {
-			lock();
 		}
 
 		if (ENDLESS_LASER || !this.laserStarted && this.laserAble) {
+
+			lock();
 		
 			this.laserStarted = true;
 			
@@ -1079,7 +1079,7 @@ public class Player {
 	public void bite(){
 		if(!this.biting && !locked && !laserAble && boltCounter >= BOLT_PRICE_FOR_LASER){
 
-			if (this.ableToGetLaser && this.isOnGround()){
+			if (this.ableToGetLaser && this.isOnGround() ){
 				
 				lock();
 				
