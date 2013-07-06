@@ -650,8 +650,10 @@ public class Player {
 		body.setTransform(lastCheckpoint.getMidPoint(), 0f);
 		wheel.getBody().setTransform(lastCheckpoint.getMidPoint(), 0f);
 		body.setLinearVelocity(new Vec2(0f, 0f));
+//		TODO eine resetVariables() wäre praktisch...
 		dead = false;
 		deadAndOnGround = false;
+		biting = false; 
 		unlock();
 	}
 

@@ -767,10 +767,13 @@ public class Game extends BasicGame {
 			enemies.add(new SmartPig(this, player.getBody().getPosition().x + 5f, player.getBody().getPosition().y - 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
 		}
 
-		if (xbox.isButtonRightThumbDown() || input.isKeyPressed(Input.KEY_ENTER)) {
-			debugView = !debugView;			
-//			DOOMSDAY = !DOOMSDAY;
+		if (xbox.isButtonRightThumbDown()) {
+			DOOMSDAY = !DOOMSDAY;
 		}
+		if(input.isKeyPressed(Input.KEY_ENTER)){
+			debugView = !debugView;			
+		}
+			
 
 
 		// TODO crappy, weils keine keyUp() methode gibt. die reihenfolge muss auch so erhalten bleiben, sonsts is immer false
