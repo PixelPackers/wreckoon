@@ -15,6 +15,7 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Polygon;
+import org.newdawn.slick.geom.Rectangle;
 
 public abstract class Enemy extends GameObjectBox {
 	
@@ -181,6 +182,11 @@ public abstract class Enemy extends GameObjectBox {
 		for (MySensor mySensor : sensorList){
 			mySensor.draw(g, this.getBody());
 		}
+
+		Rectangle r = new Rectangle(this.getBody().getPosition().x - this.getWidth()/2, this.getBody().getPosition().y - this.getHeight(), health/50f, 0.05f);
+		g.setColor(Color.red);
+		g.fill(r);
+		g.draw(r);
 	}
 
 //	public void drawImage(){
@@ -230,6 +236,9 @@ public abstract class Enemy extends GameObjectBox {
 		dizzy = true;
 		dizzyCounter = 0;
 		dizzyRotationCounter = 0;
+		
+//		FIXME magic numbers
+		health -= 10;
 		
 		initRotation();
 	}
@@ -297,6 +306,7 @@ public abstract class Enemy extends GameObjectBox {
 		++dizzyCounter;
 		++dizzyRotationCounter;
 	}
+
 
 	public void drawImage() {
 //		float drawWidth = (left) ? -pigSize : pigSize;
