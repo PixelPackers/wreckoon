@@ -819,7 +819,12 @@ public class Game extends BasicGame {
 		if(xbox.isButtonYDown() || input.isKeyPressed(input.KEY_J)){
 
 			player.setWaitingForLaserToBeKilled(false);
-			if( !player.bite() && player.isLaserAble()) {
+			
+			if(!player.isBiting()) {
+				player.bite();
+			}
+			
+			if( !player.isBiting() && player.isLaserAble()) {
 				player.initializeLaser();	
 			}
 		}
