@@ -299,9 +299,14 @@ public abstract class Enemy extends GameObjectBox {
 			die();
 		}
 		
+		if (getsGrilled && !game.getPlayer().isLaserActive()){
+			getsGrilled = false;
+		}
+		
 		if (getsGrilled){
 			--health;
 		}
+		
 		++dieCounter;
 		++dizzyCounter;
 		++dizzyRotationCounter;
