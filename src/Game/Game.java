@@ -81,6 +81,8 @@ public class Game extends BasicGame {
 	private static Rectangle skyRect;
 	private static ShapeFill skyGradient;
 	
+	private static int doomsdayCounter = 0;
+	
 	private static House house;
 	private static Camera cam = new Camera(0, 0);
 	private static Level level;
@@ -258,6 +260,13 @@ public class Game extends BasicGame {
 			cam.follow(targetCamX, targetCamY, 10);
 			if(DOOMSDAY){
 				cam.wiggle((player.isLaserActive()) ? 1f : 0.5f);
+				
+				if (doomsdayCounter > 450 ) {
+					enemies.add(new SmartPig(this, player.getBody().getPosition().x - 5f, player.getBody().getPosition().y - 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+					doomsdayCounter = 0;
+				}
+				++doomsdayCounter;
+				
 			} else {
 				cam.wiggle((player.isLaserActive()) ? 1f : 0f);	
 			}
@@ -529,6 +538,10 @@ public class Game extends BasicGame {
 //		g.drawString("pos: " + player.getBody().getPosition(), 200, 50);
 //		g.drawString("pigs: " + player.getPigCounter(), 10, 30);
 		g.drawString("laserc: " + player.getLaserTime(), 10, 30);
+		g.setColor(Color.blue);
+		g.fillRect(50, 50, player.getLaserTime()*5, 50);
+		g.setColor(Color.white);
+		
 		
 		g.drawString("left thumbstick angle: " +  xbox.getLeftThumbDirection() + "\n" +
 						"laser angle: " + laserAngle + "\n" +
@@ -792,7 +805,7 @@ public class Game extends BasicGame {
 		if(input.isKeyPressed(Input.KEY_ENTER)){
 			debugView = !debugView;			
 		}
-			
+		
 
 
 		// TODO crappy, weils keine keyUp() methode gibt. die reihenfolge muss auch so erhalten bleiben, sonsts is immer false

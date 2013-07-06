@@ -26,7 +26,7 @@ public class Player {
 	private static final float	TAILWHIP_DISTANCE	= 5f;
 	private static final int	TAILWHIP_TIME		= 110;
 	private static final int 	GROUNDPOUND_AIRTIME = 30;
-	private static final int 	LASER_DURATION 		= 120;
+	private static final int 	MAX_LASER_DURATION 		= 250;
 	private static final int 	SHOCK_DURATION		= 200;
 	private static final int 	DEATH_WAIT_TIME		= 70;
 
@@ -35,7 +35,6 @@ public class Player {
 	private final float ACC_WALKING = 0.375f;
 	private final float ACC_RUNNING = 0.4375f;
 	private final float FRICTION = 1f;
-    private static final int         BOLT_PRICE_FOR_LASER= 10;
     private static final boolean ENDLESS_LASER = true;
 
 	
@@ -48,7 +47,7 @@ public class Player {
 	private int laserCounter 		= 0;
 	private int biteCounter 		= 0;
 	private int floatingCounter 	= 0;
-	private int boltCounter			= 1110;
+	private int boltCounter			= 110;
 	private int tmpBoltAmount		= 0;
 	private int pigCounter			= 0;
 	private int deathTimeCounter	= 0;
@@ -66,10 +65,11 @@ public class Player {
 	private boolean dizzy			= false;
 	private boolean dead			= false;
 	private boolean deadAndOnGround	= false;	
-	private boolean biting			= false;
+	private boolean biting			= false;	
+	private boolean biteShockLoading = false;
 	private boolean laserActive		= false;
 	private boolean ableToGetLaser	= false;
-	private boolean laserAble		= false;
+//	private boolean laserAble		= false;
 	private boolean laserStarted	= false;
 	private boolean wasLasering		= false;
 	private boolean waitingForLaserToBeKilled = false;
@@ -535,8 +535,8 @@ public class Player {
 					unlock();
 				}
 				this.jumpingFromWall = false;
+
 				wasLasering = false;
-				
 			}
 			
 	
@@ -597,11 +597,14 @@ public class Player {
 //			if( laserCounter == LASER_DURATION ){
 			if(laserTime <= 0	){
 				laserTime = 0;
-				destroyLaser();
+				if(laserStarted){
+					destroyLaser();
+				}
 			}
 			
 			if (this.biting && this.currentAnimation.isStopped() ) {
 				this.currentAnimation = animations.get("shock");
+				biteShockLoading = true;
 			}
 	
 			if	(this.biting && /*biteCounter == SHOCK_DURATION*/ stopBiting) {
@@ -845,8 +848,8 @@ public class Player {
 			this.doTailwhip = true;
 			this.tailwhipCounter = 0;
 			
-			float tailWidth 	= 0.7f;
-			float tailHeight	= 0.2f;
+			float tailWidth 	= 0.7f*0.25f;
+			float tailHeight	= 0.2f*0.25f;
 			float direction = this.width;
 			float distance = TAILWHIP_DISTANCE;
 			
@@ -1016,7 +1019,7 @@ public class Player {
 			return;
 		}
 
-		if (ENDLESS_LASER || !this.laserStarted && this.laserAble) {
+//		if (ENDLESS_LASER || !this.laserStarted && this.laserAble) {
 
 			lock();
 		
@@ -1025,7 +1028,7 @@ public class Player {
 			laserCounter = 0;
 			this.currentAnimation = animations.get("groundpound");
 			this.currentAnimation.restart();
-		}
+//		}
 	}
 	
 	private void createLaser(){
@@ -1065,9 +1068,9 @@ public class Player {
 
 		
 
-		if(laserActive){ // wenn laser taste gedrückt wurde, aber bevor geschossen wurde, abgebrochen
-			this.laserAble = false;
-		}
+//		if(laserActive){ // wenn laser taste gedrückt wurde, aber bevor geschossen wurde, abgebrochen
+//			this.laserAble = false;
+//		}
 		
 		this.laserStarted = false;
 		this.laserActive = false;
@@ -1081,7 +1084,8 @@ public class Player {
 
 
 	public void bite(){
-		if(!this.biting && !locked && !laserAble && boltCounter >0/*>= BOLT_PRICE_FOR_LASER*/){
+//		if(!this.biting && !locked && !laserAble && boltCounter >0/*>= BOLT_PRICE_FOR_LASER*/){
+		if(!this.biting && !locked && boltCounter >0/*>= BOLT_PRICE_FOR_LASER*/){
 
 			if (this.ableToGetLaser && this.isOnGround() ){
 				
@@ -1103,9 +1107,9 @@ public class Player {
 	
 	private void biteFinalize(){
 		this.biting = false;
+		biteShockLoading = false;
 		this.currentAnimation = animations.get("idle");
-		this.laserAble = true;
-        boltCounter -= BOLT_PRICE_FOR_LASER;
+//		this.laserAble = true;
 
 		unlock();
 	}
@@ -1357,9 +1361,9 @@ public class Player {
 		
 	}
 	
-	public boolean isLaserAble() {
-		return laserAble;
-	}
+//	public boolean isLaserAble() {
+//		return laserAble;
+//	}
 	
 	public boolean isWaitingForLaserToBeKilled() {
 		return waitingForLaserToBeKilled;
@@ -1381,15 +1385,38 @@ public class Player {
     public void adjustLaserTime(){
     	
     	if(laserActive){
-    		--laserTime;        
+    		--laserTime;
     	}
-    	
-    	if(biting && currentAnimation == animations.get("shock") ){
-    		++laserTime;
-        	--boltCounter;
+
+		
+    	if(biteShockLoading && boltCounter >= 0) {
+
+    		int step = (boltCounter > 2) ? 2 : boltCounter;
+    		
+    		if(laserTime <= MAX_LASER_DURATION-step+1){
+    			
+				laserTime += step;
+			}
+	
+    		boltCounter -= step;
+    		
+    		dropElectroBolt();
+    		
+        	if ( boltCounter == 0){
+        		biteFinalize();
+        	}
+    			
     	}
+    	 
+    		    	
     }
-    public boolean isBiting() {
+    private void dropElectroBolt() {
+    	
+    	
+		
+	}
+
+	public boolean isBiting() {
 		return biting;
 	}
 
