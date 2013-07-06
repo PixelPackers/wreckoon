@@ -162,7 +162,7 @@ public class Game extends BasicGame {
 		girders.add(new Girder(world, 25f,  -6f, 7.75f));
 		girders.add(new Girder(world, 35f, -10f, 7.75f));
 
-		generator = new Generator(world, 5f, 15f, 5f*0.25f, 6f*0.25f);
+		generator = new Generator(world, 5f, 14.6f, 5f*0.25f, 6f*0.25f);
 
 		//conveyor.add(new Conveyor(world, 7f, 4f, 11f, 0.1f, 0.5f, 0.5f, 0.5f));
 

@@ -75,9 +75,12 @@ public class DumbPig extends Enemy{
 		SpriteSheet sheetWalk = new SpriteSheet("images/dumbpigwalk.png", 	275, 276);
 		SpriteSheet sheetIdle = new SpriteSheet("images/dumbpigidle.png", 	275, 275);
 		SpriteSheet sheetIdle2 = new SpriteSheet("images/dumbpigidlescratch.png", 	275, 275);
-		SpriteSheet sheetDie  = new SpriteSheet("images/smartpigdeath.png", 	275, 275);
+		SpriteSheet sheetDie  = new SpriteSheet("images/dumbpigdeath.png", 	275, 275);
+		SpriteSheet sheetDisabled  = new SpriteSheet("images/dumbpigdisable.png", 	275, 250);
 		
 		Animation animationWalk = new Animation(sheetWalk, 80);
+		
+		Animation animationDisabled = new Animation(sheetDisabled, 150);
 
 		Animation animationIdle = new Animation(sheetIdle, idleTime/2);
 		
@@ -91,6 +94,7 @@ public class DumbPig extends Enemy{
 		animations.put("idle", animationIdle);
 		animations.put("idle2", animationIdle2);
 		animations.put("die", animationDie);
+		animations.put("disabled", animationDisabled);
 		
 		currentAnimation = animationWalk;
 	
@@ -100,6 +104,12 @@ public class DumbPig extends Enemy{
 	public void die() {
 		super.die();
 		currentAnimation = animations.get("die");
+	}
+	
+	@Override
+	public void throwBack() {
+		super.throwBack();
+		this.currentAnimation = animations.get("disabled");
 	}
 	
 }

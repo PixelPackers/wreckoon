@@ -422,11 +422,10 @@ public class Player {
 		float drawHeight = currentAnimation.getHeight() / 150f;
 		drawWidth= (left) ? drawWidth: -drawWidth;
 		
-		System.out.println(currentAnimation.getImage(0).getResourceReference());
 		Vec2 offset = animationOffsets.get(currentAnimation.getImage(0).getResourceReference());
 		float scale = 0.5f;
-		currentAnimation.draw( position.x + 0*drawWidth*0.5f + ((left) ? -offset.x : offset.x),
-				position.y - 0*drawHeight*0.5f + offset.y, // -0.5f --> sonst wuerde sprite in den boden hinein stehen 
+		currentAnimation.draw( position.x + ((left) ? -offset.x : offset.x),
+				position.y + offset.y, // -0.5f --> sonst wuerde sprite in den boden hinein stehen 
 				-drawWidth * scale , 
 				drawHeight * scale);
 	}
