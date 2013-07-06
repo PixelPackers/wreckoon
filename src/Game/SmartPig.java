@@ -33,6 +33,7 @@ public class SmartPig extends Enemy {
 	
 	public void update(){
 		super.update();
+		
 		Player player = this.game.getPlayer();
 		
 		Vec2 p = player.getBody().getPosition();
@@ -52,7 +53,7 @@ public class SmartPig extends Enemy {
 			}
 		}
 		
-		if (!isDead() && !dizzy ){
+		if (!isDead() && !dizzy && !getsGrilled){ // movement
 			if(aggro){
 			
 				float x; 

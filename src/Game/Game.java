@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
@@ -308,6 +309,17 @@ public class Game extends BasicGame {
 			for (DropItem d : dropItems){
 				d.update();
 			}
+			
+			Iterator iterator = player.getDropItemsToCollect().iterator();
+			while (iterator.hasNext()){
+				DropItem dropItem = (DropItem) iterator.next();
+				if(dropItem.isCollectable()){
+					dropItem.collect();
+					iterator.remove();
+					getObjectsToRemove().add(dropItem);
+				}
+			}
+			System.out.println(getPlayer().getDropItemsToCollect().size());
 			
 	//		for (GameObject o :  objectsToAdd){
 	//			world.destroyBody(o.getBody());
@@ -820,15 +832,12 @@ public class Game extends BasicGame {
 			
 			if(!player.isBiting()) {
 				player.bite();
-			
-				if(player.isLaserAble()) {
-					player.initializeLaser();	
-				}
+				player.initializeLaser();
 			}
 		}
 		
 		if(xbox.isButtonYUp()){
-			if(player.isLaserAble()){ 
+			if(player.isLaserStarted()){ 
 				player.setWaitingForLaserToBeKilled(true);
 			}
 		}

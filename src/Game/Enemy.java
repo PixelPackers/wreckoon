@@ -32,6 +32,9 @@ public abstract class Enemy extends GameObjectBox {
 	protected int dizzyCounter = 0;
 	private int dizzyRotationCounter = 0;
 	
+	private 	int	 	health = 35;
+	protected	boolean	getsGrilled = false;
+	
 
 	protected static final int DIZZY_TIME 			= 300;
 	
@@ -283,6 +286,13 @@ public abstract class Enemy extends GameObjectBox {
 			dizzy = false;
 		}
 		
+		if (health < 0 && !dead){
+			die();
+		}
+		
+		if (getsGrilled){
+			--health;
+		}
 		++dieCounter;
 		++dizzyCounter;
 		++dizzyRotationCounter;
@@ -339,7 +349,13 @@ public abstract class Enemy extends GameObjectBox {
 	}
 	
 	public void laserHit(){
-		this.throwBack();
-		this.die();
+//		this.throwBack();
+//		this.die();
+
+		getsGrilled = true;
 	}
+	public void laserHitEnd(){
+		getsGrilled = false;
+	}
+	
 }

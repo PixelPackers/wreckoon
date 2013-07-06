@@ -26,7 +26,7 @@ public class Player {
 	private static final float	TAILWHIP_DISTANCE	= 5f;
 	private static final int	TAILWHIP_TIME		= 110;
 	private static final int 	GROUNDPOUND_AIRTIME = 30;
-	private static final int 	LASER_DURATION 		= 120;
+	private static final int 	LASER_DURATION 		= 12000;
 	private static final int 	SHOCK_DURATION		= 200;
 	private static final int 	DEATH_WAIT_TIME		= 70;
 
@@ -36,6 +36,7 @@ public class Player {
 	private final float ACC_RUNNING = 0.4375f;
 	private final float FRICTION = 1f;
     private static final int         BOLT_PRICE_FOR_LASER= 10;
+    private static final boolean ENDLESS_LASER = true;
 
 	
 	private int groundPoundCounter	= 0;
@@ -121,6 +122,7 @@ public class Player {
 	
 	private Laser laser;
 
+	private ArrayList<DropItem> dropItemsToCollect = new ArrayList<DropItem>();
 
 	private ArrayList<MySensor> sensorList			= new ArrayList<MySensor>();
 	
@@ -607,7 +609,7 @@ public class Player {
 			if (this.laserStarted && this.currentAnimation.isStopped() ) {
 				this.currentAnimation = animations.get("laser");
 				createLaser();
-			}
+			}			
 			
 			// TODO überprüfen ob das jetzt mit lauf band funkt
 			if(this.conveyorSpeed != 0){
@@ -1009,8 +1011,8 @@ public class Player {
 		} else {
 			lock();
 		}
-		
-		if (!this.laserStarted && this.laserAble) {
+
+		if (ENDLESS_LASER || !this.laserStarted && this.laserAble) {
 		
 			this.laserStarted = true;
 			
@@ -1384,5 +1386,11 @@ public class Player {
 
     public int getLaserTime() {
 		return laserTime;
+	}
+    public boolean isLaserStarted() {
+		return laserStarted;
+	}
+    public ArrayList<DropItem> getDropItemsToCollect() {
+		return dropItemsToCollect;
 	}
 }
