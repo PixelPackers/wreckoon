@@ -319,7 +319,6 @@ public class Game extends BasicGame {
 					getObjectsToRemove().add(dropItem);
 				}
 			}
-			System.out.println(getPlayer().getDropItemsToCollect().size());
 			
 	//		for (GameObject o :  objectsToAdd){
 	//			world.destroyBody(o.getBody());

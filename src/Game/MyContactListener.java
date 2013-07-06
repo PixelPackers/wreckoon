@@ -195,7 +195,7 @@ public class MyContactListener implements ContactListener{
 						iterator.remove();
 						game.getObjectsToRemove().add(dropItem);
 					} else {
-//						game.getPlayer().getDropItemsToCollect().add(dropItem);
+						game.getPlayer().getDropItemsToCollect().add(dropItem);
 					}
 					
 					
@@ -288,23 +288,24 @@ public class MyContactListener implements ContactListener{
 				break;
 			}
 			
-////			player + dropItems	
-//			Iterator iterator = game.getDropItems().iterator();
-//			while (iterator.hasNext()){
-//				
-//				DropItem dropItem = (DropItem) iterator.next();
-//					
-//				if (dropItem.getFixture() == contact.getFixtureA() || dropItem.getFixture() == contact.getFixtureB() ) {
-//
-//					if (!dropItem.isCollectable()) {
-//						game.getPlayer().getDropItemsToCollect().remove(dropItem);
-//					} else {
-//						dropItem.collect();
-//						iterator.remove();
+//			player + dropItems	
+			Iterator iterator = game.getDropItems().iterator();
+			while (iterator.hasNext()){
+				
+				DropItem dropItem = (DropItem) iterator.next();
+					
+				if (dropItem.getFixture() == contact.getFixtureA() || dropItem.getFixture() == contact.getFixtureB() ) {
+
+					if (!dropItem.isCollectable()) {
+						game.getPlayer().getDropItemsToCollect().remove(dropItem);
+					} else {
+						dropItem.collect();
+//						kA warum das nicht gebraucht wird, aber bitte... es funkt
 //						game.getObjectsToRemove().add(dropItem);
-//					}
-//				}
-//			}
+						iterator.remove();
+					}
+				}
+			}
 		}
 		
 		

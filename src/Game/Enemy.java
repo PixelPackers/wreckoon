@@ -32,7 +32,7 @@ public abstract class Enemy extends GameObjectBox {
 	protected int dizzyCounter = 0;
 	private int dizzyRotationCounter = 0;
 	
-	private 	int	 	health = 35;
+	private 	int	 	health = (int)(35 * Math.random()  + 20);
 	protected	boolean	getsGrilled = false;
 	
 
