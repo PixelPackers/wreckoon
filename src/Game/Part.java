@@ -22,7 +22,7 @@ public class Part {
 	private Game game;
 	private float x;
 	private float y;
-	private Image image = new Image("images/part.png");
+	private Image image = Images.getInstance().getImage("images/part.png");
 	private boolean collected = false;
 	
 	private float floatingHeight = 0f;

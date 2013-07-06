@@ -44,7 +44,7 @@ public class Shred extends DropItem {
 	
 	public void grilled() throws SlickException{
 		if(!grilled){
-			super.image = new Image( image.getResourceReference().replace(".png", "laser.png") ) ;
+			super.image = Images.getInstance().getImage(image.getResourceReference().replace(".png", "laser.png"));
 			this.grilled = true;
 		}
 	}

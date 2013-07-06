@@ -119,7 +119,7 @@ public class Game extends BasicGame {
 		xbox = new Xbox360Controller();
 
 		for (int i = 0; i <= 4; ++i) {
-			trashpile[i] = new Image("images/background" + (i + 1) + ".png");
+			trashpile[i] = Images.getInstance().getImage("images/background" + (i + 1) + ".png");
 		}
 		
 		pauseImage = Images.getInstance().getImage("images/Pause.png");
@@ -248,8 +248,15 @@ public class Game extends BasicGame {
 			
 			world.setGravity(new Vec2(0f, (float) ((1d - xbox.getLeftTriggerValue()) * 20f +  ((float) xbox.getRightTriggerValue() * -20f))));
 			
-			float targetCamX = (float) (player.getBody().getPosition().x + xbox.getRightThumbX() * 3f);
-			float targetCamY = (float) (player.getBody().getPosition().y + xbox.getRightThumbY() * 3f);
+			float targetCamX, targetCamY;
+			if (player.isLaserActive()) {
+				targetCamX = (float) (player.getBody().getPosition().x + xbox.getLeftThumbX() * 4f);
+				targetCamY = (float) (player.getBody().getPosition().y + xbox.getLeftThumbY() * 4f);
+			} else {
+				targetCamX = (float) (player.getBody().getPosition().x + xbox.getRightThumbX() * 3f);
+				targetCamY = (float) (player.getBody().getPosition().y + xbox.getRightThumbY() * 3f);
+			}
+			
 			//if (targetCamY > level.getHeight() - screenHeight/2/zoom) targetCamY = level.getHeight() - screenHeight/2/zoom;
 			cam.follow(targetCamX, targetCamY, 10);
 			if(DOOMSDAY){
@@ -406,6 +413,9 @@ public class Game extends BasicGame {
 		g.pushTransform();
 		g.translate(-cam.getX() * zoom + screenWidth / 2f, -cam.getY() * zoom + screenHeight * 2f / 3f);
 		g.scale(zoom, zoom);
+		
+		g.setColor(earthColor);
+		g.fillRect(-21.5f, level.getHeight() - 1f, level.getWidth() + 21f, 10f);
 
 		house.draw(g, debugView);
 
@@ -477,10 +487,6 @@ public class Game extends BasicGame {
 		if (player.isLaserActive()) {
 			laser.draw(g, debugView);
 		}
-		
-		
-		g.setColor(earthColor);
-		g.fillRect(-21.5f, level.getHeight() - 1f, level.getWidth() + 21f, 10f);
 		
 		g.popTransform();
 		

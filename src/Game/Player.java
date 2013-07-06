@@ -133,23 +133,23 @@ public class Player {
 
 	private void initAnimations() throws SlickException {
 		// XXX evtl auch da eine hashmap verwenden?
-		SpriteSheet sheetWalk 		= new SpriteSheet("images/walkcycle.png", 	300, 290);
-		SpriteSheet sheetRun 		= new SpriteSheet("images/runcycle.png", 	368, 192);
-		SpriteSheet sheetWallJump	= new SpriteSheet("images/walljump.png", 	310, 342);
-		SpriteSheet sheetWallIdle	= new SpriteSheet("images/wallidle.png", 	310, 342);
-		SpriteSheet sheetTailwhip	= new SpriteSheet("images/tailwhip.png",	385, 180);
-		SpriteSheet sheetIdle		= new SpriteSheet("images/idle.png", 		227, 288);
-		SpriteSheet sheetGroundpoundRoll	= new SpriteSheet("images/groundpoundroll.png", 300, 270);
-		SpriteSheet sheetGroundpoundAir		= new SpriteSheet("images/groundpoundair.png", 300, 270);
-		SpriteSheet sheetGroundpoundImpact	= new SpriteSheet("images/groundpoundimpact.png", 300, 271);
-		SpriteSheet sheetDeath		= new SpriteSheet("images/death.png", 		364, 160);
-		SpriteSheet sheetDeathAir	= new SpriteSheet("images/deathair.png", 	365, 160);
-		SpriteSheet sheetWalkJump	= new SpriteSheet("images/jump.png", 		337, 288);
-		SpriteSheet sheetWalkJumpAir= new SpriteSheet("images/jumpair.png", 	338, 288);
-		SpriteSheet sheetRunJump	= new SpriteSheet("images/flycycle.png", 	368, 172);
-		SpriteSheet sheetBite		= new SpriteSheet("images/bite.png", 		227, 288);
-		SpriteSheet sheetShock		= new SpriteSheet("images/shock.png", 		227, 288);
-		SpriteSheet sheetLaser		= new SpriteSheet("images/lasercycle.png", 	300, 270);
+		SpriteSheet sheetWalk 		= Images.getInstance().getSpriteSheet("images/walkcycle.png", 	300, 290);
+		SpriteSheet sheetRun 		= Images.getInstance().getSpriteSheet("images/runcycle.png", 	368, 192);
+		SpriteSheet sheetWallJump	= Images.getInstance().getSpriteSheet("images/walljump.png", 	310, 342);
+		SpriteSheet sheetWallIdle	= Images.getInstance().getSpriteSheet("images/wallidle.png", 	310, 342);
+		SpriteSheet sheetTailwhip	= Images.getInstance().getSpriteSheet("images/tailwhip.png",	385, 180);
+		SpriteSheet sheetIdle		= Images.getInstance().getSpriteSheet("images/idle.png", 		227, 288);
+		SpriteSheet sheetGroundpoundRoll	= Images.getInstance().getSpriteSheet("images/groundpoundroll.png", 300, 270);
+		SpriteSheet sheetGroundpoundAir		= Images.getInstance().getSpriteSheet("images/groundpoundair.png", 300, 270);
+		SpriteSheet sheetGroundpoundImpact	= Images.getInstance().getSpriteSheet("images/groundpoundimpact.png", 300, 271);
+		SpriteSheet sheetDeath		= Images.getInstance().getSpriteSheet("images/death.png", 		364, 160);
+		SpriteSheet sheetDeathAir	= Images.getInstance().getSpriteSheet("images/deathair.png", 	365, 160);
+		SpriteSheet sheetWalkJump	= Images.getInstance().getSpriteSheet("images/jump.png", 		337, 288);
+		SpriteSheet sheetWalkJumpAir= Images.getInstance().getSpriteSheet("images/jumpair.png", 	338, 288);
+		SpriteSheet sheetRunJump	= Images.getInstance().getSpriteSheet("images/flycycle.png", 	368, 172);
+		SpriteSheet sheetBite		= Images.getInstance().getSpriteSheet("images/bite.png", 		227, 288);
+		SpriteSheet sheetShock		= Images.getInstance().getSpriteSheet("images/shock.png", 		227, 288);
+		SpriteSheet sheetLaser		= Images.getInstance().getSpriteSheet("images/lasercycle.png", 	300, 270);
 		
 		
 		

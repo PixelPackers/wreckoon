@@ -20,14 +20,14 @@ public class Laser extends GameObjectPolygon {
 	private SpriteSheet laserSheet = Images.getInstance().getSpriteSheet("images/laser.png", 1500, 100);
 	private Animation laserAnimation;
 	
-	private static float DRAW_WIDTH = 8f;
-	private static float DRAW_HEIGHT = 1f;
+	private static float WIDTH = 15f;
+	private static float HEIGHT = 1f;
 	
 	
 	private static Vec2[] verts = new Vec2[] {
-			new Vec2( 0f, 0f),
-			new Vec2( 8f, -0.5f),
-			new Vec2( 8f, 0.5f)
+			new Vec2(0f, 0f),
+			new Vec2(WIDTH, -HEIGHT * 0.5f),
+			new Vec2(WIDTH, HEIGHT * 0.5f)
 		};
 	
 	public Laser(World world, float posX, float posY) throws SlickException {
@@ -51,12 +51,12 @@ public class Laser extends GameObjectPolygon {
 	public void drawImage(Graphics g) {
 		g.pushTransform();
 		g.rotate(getBody().getPosition().x, getBody().getPosition().y, (float) Math.toDegrees(getBody().getAngle()));
-		g.translate(0f, -DRAW_HEIGHT * 0.5f);
+		g.translate(0f, -HEIGHT * 0.5f);
 		laserAnimation.draw(
 				getBody().getPosition().x,
 				getBody().getPosition().y, 
-				DRAW_WIDTH, 
-				DRAW_HEIGHT);
+				WIDTH, 
+				HEIGHT);
 		g.popTransform();
 	}
 	

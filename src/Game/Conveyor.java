@@ -34,7 +34,7 @@ public class Conveyor extends GameObjectBox {
 		
 		try {
 			// TODO richtiges bild verwendenen
-			spriteSheet = new SpriteSheet("images/generatoranimated.png", 	770, 1135);
+			spriteSheet = Images.getInstance().getSpriteSheet("images/generatoranimated.png", 	770, 1135);
 		} catch (SlickException e) {
 			e.printStackTrace();
 		}
