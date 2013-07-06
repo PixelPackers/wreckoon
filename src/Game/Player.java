@@ -1072,10 +1072,10 @@ public class Player {
 
 
 	public void bite(){
-		
 		if(!this.biting && !locked && !laserAble && boltCounter >= BOLT_PRICE_FOR_LASER){
-			
+
 			if (this.ableToGetLaser && this.isOnGround()){
+				
 				lock();
 				
 				this.biting = true;

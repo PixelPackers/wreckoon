@@ -821,10 +821,10 @@ public class Game extends BasicGame {
 			
 			if(!player.isBiting()) {
 				player.bite();
-			}
 			
-			if( !player.isBiting() && player.isLaserAble()) {
-				player.initializeLaser();	
+				if(player.isLaserAble()) {
+					player.initializeLaser();	
+				}
 			}
 		}
 		
