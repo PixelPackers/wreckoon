@@ -59,6 +59,7 @@ public abstract class Enemy extends GameObjectBox {
 
 	protected HashMap<String, Animation> animations = new HashMap<String, Animation>();
 	protected Animation currentAnimation;
+	protected HashMap<String, Vec2> animationOffsets = new HashMap<String, Vec2>();
 
 	public Enemy(Game game, float posX, float posY, String imgPath) throws SlickException {
 		super(game.getWorld(), posX, posY, staticPigSize, staticPigSize, 3.3f, 0.3f, 0.3f, imgPath, BodyType.DYNAMIC);
@@ -156,7 +157,9 @@ public abstract class Enemy extends GameObjectBox {
 	
 	@Override
 	public void drawOutline(Graphics g){
-				
+		
+		drawImage();
+		
 		Polygon polygonToDraw = new Polygon();
 		Vec2[] verts = this.polygonShape.getVertices();
 		for (int i=0; i< this.polygonShape.m_vertexCount; ++i) {
@@ -286,28 +289,45 @@ public abstract class Enemy extends GameObjectBox {
 	}
 
 	public void drawImage() {
-		float drawWidth = (left) ? -pigSize : pigSize;
-//		float drawHeight= (dizzy) ? -pigSize : pigSize;
-		float drawHeight= pigSize;
+//		float drawWidth = (left) ? -pigSize : pigSize;
+////		float drawHeight= (dizzy) ? -pigSize : pigSize;
+//		float drawHeight= pigSize;
+		
+		
+		float drawWidth =  currentAnimation.getWidth() / 150f * pigSize; 
+		float drawHeight = currentAnimation.getHeight() / 150f * pigSize;
+		drawWidth= (left) ? drawWidth: -drawWidth;
+		
+		Vec2 offset = animationOffsets.get(currentAnimation.getImage(0).getResourceReference());
+		float scale = 0.7f;
 		
 		if(!this.dead && !this.isOnGround() && dizzy && (dizzyRotationCounter*12 % 540 != 0) && firstTimeRotation ){
 			Image tmpImg = currentAnimation.getCurrentFrame();
 			tmpImg.setRotation( rotDir * dizzyRotationCounter*12);
-			tmpImg.draw( 
-					getBody().getPosition().x-drawWidth*0.5f,
-					getBody().getPosition().y-drawHeight*0.5f, 
-					drawWidth * PIG_CLASS_SIZE_FACTOR, 
-					drawHeight * PIG_CLASS_SIZE_FACTOR);
+//			tmpImg.draw( 
+//					getBody().getPosition().x-drawWidth*0.5f,
+//					getBody().getPosition().y-drawHeight*0.5f, 
+//					drawWidth * PIG_CLASS_SIZE_FACTOR, 
+//					drawHeight * PIG_CLASS_SIZE_FACTOR);
+			tmpImg.draw( getBody().getPosition().x + ((left) ? -offset.x : offset.x)* pigSize,
+					getBody().getPosition().y + offset.y * pigSize,
+					-drawWidth * scale , 
+					drawHeight * scale);
 			tmpImg.setRotation( 0);
 			
 		} else {
 			firstTimeRotation = true;
-			currentAnimation.draw( 
-					getBody().getPosition().x-drawWidth*0.5f,
-					getBody().getPosition().y-drawHeight*0.5f, 
-					drawWidth * PIG_CLASS_SIZE_FACTOR, 
-					drawHeight * PIG_CLASS_SIZE_FACTOR);
+//			currentAnimation.draw( 
+//					getBody().getPosition().x-drawWidth*0.5f,
+//					getBody().getPosition().y-drawHeight*0.5f, 
+//					drawWidth * PIG_CLASS_SIZE_FACTOR, 
+//					drawHeight * PIG_CLASS_SIZE_FACTOR);
+			currentAnimation.draw( getBody().getPosition().x + ((left) ? -offset.x : offset.x)* pigSize,
+					getBody().getPosition().y + offset.y * pigSize,
+					-drawWidth * scale , 
+					drawHeight * scale);			
 		}
+		
 	}
 	
 	public float getPigSize() {

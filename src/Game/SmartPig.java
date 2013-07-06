@@ -1,5 +1,7 @@
 package Game;
 
+import java.util.HashMap;
+
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
 import org.newdawn.slick.Animation;
@@ -96,11 +98,11 @@ public class SmartPig extends Enemy {
 	@Override
 	protected void initAnimations() throws SlickException {
 
-		SpriteSheet sheetWalk= new SpriteSheet("images/smartpigWalk.png", 	275, 330);
-		SpriteSheet sheetRun = new SpriteSheet("images/smartpigrun.png", 	290, 306);
-		SpriteSheet sheetIdle = new SpriteSheet("images/smartpigIdle.png", 	275, 300);
-		SpriteSheet sheetDie  = new SpriteSheet("images/smartpigdeath.png", 	275, 300);
-		SpriteSheet sheetDisabled  = new SpriteSheet("images/smartpigdisable.png", 	275, 250);
+		SpriteSheet sheetWalk= Images.getInstance().getSpriteSheet("images/smartpigWalk.png", 	275, 330);
+		SpriteSheet sheetRun = Images.getInstance().getSpriteSheet("images/smartpigrun.png", 	290, 306);
+		SpriteSheet sheetIdle = Images.getInstance().getSpriteSheet("images/smartpigIdle.png", 	275, 300);
+		SpriteSheet sheetDie  = Images.getInstance().getSpriteSheet("images/smartpigdeath.png", 	275, 300);
+		SpriteSheet sheetDisabled  = Images.getInstance().getSpriteSheet("images/smartpigdisable.png", 	275, 250);
 		
 		
 		Animation animationWalk = new Animation(sheetWalk, 120);
@@ -118,6 +120,12 @@ public class SmartPig extends Enemy {
 		animations.put("idle", animationIdle);
 		animations.put("disabled", animationDisabled);
 		animations.put("die", animationDie);
+		
+		animationOffsets.put("images/smartpigWalk.png", new Vec2(-0.5f, -1f));
+		animationOffsets.put("images/smartpigrun.png", new Vec2(-0.6f, -0.9f));
+		animationOffsets.put("images/smartpigIdle.png", new Vec2(-0.5f, -1f));
+		animationOffsets.put("images/smartpigdeath.png", new Vec2(-0.5f, -0.6f));
+		animationOffsets.put("images/smartpigdisable.png", new Vec2(-0.5f, -0.6f));
 		
 		currentAnimation = animationWalk;
 		

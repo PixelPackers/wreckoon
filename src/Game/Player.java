@@ -239,7 +239,7 @@ public class Player {
 		
 		Filter filter = new Filter();
 		filter.maskBits = 1 + 4 + 8;
-		filter.categoryBits = 8;
+		filter.categoryBits = 2;
 		wheel.getFixture().setFilterData(filter);
 		
 		RevoluteJointDef revoluteJointDef = new RevoluteJointDef();
@@ -400,17 +400,18 @@ public class Player {
 	}
 
 	public void draw(Graphics g, boolean debugView){
-//		if (debugView) {
-//			this.drawOutline(g);
-//		} else {
-//			this.drawImage();
-//		}
+		if (debugView) {
+			this.drawOutline(g);
+			wheel.drawOutline(g);
+		} else {
+			this.drawImage();
+		}
 		
-		// sprite testing
-		this.drawImage();
-		this.drawOutline(g);
+//		// sprite testing
+//		this.drawImage();
+//		this.drawOutline(g);
 		
-		wheel.drawOutline(g);
+		
 		
 	}
 	
@@ -425,7 +426,7 @@ public class Player {
 		Vec2 offset = animationOffsets.get(currentAnimation.getImage(0).getResourceReference());
 		float scale = 0.5f;
 		currentAnimation.draw( position.x + ((left) ? -offset.x : offset.x),
-				position.y + offset.y, // -0.5f --> sonst wuerde sprite in den boden hinein stehen 
+				position.y + offset.y,
 				-drawWidth * scale , 
 				drawHeight * scale);
 	}

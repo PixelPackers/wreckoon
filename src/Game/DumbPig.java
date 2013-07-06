@@ -1,5 +1,7 @@
 package Game;
 
+import java.util.HashMap;
+
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
 import org.newdawn.slick.Animation;
@@ -17,8 +19,6 @@ public class DumbPig extends Enemy{
 
 	private int		updateCounter	= 0;
 	private boolean	idle			= false;
-	
-	
 	
 	public DumbPig(Game game, float posX, float posY, float width, float height, float density, float friction, float restitution, String imgPath,
 			BodyType bodyType) throws SlickException {
@@ -72,11 +72,11 @@ public class DumbPig extends Enemy{
 	@Override
 	protected void initAnimations() throws SlickException {
 
-		SpriteSheet sheetWalk = new SpriteSheet("images/dumbpigwalk.png", 	275, 276);
-		SpriteSheet sheetIdle = new SpriteSheet("images/dumbpigidle.png", 	275, 275);
-		SpriteSheet sheetIdle2 = new SpriteSheet("images/dumbpigidlescratch.png", 	275, 275);
-		SpriteSheet sheetDie  = new SpriteSheet("images/dumbpigdeath.png", 	275, 275);
-		SpriteSheet sheetDisabled  = new SpriteSheet("images/dumbpigdisable.png", 	275, 250);
+		SpriteSheet sheetWalk = Images.getInstance().getSpriteSheet("images/dumbpigwalk.png", 	275, 276);
+		SpriteSheet sheetIdle = Images.getInstance().getSpriteSheet("images/dumbpigidle.png", 	275, 275);
+		SpriteSheet sheetIdle2 = Images.getInstance().getSpriteSheet("images/dumbpigidlescratch.png", 	275, 275);
+		SpriteSheet sheetDie  = Images.getInstance().getSpriteSheet("images/dumbpigdeath.png", 	275, 275);
+		SpriteSheet sheetDisabled  = Images.getInstance().getSpriteSheet("images/dumbpigdisable.png", 	275, 250);
 		
 		Animation animationWalk = new Animation(sheetWalk, 80);
 		
@@ -95,6 +95,12 @@ public class DumbPig extends Enemy{
 		animations.put("idle2", animationIdle2);
 		animations.put("die", animationDie);
 		animations.put("disabled", animationDisabled);
+		
+		animationOffsets.put("images/dumbpigwalk.png", new Vec2(-0.5f, -0.7f));
+		animationOffsets.put("images/dumbpigidle.png", new Vec2(-0.5f, -0.7f));
+		animationOffsets.put("images/dumbpigidlescratch.png", new Vec2(-0.5f, -0.7f));
+		animationOffsets.put("images/dumbpigdeath.png", new Vec2(-0.5f, -0.6f));
+		animationOffsets.put("images/dumbpigdisable.png", new Vec2(-0.5f, -0.6f));
 		
 		currentAnimation = animationWalk;
 	

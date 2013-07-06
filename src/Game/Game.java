@@ -485,7 +485,7 @@ public class Game extends BasicGame {
 		}
 		
 		//drawZoomAreas(g);
-		drawCheckpoints(g);
+		//drawCheckpoints(g);
 
 		// GUI
 		
@@ -557,8 +557,7 @@ public class Game extends BasicGame {
 				g.translate(-cam.getX() * zoom * bo.getZ() + screenWidth / 2, -cam.getY() * zoom * bo.getZ() + screenHeight * 2 / 3);
 				g.scale(zoom * bo.getZ(), zoom * bo.getZ());
 
-				//Image tmp = trashpile[bo.getType()];
-				Image tmp = trashpile[0];
+				Image tmp = trashpile[bo.getType()];
 				tmp = tmp.getFlippedCopy(bo.isFlipped(), false);
 				tmp.setImageColor(1f - bo.getZ() + multiplierColor.r * bo.getZ(),
 						1f - bo.getZ() + multiplierColor.g * bo.getZ(),

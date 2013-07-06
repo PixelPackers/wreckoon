@@ -2,6 +2,7 @@ package Game;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.Filter;
 import org.jbox2d.dynamics.Fixture;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
@@ -17,6 +18,10 @@ public class MySensor {
 	
 	public MySensor(Fixture fixture, PolygonShape polygonShape){
 		this.fixture = fixture;
+		Filter filter = new Filter();
+		filter.categoryBits = 4;
+		filter.maskBits = 1 + 2 + 4;
+		this.fixture.setFilterData(filter);
 		this.polygonShape = polygonShape;
 	}
 	
