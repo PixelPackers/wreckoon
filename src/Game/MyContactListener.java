@@ -118,8 +118,9 @@ public class MyContactListener implements ContactListener {
 				}
 				
 				// groundpound + boden
-				if (contact.getFixtureA().getFilterData().categoryBits == 1 || contact.getFixtureB().getFilterData().categoryBits == 1) {
+				if (contact.getFixtureA().getFilterData().categoryBits == 33 || contact.getFixtureB().getFilterData().categoryBits == 33) {
 					game.getPlayer().stopGroundpounding();
+					System.out.println("32");
 				}
 			}
 			
