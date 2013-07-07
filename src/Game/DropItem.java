@@ -21,15 +21,13 @@ public abstract class DropItem extends GameObjectPolygon {
 	private boolean			collectable	= false;
 	
 	// @formatter:off
-	private static Vec2[] verts = new Vec2[] {
-		new Vec2(-0.45117188f * FACTOR, -0.28125f * FACTOR),
-		new Vec2(-0.29882812f * FACTOR, -0.47265625f * FACTOR),
-		new Vec2(0.16015625f * FACTOR, -0.5f * FACTOR),
-		new Vec2(0.5f * FACTOR, -0.12695312f * FACTOR),
-		new Vec2(0.45703125f * FACTOR, 0.27734375f * FACTOR),
-		new Vec2(0.265625f * FACTOR, 0.43554688f * FACTOR),
-		new Vec2(-0.15625f * FACTOR, 0.49023438f * FACTOR),
-		new Vec2(-0.5f * FACTOR, 0.17382812f * FACTOR)
+	private static Vec2[] verts = new Vec2[]{
+			new Vec2(-0.37695312f * FACTOR, -0.40429688f * FACTOR),
+			new Vec2(0.15625f * FACTOR, -0.46875f * FACTOR),
+			new Vec2(0.49414062f * FACTOR, -0.080078125f * FACTOR),
+			new Vec2(0.3203125f * FACTOR, 0.40039062f * FACTOR),
+			new Vec2(-0.16796875f * FACTOR, 0.46875f * FACTOR),
+			new Vec2(-0.46679688f * FACTOR, 0.13867188f * FACTOR),
 	};
 	// @formatter:on
 	

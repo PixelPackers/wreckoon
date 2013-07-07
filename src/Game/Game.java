@@ -9,6 +9,7 @@ import java.util.Iterator;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.World;
+import org.lwjgl.openal.AL;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Color;
@@ -21,6 +22,9 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.fills.GradientFill;
 import org.newdawn.slick.geom.Rectangle;
+
+import ch.aplu.xboxcontroller.XboxController;
+import ch.aplu.xboxcontroller.XboxControllerAdapter;
 
 import com.google.gson.Gson;
 
@@ -46,14 +50,13 @@ public class Game extends BasicGame {
 	
 	private static final float				MANUAL_ZOOM_STEP	= 4f;
 	private static double					laserAngle;
-	
 	private static double					laserTargetAngle;
 	
 	private static World					world;
 	private static ArrayList<GameObject>	staticObjects		= new ArrayList<GameObject>();
 	private static ArrayList<GameObject>	dynamicObjects		= new ArrayList<GameObject>();
 	private static ArrayList<Enemy>			enemies				= new ArrayList<Enemy>();
-	private static ArrayList<Tile>			tiles				= new ArrayList<Tile>();
+	private static Tile[][]					tiles;
 	private static Player					player;
 	private static ArrayList<Part>			parts				= new ArrayList<Part>();
 	private static ArrayList<Girder>		girders				= new ArrayList<Girder>();
@@ -85,7 +88,7 @@ public class Game extends BasicGame {
 	
 	private static Level					level;
 	
-	private static Xbox360Controller		xbox;
+	private static XboxController			xbox;
 	private float							BACKGROUND_SCALE	= 0.008f;
 	private float							smoothBoltGUIAngle;
 	
@@ -95,6 +98,18 @@ public class Game extends BasicGame {
 	private static SpriteSheet				digits;
 	
 	private static Laser					laser;
+	
+	private int								tilesDrawn;
+	
+	private static final double				THUMBSTICK_DEADZONE	= 0.2d;
+	private static final double				TRIGGER_DEADZONE	= 0.2d;
+	
+	private double							xboxLeftThumbDirection;
+	private double							xboxRightThumbDirection;
+	private double							xboxLeftThumbMagnitude;
+	private double							xboxRightThumbMagnitude;
+	private double							xboxLeftTrigger;
+	private double							xboxRightTrigger;
 	
 	public static ArrayList<Conveyor> getConveyors() {
 		return conveyors;
@@ -272,7 +287,7 @@ public class Game extends BasicGame {
 	public void init(GameContainer gc) throws SlickException {
 		// MusicManager.getInstance().bgMusic();
 		
-		xbox = new Xbox360Controller();
+		setupXBox();
 		
 		for (int i = 0; i <= 4; ++i) {
 			trashpile[i] = Images.getInstance().getImage("images/background" + (i + 1) + ".png");
@@ -294,12 +309,13 @@ public class Game extends BasicGame {
 		house = new House(world, -21.03f, level.getHeight() - 0.88f);
 		
 		// create the tiles
+		tiles = new Tile[level.getWidth()][level.getHeight()];
 		for (int x = 0; x < level.getWidth(); ++x) {
 			for (int y = 0; y < level.getHeight(); ++y) {
 				Block b = level.getBlock(x, y);
 				if (b.getType() > 0) {
 					Tile newTile = new Tile(world, x, y, b.getType(), 180 + b.getAngle(), !b.isFlipped());
-					tiles.add(newTile);
+					tiles[x][y] = newTile;
 					
 					// SPIKES
 					if (isSpike(b.getType())) {
@@ -346,6 +362,78 @@ public class Game extends BasicGame {
 		
 	}
 	
+	private void setupXBox() {
+		xbox = new XboxController();
+		xbox.setLeftThumbDeadZone(THUMBSTICK_DEADZONE);
+		xbox.setRightThumbDeadZone(THUMBSTICK_DEADZONE);
+		xbox.setLeftTriggerDeadZone(TRIGGER_DEADZONE);
+		xbox.setRightTriggerDeadZone(TRIGGER_DEADZONE);
+		xbox.addXboxControllerListener(new XboxControllerAdapter() {
+			public void buttonA(boolean pressed) {
+				if (pressed)
+					actionJump();
+				else
+					actionCancelJump();
+			}
+			
+			public void buttonB(boolean pressed) {
+				if (pressed)
+					actionGroundpound();
+			}
+			
+			public void buttonX(boolean pressed) {
+				if (pressed) {
+					actionTailwhip();
+				}
+			}
+			
+			public void buttonY(boolean pressed) {
+				if (pressed)
+					actionLaserStart();
+				else
+					actionLaserEnd();
+			}
+			
+			public void start(boolean pressed) {
+				if (pressed) {
+					actionPause();
+				}
+			}
+			
+			public void leftThumb(boolean pressed) {
+				actionDebugView();
+			}
+			
+			public void leftThumbDirection(double direction) {
+				xboxLeftThumbDirection = direction;
+			}
+			
+			public void leftThumbMagnitude(double magnitude) {
+				xboxLeftThumbMagnitude = magnitude;
+			}
+			
+			public void leftTrigger(double value) {
+				xboxLeftTrigger = value;
+			}
+			
+			public void rightThumbMagnitude(double magnitude) {
+				xboxRightThumbMagnitude = magnitude;
+			}
+			
+			public void rightTrigger(double value) {
+				xboxRightTrigger = value;
+			}
+			
+			public void rightThumb(boolean pressed) {
+				actionDoomsday();
+			}
+			
+			public void rightThumbDirection(double direction) {
+				xboxRightThumbDirection = direction;
+			}
+		});
+	}
+	
 	private void initNormalSky() {
 		skyGradientColor1 = new Color(112, 149, 163);
 		skyGradientColor2 = new Color(152, 199, 193);
@@ -390,13 +478,8 @@ public class Game extends BasicGame {
 	
 	public void processInput(Input input) throws SlickException {
 		
-		if (xbox.isButtonADown() || input.isKeyPressed(Input.KEY_SPACE) || input.isKeyPressed(Input.KEY_W)
-				|| input.isKeyPressed(Input.KEY_UP)) {
-			
-			if (!player.isCharging()) {
-				player.jump();
-			}
-			
+		if (input.isKeyPressed(Input.KEY_SPACE) || input.isKeyPressed(Input.KEY_W) || input.isKeyPressed(Input.KEY_UP)) {
+			actionJump();
 		}
 		
 		// / XXX MAGIC NUMBERS
@@ -406,24 +489,8 @@ public class Game extends BasicGame {
 		float slowDownForce = 5f;
 		float slowDownThreshold = 0.5f;
 		
-		if (xbox.isLeftThumbTiltedLeft() || input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
-			if (player.isCharging()) {
-				// player.getShootingDirection().x -= 1;
-				player.increaseShootingDirection(-1, 0);
-			} else {
-				// if (player.isOnGround()) {
-				player.setLeft(true);
-				// }
-				if (player.movesLeft()) {
-					player.accelerate((float) xbox.getLeftThumbMagnitude());
-				}
-				// else if( player.getBody().getLinearVelocity().x >
-				// minCounterSteerSpeed) {
-				// player.setLeft(true);
-				// player.accelerate();
-				// player.setLeft(false);
-				// }
-			}
+		if (isTiltedLeft(xboxLeftThumbDirection, xboxLeftThumbMagnitude) || input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
+			actionLeft();
 		}
 		
 		if (input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
@@ -432,25 +499,9 @@ public class Game extends BasicGame {
 			}
 		}
 		
-		if (xbox.isLeftThumbTiltedRight() || input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D)) {
-			
-			if (player.isCharging()) {
-				// player.getShootingDirection().x += 1;
-				player.increaseShootingDirection(1, 0);
-			} else {
-				// if (player.isOnGround()) {
-				player.setLeft(false);
-				// }
-				if (!player.movesLeft()) {
-					player.accelerate((float) xbox.getLeftThumbMagnitude());
-				}
-				// else if (player.getBody().getLinearVelocity().x <
-				// -minCounterSteerSpeed) {
-				// player.setLeft(false);
-				// player.accelerate();
-				// player.setLeft(true);
-				// }
-			}
+		if (isTiltedRight(xboxLeftThumbDirection, xboxLeftThumbMagnitude) || input.isKeyDown(Input.KEY_RIGHT)
+				|| input.isKeyDown(Input.KEY_D)) {
+			actionRight();
 		}
 		
 		if (input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D)) {
@@ -459,36 +510,8 @@ public class Game extends BasicGame {
 			}
 		}
 		
-		if (xbox.isButtonBDown() || input.isKeyPressed(Input.KEY_DOWN) || input.isKeyPressed(Input.KEY_S)) {
-			if (!player.isCharging() && !player.isOnGround()) {
-				player.groundpoundInit();
-			}
-			// } else if (player.isOnWall()){
-			// if(player.leftWallColliding()){
-			// // XXX magic numbers
-			// player.getBody().setLinearVelocity(new Vec2(3,0));
-			// } else if(player.rightWallColliding()){
-			// player.getBody().setLinearVelocity(new Vec2(-3,0));
-			// }
-			// }
-		}
-		
-		if (xbox.isButtonADown() || input.isKeyDown(Input.KEY_SPACE) || input.isKeyDown(Input.KEY_W) || input.isKeyDown(Input.KEY_UP)) {
-			if (player.isCharging()) {
-				// player.getShootingDirection().y += 1;
-				player.increaseShootingDirection(0, 1);
-			}
-		}
-		
-		if (xbox.isButtonAUp() && player.getBody().getLinearVelocity().y < 0f && !player.isOnGround()) {
-			player.cancelJump();
-		}
-		
-		if (xbox.isLeftThumbTiltedDown() || input.isKeyDown(Input.KEY_DOWN) || input.isKeyDown(Input.KEY_S)) {
-			if (player.isCharging()) {
-				// player.getShootingDirection().y -= 1;
-				player.increaseShootingDirection(0, -1);
-			}
+		if (input.isKeyPressed(Input.KEY_DOWN) || input.isKeyPressed(Input.KEY_S)) {
+			actionGroundpound();
 		}
 		
 		if (input.isKeyPressed(Input.KEY_Z)) {
@@ -586,42 +609,19 @@ public class Game extends BasicGame {
 			// 0.3f, 0.3f, null, BodyType.DYNAMIC));
 		}
 		
-		if (xbox.isButtonRightThumbDown()) {
-			DOOMSDAY = !DOOMSDAY;
+		if (input.isKeyPressed(Input.KEY_O)) {
+			actionDoomsday();
 		}
-		if (xbox.isButtonLeftThumbDown() || input.isKeyPressed(Input.KEY_ENTER)) {
-			debugView = !debugView;
+		if (input.isKeyPressed(Input.KEY_ENTER)) {
+			actionDebugView();
 		}
 		
 		if (input.isKeyDown(Input.KEY_N)) {
 			laserAngle = laserTargetAngle = 0d;
 		}
 		
-		// TODO crappy, weils keine keyUp() methode gibt. die reihenfolge muss
-		// auch so erhalten bleiben, sonsts is immer false
-		if (!xbox.isLeftTriggerDown() && !input.isKeyDown(Input.KEY_LSHIFT) && !input.isKeyDown(Input.KEY_RSHIFT)) {
-			// if (player.isOnGround() ){
-			player.setRunning(DEFAULT_RUNNING);
-			// }
-		}
-		
-		if (xbox.isButtonXDown() || input.isKeyDown(Input.KEY_H)) {
-			player.tailwhipInit();
-		}
-		
-		if (xbox.isButtonYDown() || input.isKeyPressed(Input.KEY_T)) {
-			
-			if (!player.hasLockedObject()) {
-				
-				player.lockObject(chooseTelekinesisTarget());
-				
-			} else if (player.isCharging()) {
-				GameObject locked = player.getLockedObject();
-				player.shoot();
-				player.lockObject(locked);
-			} else {
-				player.releaseObject();
-			}
+		if (input.isKeyDown(Input.KEY_H)) {
+			actionTailwhip();
 		}
 		
 		boolean shootkeyDown = false;
@@ -640,25 +640,105 @@ public class Game extends BasicGame {
 			}
 		}
 		
-		if (xbox.isButtonYDown() || input.isKeyPressed(Input.KEY_J)) {
-			
-			player.setWaitingForLaserToBeKilled(false);
-			
-			if (!player.isBiting()) {
-				player.bite();
-				player.initializeLaser();
-			}
+		if (input.isKeyPressed(Input.KEY_J)) {
+			actionLaserStart();
 		}
 		
-		if (xbox.isButtonYUp()) {
-			if (player.isBiting()) {
-				player.stopBiting();
-			}
-			if (player.isLaserStarted()) {
-				player.setWaitingForLaserToBeKilled(true);
-			}
+	}
+	
+	private void actionCancelJump() {
+		if (player.getBody().getLinearVelocity().y < 0f && !player.isOnGround())
+			player.cancelJump();
+	}
+	
+	private void actionLaserEnd() {
+		if (player.isBiting()) {
+			player.stopBiting();
 		}
+		if (player.isLaserStarted()) {
+			player.setWaitingForLaserToBeKilled(true);
+		}
+	}
+	
+	private void actionLaserStart() {
+		player.setWaitingForLaserToBeKilled(false);
 		
+		if (!player.isBiting()) {
+			player.bite();
+			player.initializeLaser();
+		}
+	}
+	
+	private void actionDebugView() {
+		debugView = !debugView;
+	}
+	
+	private void actionDoomsday() {
+		DOOMSDAY = !DOOMSDAY;
+	}
+	
+	private void actionTailwhip() {
+		player.tailwhipInit();
+	}
+	
+	private void actionGroundpound() {
+		if (!player.isCharging() && !player.isOnGround()) {
+			player.groundpoundInit();
+		}
+		// } else if (player.isOnWall()){
+		// if(player.leftWallColliding()){
+		// // XXX magic numbers
+		// player.getBody().setLinearVelocity(new Vec2(3,0));
+		// } else if(player.rightWallColliding()){
+		// player.getBody().setLinearVelocity(new Vec2(-3,0));
+		// }
+		// }
+	}
+	
+	private void actionRight() {
+		if (player.isCharging()) {
+			// player.getShootingDirection().x += 1;
+			player.increaseShootingDirection(1, 0);
+		} else {
+			// if (player.isOnGround()) {
+			player.setLeft(false);
+			// }
+			if (!player.movesLeft()) {
+				player.accelerate((float) xboxLeftThumbMagnitude);
+			}
+			// else if (player.getBody().getLinearVelocity().x <
+			// -minCounterSteerSpeed) {
+			// player.setLeft(false);
+			// player.accelerate();
+			// player.setLeft(true);
+			// }
+		}
+	}
+	
+	private void actionLeft() {
+		if (player.isCharging()) {
+			// player.getShootingDirection().x -= 1;
+			player.increaseShootingDirection(-1, 0);
+		} else {
+			// if (player.isOnGround()) {
+			player.setLeft(true);
+			// }
+			if (player.movesLeft()) {
+				player.accelerate((float) xboxLeftThumbMagnitude);
+			}
+			// else if( player.getBody().getLinearVelocity().x >
+			// minCounterSteerSpeed) {
+			// player.setLeft(true);
+			// player.accelerate();
+			// player.setLeft(false);
+			// }
+		}
+	}
+	
+	private void actionJump() {
+		if (!player.isCharging()) {
+			player.jump();
+		}
 	}
 	
 	private String readFile(String file) throws IOException {
@@ -676,6 +756,8 @@ public class Game extends BasicGame {
 	
 	@Override
 	public void render(GameContainer gc, Graphics g) throws SlickException {
+		
+		tilesDrawn = 0;
 		
 		g.fill(skyRect, skyGradient);
 		
@@ -724,8 +806,13 @@ public class Game extends BasicGame {
 		
 		player.draw(g, debugView);
 		
-		for (Tile tile : tiles) {
-			tile.draw(g, debugView);
+		for (int x = getBlockX(0); x <= getBlockX(screenWidth); ++x) {
+			for (int y = getBlockY(0); y <= getBlockY(screenHeight); ++y) {
+				if (tiles[x][y] != null) {
+					tiles[x][y].draw(g, debugView);
+					++tilesDrawn;
+				}
+			}
 		}
 		
 		for (Spike spike : spikes) {
@@ -804,10 +891,12 @@ public class Game extends BasicGame {
 		// g.drawString("ShootingPower: " + player.getShootingPower(), 200, 30);
 		// g.drawString("pos: " + player.getBody().getPosition(), 200, 50);
 		// g.drawString("pigs: " + player.getPigCounter(), 10, 30);
-		g.drawString("laserc: " + player.getLaserTime(), 10, 30);
-		
-		g.drawString("left thumbstick angle: " + xbox.getLeftThumbDirection() + "\n" + "laser angle: " + laserAngle + "\n"
-				+ "laser target angle: " + laserTargetAngle, 10, 50);
+		// g.drawString("laserc: " + player.getLaserTime(), 10, 30);
+		//
+		// g.drawString("left thumbstick angle: " + xbox.getLeftThumbDirection()
+		// + "\n" + "laser angle: " + laserAngle
+		// + "\nlaser target angle: " + laserTargetAngle + "\ntiles drawn: " +
+		// tilesDrawn, 10, 50);
 	}
 	
 	// public static ArrayList<Shred> getShreds() {
@@ -830,14 +919,8 @@ public class Game extends BasicGame {
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
 		Input input = gc.getInput();
-		if (xbox.isButtonStartDown() || input.isKeyPressed(Input.KEY_ESCAPE)) {
-			if (curMode == Mode.PLAY) {
-				curMode = Mode.PAUSE;
-				pauseAnimations();
-			} else {
-				curMode = Mode.PLAY;
-				restartAnimations();
-			}
+		if (input.isKeyPressed(Input.KEY_ESCAPE)) {
+			actionPause();
 		}
 		
 		if (curMode == Mode.PLAY) {
@@ -845,7 +928,7 @@ public class Game extends BasicGame {
 			
 			house.updateAnimations();
 			
-			laserTargetAngle = Math.toRadians(xbox.getLeftThumbDirection() - 90d);
+			laserTargetAngle = Math.toRadians(xboxLeftThumbDirection - 90d);
 			laserAngle = Functions.curveAngle(laserAngle, laserTargetAngle, 0.1f);
 			laser.position(player.getBody().getPosition().x, player.getBody().getPosition().y - 0.4f, (float) laserAngle);
 			
@@ -855,15 +938,15 @@ public class Game extends BasicGame {
 				enemy.update();
 			}
 			
-			world.setGravity(new Vec2(0f, (float) ((1d - xbox.getLeftTriggerValue()) * 20f + ((float) xbox.getRightTriggerValue() * -20f))));
+			world.setGravity(new Vec2(0f, (float) ((1d - xboxLeftTrigger) * 20f + ((float) xboxRightTrigger * -20f))));
 			
 			float targetCamX, targetCamY;
 			if (player.isLaserActive()) {
-				targetCamX = (float) (player.getBody().getPosition().x + xbox.getLeftThumbX() * 4f);
-				targetCamY = (float) (player.getBody().getPosition().y + xbox.getLeftThumbY() * 4f);
+				targetCamX = (float) (player.getBody().getPosition().x + polarToX(xboxLeftThumbDirection, xboxLeftThumbMagnitude) * 4f);
+				targetCamY = (float) (player.getBody().getPosition().y + polarToY(xboxLeftThumbDirection, xboxLeftThumbMagnitude) * 4f);
 			} else {
-				targetCamX = (float) (player.getBody().getPosition().x + xbox.getRightThumbX() * 3f);
-				targetCamY = (float) (player.getBody().getPosition().y + xbox.getRightThumbY() * 3f);
+				targetCamX = (float) (player.getBody().getPosition().x + polarToX(xboxRightThumbDirection, xboxRightThumbMagnitude) * 3f);
+				targetCamY = (float) (player.getBody().getPosition().y + polarToY(xboxRightThumbDirection, xboxRightThumbMagnitude) * 3f);
 			}
 			// if (targetCamY > level.getHeight() - screenHeight/2/zoom)
 			// targetCamY = level.getHeight() - screenHeight/2/zoom;
@@ -968,8 +1051,58 @@ public class Game extends BasicGame {
 			initNormalSky();
 		}
 		
-		xbox.resetStates();
-		
+	}
+	
+	private double polarToY(double direction, double magnitude) {
+		return Math.sin(Math.toRadians(direction - 90d)) * magnitude;
+	}
+	
+	private double polarToX(double direction, double magnitude) {
+		return Math.cos(Math.toRadians(direction - 90d)) * magnitude;
+	}
+	
+	private void actionPause() {
+		if (curMode == Mode.PLAY) {
+			curMode = Mode.PAUSE;
+			pauseAnimations();
+		} else {
+			curMode = Mode.PLAY;
+			restartAnimations();
+		}
+	}
+	
+	private float getWorldX(float screenX) {
+		return screenX / zoom + cam.getX() - screenWidth / 2 / zoom;
+	}
+	
+	private float getWorldY(float screenY) {
+		return screenY / zoom + cam.getY() - screenHeight / 2 / zoom;
+	}
+	
+	private int getBlockX(float screenX) {
+		float blockX = (screenX - screenWidth / 2) / zoom + 0.5f + cam.getX();
+		return (int) Math.max(0, Math.min(blockX, level.getWidth() - 1));
+	}
+	
+	private int getBlockY(float screenY) {
+		float blockY = (screenY - screenHeight / 2) / zoom + 0.5f + cam.getY();
+		return (int) Math.max(0, Math.min(blockY, level.getHeight() - 1));
+	}
+	
+	public boolean isTiltedDown(double direction, double magnitude) {
+		return Math.abs(magnitude) > THUMBSTICK_DEADZONE && direction >= 135d && direction <= 225d;
+	}
+	
+	public boolean isTiltedLeft(double direction, double xboxLeftThumbMagnitude2) {
+		return Math.abs(xboxLeftThumbMagnitude2) > THUMBSTICK_DEADZONE && direction >= 225d && direction <= 315d;
+	}
+	
+	public boolean isTiltedRight(double direction, double magnitude) {
+		return Math.abs(magnitude) > THUMBSTICK_DEADZONE && direction >= 45d && direction <= 135d;
+	}
+	
+	public boolean isTiltedUp(double direction, double magnitude) {
+		return Math.abs(magnitude) > THUMBSTICK_DEADZONE && direction >= 315d && direction <= 45d;
 	}
 	
 }

@@ -174,6 +174,8 @@ public class Xbox360Controller extends XboxController {
 			
 			public void buttonA(boolean pressed) {
 				buttonA.listen(pressed);
+				if (pressed)
+					System.out.println("event button a");
 			}
 			
 			public void buttonB(boolean pressed) {

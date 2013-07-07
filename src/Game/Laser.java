@@ -16,8 +16,8 @@ public class Laser extends GameObjectPolygon {
 	private SpriteSheet				laserSheet		= Images.getInstance().getSpriteSheet("images/laser.png", 1500, 100);
 	
 	private Animation				laserAnimation;
-	private static float			WIDTH			= 11.25f;
-	private static float			HEIGHT			= 0.75f;
+	private static float			WIDTH			= 15f;
+	private static float			HEIGHT			= 1f;
 	
 	private static Vec2[]			verts			= new Vec2[] { new Vec2(0f, 0f), new Vec2(WIDTH, -HEIGHT * 0.5f),
 			new Vec2(WIDTH, HEIGHT * 0.5f)			};

@@ -81,8 +81,6 @@ public class Player {
 	private boolean						locked						= false;
 	private boolean						godmode						= false;
 	
-	private boolean						movementButtonIsDown		= false;
-	
 	// XXX ??
 	private float						accelerationX				= ACC_WALKING;
 	private float						maxVelocity					= MAX_VELOCITY_WALKING;
@@ -208,9 +206,6 @@ public class Player {
 		float velocityX = this.body.getLinearVelocity().x;
 		float velocityY = this.body.getLinearVelocity().y;
 		
-		if (this.isOnGround() || this.isOnWall()) {
-			adjustVelocity();
-		}
 		/*
 		 * if (left){ // TODO Math.abs, verbraucht das mehr rechenleistung? als
 		 * ob man die checkt obs pos sind? this.accelerationX =
@@ -304,19 +299,6 @@ public class Player {
 		
 	}
 	
-	public void adjustVelocity() {
-		
-		if (this.isRunning()) {
-			accelerationX = ACC_RUNNING;
-			maxVelocity = MAX_VELOCITY_RUNNING;
-			
-		} else {
-			accelerationX = ACC_WALKING;
-			maxVelocity = MAX_VELOCITY_WALKING;
-		}
-		
-	}
-	
 	public void bite() {
 		// if(!this.biting && !locked && !laserAble && boltCounter >0/*>=
 		// BOLT_PRICE_FOR_LASER*/){
@@ -400,12 +382,6 @@ public class Player {
 		}
 		this.sensorList = new ArrayList<MySensor>();
 		
-		float width = this.width;
-		float height = this.height;
-		if (this.isRunning()) {
-			width = this.height;
-			height = this.width;
-		}
 		// wall collision sensors
 		float sensorSizeWidth = width * 0.125f;
 		float sensorSizeHeight = height * 0.1f;
@@ -596,10 +572,6 @@ public class Player {
 		return currentAnimation;
 	}
 	
-	public float getCurrentMaxSpeed() {
-		return (this.isRunning()) ? this.MAX_VELOCITY_RUNNING : this.MAX_VELOCITY_WALKING;
-	}
-	
 	public Vec2 getCurrentVelocity() {
 		return this.body.getLinearVelocity();
 	}
@@ -704,10 +676,6 @@ public class Player {
 			
 			this.groundpound();
 			
-		}
-		
-		if (this.isRunning()) {
-			setRunning(false);
 		}
 		
 	}
@@ -908,10 +876,6 @@ public class Player {
 		return this.leftWallColliding() || this.rightWallColliding();
 	}
 	
-	public boolean isRunning() {
-		return running;
-	}
-	
 	// public void setShootingPower(int shootingPower) {
 	// this.shootingPower = shootingPower;
 	// }
@@ -937,12 +901,8 @@ public class Player {
 			
 			if (this.isOnGround()) {
 				
-				if (this.isRunning()) {
-					this.currentAnimation = animations.get("runJump");
-				} else {
-					this.currentAnimation = animations.get("walkJump");
-					this.currentAnimation.restart();
-				}
+				this.currentAnimation = animations.get("walkJump");
+				this.currentAnimation.restart();
 				
 			} else {
 				
@@ -1072,18 +1032,6 @@ public class Player {
 	}
 	
 	public void setMovementButtonIsDown(boolean movementButtonIsDown) {
-		this.movementButtonIsDown = movementButtonIsDown;
-	}
-	
-	// public boolean isLaserAble() {
-	// return laserAble;
-	// }
-	
-	public void setRunning(boolean running) {
-		// performance wenn man if weglaesst?
-		if (this.running != running) {
-			this.running = running;
-		}
 	}
 	
 	public void setShootingPower(float shootingPower) {
@@ -1193,7 +1141,6 @@ public class Player {
 			this.currentAnimation = animations.get("tailwhip");
 			this.currentAnimation.restart();
 			
-			this.running = true;
 			isGoingToCreateTailwhip = true;
 			tailwhipDelayCounter = 0;
 			

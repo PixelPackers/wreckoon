@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.Sound;
 import org.newdawn.slick.openal.Audio;
 import org.newdawn.slick.openal.AudioLoader;
 import org.newdawn.slick.util.ResourceLoader;
@@ -36,8 +35,6 @@ public class Sounds {
 	}
 	
 	private void loadAudioFiles() throws SlickException, IOException {
-		// itemCollected = new Sound("audio/part_collected.wav");
-		// bgMusic = new Sound("audio/Part 1_ Loop _Lang.wav");
 		putSound("jump");
 		putSound("pigdeath");
 		putSound("laser", "audio/laser3.ogg");
