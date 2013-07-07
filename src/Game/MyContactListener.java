@@ -115,10 +115,11 @@ public class MyContactListener implements ContactListener{
 		
 		// groundpounding
 		if(game.getPlayer().isGroundPounding() ){
-
 			if (	contact.getFixtureA() == game.getPlayer().getSensorGroundCollision().getFixture()
 				|| 	contact.getFixtureB() == game.getPlayer().getSensorGroundCollision().getFixture() ) {
 			
+
+//				groundpound + enemy
 				for( Enemy enemy : game.getEnemies()){
 					if( enemy.getFixture() == contact.getFixtureA() ||
 						enemy.getFixture() == contact.getFixtureB()
@@ -126,12 +127,15 @@ public class MyContactListener implements ContactListener{
 						enemy.die();
 					}
 				}
+				
+//				groundpound + boden
+				if (contact.getFixtureA().getFilterData().categoryBits == 1 || 
+					contact.getFixtureB().getFilterData().categoryBits == 1 ) {
+					game.getPlayer().stopGroundpounding();
+				}
 			}
 
-			if (contact.getFixtureA().getFilterData().categoryBits == 4 || 
-				contact.getFixtureB().getFilterData().categoryBits == 4 ) {
-//				System.out.println("buja");
-			}
+			
 		}
 		
 		// enemies sensors
@@ -158,6 +162,7 @@ public class MyContactListener implements ContactListener{
 			}
 			
 //			player + item
+			if( !game.getPlayer().isDead() )
 			for (Part part : game.getParts()){
 				if(!part.isCollected()){
 					if(part.getFixture() == contact.getFixtureA() || part.getFixture() == contact.getFixtureB() ){

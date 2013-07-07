@@ -31,6 +31,7 @@ public class Player {
 	private static final int 	MAX_LASER_DURATION 		= 450;
 	private static final int 	SHOCK_DURATION		= 200;
 	private static final int 	DEATH_WAIT_TIME		= 70;
+	private static final int 	GROUNDPOUND_DELAY 	= 50;
 
 	private final float MAX_VELOCITY_WALKING = 1.75f;
 	private final float MAX_VELOCITY_RUNNING = 5f;
@@ -45,8 +46,6 @@ public class Player {
 	private int tailwhipCounter		= 0;
 	private int tailwhipDelayCounter= 0;	
 	private int idleCounter			= 0;
-	private int dizzyCounter		= 0;
-	private int dizzyIncrease		=-1;
 	private int jumpCounter 		= 0;
 	private int laserCounter 		= 0;
 	private int biteCounter 		= 0;
@@ -531,9 +530,7 @@ public class Player {
 	//		if(getSensorGroundCollision().isColliding() && this.body.getLinearVelocity().y < 0f){
 			if(isOnGround() || isOnWall()){
 				
-				if(groundPounding || wasLasering){
-					this.groundPounding = false;
-					dizzyIncrease = -1;
+				if(wasLasering){
 					unlock();
 				}
 				this.jumpingFromWall = false;
@@ -541,13 +538,8 @@ public class Player {
 				wasLasering = false;
 			}
 			
-	
 			
-			if(dizzyCounter > 0){
-				this.dizzy = true;
-			} else {
-				this.dizzy = false;
-			}
+	
 	//		this.adjustHitboxes();
 			
 			
@@ -557,7 +549,7 @@ public class Player {
 			
 			this.telekinesis();
 	
-			if( this.isOnGround() /*&& !this.isRunning() */&& !isGoingToCreateTailwhip && !this.doTailwhip && idleCounter > 2 && !this.dead && !this.biting && !locked) {
+			if( isOnGround() /*&& !this.isRunning() */&& !isGoingToCreateTailwhip && !doTailwhip && idleCounter > 2 && !dead && !biting && !locked) {
 				this.currentAnimation = animations.get("idle");
 			}
 			
@@ -588,6 +580,7 @@ public class Player {
 			}
 			
 			if (this.isOnGround() && this.dizzy){
+				// gugu
 				this.currentAnimation = animations.get("groundpoundImpact");
 			}
 	
@@ -812,7 +805,7 @@ public class Player {
 	 		return;
 	 	} 
 		
-		if(groundPoundCounter > 50 && !groundPounding){
+		if(groundPoundCounter > GROUNDPOUND_DELAY && !groundPounding){
 			
 
 	 		lock();
@@ -823,8 +816,8 @@ public class Player {
 			
 			this.groundPounding = true;
 			this.groundPoundCounter = 0;
-			this.dizzyCounter = 0;
-			this.dizzyIncrease = 1; // positive
+			
+			godmode = true;
 			
 			this.groundpound();
 			
@@ -840,7 +833,7 @@ public class Player {
 
 		if( this.groundPoundCounter > GROUNDPOUND_AIRTIME ) {
 			this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, groundPoundPower));
-			unlock();
+//			unlock();
 		} else {
 			this.getBody().setLinearVelocity(new Vec2(0f,0f));
 		}
@@ -1142,7 +1135,6 @@ public class Player {
 			++shootingPower;
 		}
 		++idleCounter;
-		dizzyCounter += dizzyIncrease;
 		++jumpCounter;
 		++laserCounter;
 		++biteCounter;
@@ -1446,5 +1438,21 @@ public class Player {
     
     public void stopBiting(){
     	stopBiting = true;
+    }
+    
+    public void stopGroundpounding(){
+    	if(groundPounding){
+//    		currentAnimation.stop();
+			this.groundPounding = false;
+			unlock();
+			godmode = false;
+
+    	}
+
+		currentAnimation = animations.get("groundpoundImpact");    	
+    }
+    
+    public boolean isAttacking(){
+    	return doTailwhip || laserStarted || laserActive || groundPounding;
     }
 }

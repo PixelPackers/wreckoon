@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.Island;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
@@ -59,7 +60,7 @@ public class SmartPig extends Enemy {
 			
 				float x = (playerIsLeft()) ? -speed : speed; 
 				
-				if(player.isGroundPounding() && insideTurnAwayRadius() ){
+				if ( (player.isAttacking() && insideTurnAwayRadius() ) || (player.isLaserActive() || player.isLaserStarted() ) ){
 					x = -x;
 				}
 				
