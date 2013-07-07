@@ -8,34 +8,27 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 
 public class Generator extends GameObjectBox {
-
-	private Vec2 position = new Vec2();
-	private float x, y;
 	
-	private Animation animation;
+	private Vec2		position	= new Vec2();
+	private float		x, y;
+	
+	private Animation	animation;
 	
 	public Generator(World world, float posX, float posY, float width, float height) throws SlickException {
 		super(world, posX, posY, width, height, 0, 0, 0, null, BodyType.STATIC, true);
-
+		
 		this.position.x = posX;
 		this.position.y = posY;
-		this.width 		= width;
-		this.height 	= height;
+		this.width = width;
+		this.height = height;
 		initializeSprite();
 	}
-
-	private void initializeSprite() {
-		SpriteSheet spriteSheet = null;
+	
+	@Override
+	public void drawImage() {
 		
-		try {
-			spriteSheet = Images.getInstance().getSpriteSheet("images/generatoranimated.png", 	385, 568);
-		} catch (SlickException e) {
-			e.printStackTrace();
-		}
+		animation.draw(position.x - width * 0.5f, position.y - height * 0.5f, width, height);
 		
-		animation = new Animation(spriteSheet, 100);
-		animation.setPingPong(true);
-		animation.start();
 	}
 	
 	public Animation getAnimation() {
@@ -50,11 +43,18 @@ public class Generator extends GameObjectBox {
 		return y;
 	}
 	
-	@Override
-	public void drawImage(){
+	private void initializeSprite() {
+		SpriteSheet spriteSheet = null;
 		
-		animation.draw( position.x-width*0.5f, position.y-height*0.5f, width, height );
+		try {
+			spriteSheet = Images.getInstance().getSpriteSheet("images/generatoranimated.png", 385, 568);
+		} catch (SlickException e) {
+			e.printStackTrace();
+		}
 		
+		animation = new Animation(spriteSheet, 100);
+		animation.setPingPong(true);
+		animation.start();
 	}
 	
 }

@@ -10,32 +10,26 @@ import org.newdawn.slick.geom.Polygon;
 
 public class GameObjectPolygon extends GameObject {
 	
-	protected PolygonShape polygonShape;
-
-	public GameObjectPolygon(World world, float posX, float posY, Vec2[] verts, float density, float friction, float restitution, String imgPath,
-			BodyType bodyType) throws SlickException {
+	protected PolygonShape	polygonShape;
+	
+	public GameObjectPolygon(World world, float posX, float posY, Vec2[] verts, float density, float friction, float restitution,
+			String imgPath, BodyType bodyType) throws SlickException {
 		this(world, posX, posY, verts, density, friction, restitution, imgPath, bodyType, false);
 	}
 	
-	public GameObjectPolygon(World world, float posX, float posY, Vec2[] verts, float density, float friction, float restitution, String imgPath,
-			BodyType bodyType, boolean isSensor) throws SlickException {
+	public GameObjectPolygon(World world, float posX, float posY, Vec2[] verts, float density, float friction, float restitution,
+			String imgPath, BodyType bodyType, boolean isSensor) throws SlickException {
 		super(world, posX, posY, density, friction, restitution, imgPath, bodyType, isSensor);
-
+		
 		this.polygonShape = new PolygonShape();
 		this.polygonShape.set(verts, verts.length);
 		this.getFixtureDef().shape = polygonShape;
 		
-//		AABB aabb = this.body.getFixtureList().m_aabb;
-//		this.width = aabb.lowerBound.x - aabb.upperBound.x;
-//		this.height = aabb.lowerBound.y - aabb.upperBound.y;
-//		this.width  = 1f;
-//		this.height = 1f;
-
 		super.getReadyToRumble(world);
 	}
-
+	
 	public void drawImage() {
-
+		
 		float sizeX = 1;
 		float sizeY = 1;
 		
@@ -45,10 +39,10 @@ public class GameObjectPolygon extends GameObject {
 		this.getImage().setRotation(-(float) Math.toDegrees(angle));
 		this.getImage().draw(position.x, position.y, sizeX, sizeY);
 	}
-
+	
 	@Override
 	public void drawOutline(Graphics g) {
-
+		
 		Polygon polygonToDraw = new Polygon();
 		Vec2[] verts = this.polygonShape.getVertices();
 		for (int i = 0; i < this.polygonShape.m_vertexCount; ++i) {

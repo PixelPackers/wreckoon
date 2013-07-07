@@ -16,37 +16,37 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Polygon;
 
 public class House {
-
-	private static final float FACTOR = 15f;
 	
-	private World	world;
-	private Body 	body;
+	private static final float	FACTOR		= 15f;
 	
-	private float 	x;
-	private float 	y;
+	private World				world;
+	private Body				body;
 	
-	private float waterAngle = 0f;
+	private float				x;
+	private float				y;
 	
-	private Image housebasic;
-	private Image housefront;
-	private Image washer;
-	private Image washy;
-
-	private float washerX;
-
-	private float washerY;
+	private float				waterAngle	= 0f;
 	
-	public House (World world, float x, float y) throws SlickException {
+	private Image				housebasic;
+	private Image				housefront;
+	private Image				washer;
+	private Image				washy;
+	
+	private float				washerX;
+	
+	private float				washerY;
+	
+	public House(World world, float x, float y) throws SlickException {
 		
-		this.world 		= world;
-		this.x			= x;
-		this.y			= y;
+		this.world = world;
+		this.x = x;
+		this.y = y;
 		
 		this.housebasic = Images.getInstance().getImage("images/housebasic.png");
 		this.housefront = Images.getInstance().getImage("images/housefront.png");
 		this.washer = Images.getInstance().getImage("images/washer.png");
 		this.washy = Images.getInstance().getImage("images/washy.png");
-		washy.setCenterOfRotation(washy.getWidth()/2, washy.getHeight()/2);
+		washy.setCenterOfRotation(washy.getWidth() / 2, washy.getHeight() / 2);
 		
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyType.STATIC;
@@ -54,16 +54,16 @@ public class House {
 		
 		ArrayList<Vec2[]> arrayList = new ArrayList<Vec2[]>();
 		arrayList = createHousePolygons();
-
+		
 		this.body = this.world.createBody(bodyDef);
-
-		FixtureDef fixtureDef	= new FixtureDef();
-		fixtureDef.restitution	= 0f;
+		
+		FixtureDef fixtureDef = new FixtureDef();
+		fixtureDef.restitution = 0f;
 		
 		for (Vec2[] verts : arrayList) {
 			PolygonShape polygonShape = new PolygonShape();
 			polygonShape.set(verts, verts.length);
-			fixtureDef.shape		= polygonShape;
+			fixtureDef.shape = polygonShape;
 			
 			this.body.createFixture(fixtureDef);
 		}
@@ -71,7 +71,7 @@ public class House {
 	
 	private ArrayList<Vec2[]> createHousePolygons() {
 		ArrayList<Vec2[]> fixtures = new ArrayList<Vec2[]>();
-		Vec2[] verts;		
+		Vec2[] verts;
 		verts = new Vec2[4];
 		verts[3] = new Vec2(FACTOR * 0.0005291f, FACTOR * -0.0015873313f);
 		verts[2] = new Vec2(FACTOR * 0.046560846f, FACTOR * -0.02169311f);
@@ -91,12 +91,12 @@ public class House {
 		verts[0] = new Vec2(FACTOR * 0.0f, FACTOR * -0.2814815f);
 		fixtures.add(verts);
 		
-//		verts = new Vec2[4];
-//		verts[3] = new Vec2(FACTOR * 0.2015873f, FACTOR * -0.2809524f);
-//		verts[2] = new Vec2(FACTOR * 0.6195767f, FACTOR * -0.26719576f);
-//		verts[1] = new Vec2(FACTOR * 0.6195767f, FACTOR * -0.28042328f);
-//		verts[0] = new Vec2(FACTOR * 0.60952383f, FACTOR * -0.28042328f);
-//		fixtures.add(verts);
+		// verts = new Vec2[4];
+		// verts[3] = new Vec2(FACTOR * 0.2015873f, FACTOR * -0.2809524f);
+		// verts[2] = new Vec2(FACTOR * 0.6195767f, FACTOR * -0.26719576f);
+		// verts[1] = new Vec2(FACTOR * 0.6195767f, FACTOR * -0.28042328f);
+		// verts[0] = new Vec2(FACTOR * 0.60952383f, FACTOR * -0.28042328f);
+		// fixtures.add(verts);
 		
 		verts = new Vec2[4];
 		verts[3] = new Vec2(FACTOR * 0.60952383f, FACTOR * -0.28042328f);
@@ -404,34 +404,13 @@ public class House {
 		
 		return fixtures;
 	}
-
-	public void draw(Graphics g, boolean debugView){
+	
+	public void draw(Graphics g, boolean debugView) {
 		if (debugView) {
 			this.drawOutline(g);
-		} else { 
+		} else {
 			this.drawImage(g);
 		}
-	}
-	
-	public void drawImage(Graphics g) {
-		g.pushTransform();
-		g.translate(this.x, this.y - FACTOR);
-		g.scale(FACTOR, FACTOR);
-			housebasic.draw(0, 0, 1 * 1.5873016f, 1);
-			g.pushTransform();
-				g.translate(0.74867725f + washerX,
-							0.4099f + washerY);
-				washy.setRotation(waterAngle);
-				washy.draw(0.15f, 0.12f, 0.11f, 0.11f);
-				washer.draw(0, 0, 0.35f, 0.33346036f);
-			g.popTransform();
-		g.popTransform();
-	}
-	
-	public void updateAnimations() {
-		waterAngle += 7.5f;
-		washerX = (float) Math.random() * 0.001f - 0.0005f;
-		washerY = (float) Math.random() * 0.001f - 0.0005f;
 	}
 	
 	public void drawFront(Graphics g, boolean debugView) {
@@ -439,17 +418,31 @@ public class House {
 			g.pushTransform();
 			g.translate(this.x, this.y - FACTOR);
 			g.scale(FACTOR, FACTOR);
-				housefront.draw(0, 0, 1 * 1.5873016f, 1);
+			housefront.draw(0, 0, 1 * 1.5873016f, 1);
 			g.popTransform();
 		}
 	}
-
+	
+	public void drawImage(Graphics g) {
+		g.pushTransform();
+		g.translate(this.x, this.y - FACTOR);
+		g.scale(FACTOR, FACTOR);
+		housebasic.draw(0, 0, 1 * 1.5873016f, 1);
+		g.pushTransform();
+		g.translate(0.74867725f + washerX, 0.4099f + washerY);
+		washy.setRotation(waterAngle);
+		washy.draw(0.15f, 0.12f, 0.11f, 0.11f);
+		washer.draw(0, 0, 0.35f, 0.33346036f);
+		g.popTransform();
+		g.popTransform();
+	}
+	
 	public void drawOutline(Graphics g) {
 		Fixture fixtureList = this.body.getFixtureList();
 		while (fixtureList != null) {
 			Polygon polygon = new Polygon();
 			PolygonShape polygonShape = (PolygonShape) fixtureList.getShape();
-
+			
 			Vec2[] verts = polygonShape.getVertices();
 			for (int i = 0; i < polygonShape.getVertexCount(); ++i) {
 				Vec2 worldPoint = body.getWorldPoint(verts[i]);
@@ -461,6 +454,12 @@ public class House {
 			g.popTransform();
 			fixtureList = fixtureList.getNext();
 		}
+	}
+	
+	public void updateAnimations() {
+		waterAngle += 7.5f;
+		washerX = (float) Math.random() * 0.001f - 0.0005f;
+		washerY = (float) Math.random() * 0.001f - 0.0005f;
 	}
 	
 }

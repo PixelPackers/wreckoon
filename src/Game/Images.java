@@ -7,18 +7,19 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 
 public class Images {
-
-	private static final Images instance = new Images();
 	
-	private HashMap<String, Image> images = new HashMap<String, Image>();
-	private HashMap<String, SpriteSheet> spriteSheets = new HashMap<String, SpriteSheet>(); 
-	
-	private Images() {
-		
-	}
+	private static final Images	instance	= new Images();
 	
 	public static Images getInstance() {
 		return instance;
+	}
+	
+	private HashMap<String, Image>			images			= new HashMap<String, Image>();
+	
+	private HashMap<String, SpriteSheet>	spriteSheets	= new HashMap<String, SpriteSheet>();
+	
+	private Images() {
+		
 	}
 	
 	public Image getImage(String path) throws SlickException {

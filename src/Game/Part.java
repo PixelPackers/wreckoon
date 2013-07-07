@@ -14,54 +14,53 @@ import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 
 public class Part {
-
-	private final int BOLT_VALUE = 500;
 	
-	private static final float radius = 0.5f;
-	private World world;
-	private Game game;
-	private float x;
-	private float y;
-	private Image image = Images.getInstance().getImage("images/part.png");
-	private boolean collected = false;
+	private final int			BOLT_VALUE		= 500;
 	
-	private float floatingHeight = 0f;
-	private float floatingSpeed = 0.005f;
-	private int i = 0;
+	private static final float	radius			= 0.5f;
+	private World				world;
+	private Game				game;
+	private float				x;
+	private float				y;
+	private Image				image			= Images.getInstance().getImage("images/part.png");
+	private boolean				collected		= false;
 	
+	private float				floatingHeight	= 0f;
+	private float				floatingSpeed	= 0.005f;
+	private int					i				= 0;
 	
-	private Body body;
-	private Fixture fixture;
-	private FixtureDef fixtureDef = new FixtureDef();
+	private Body				body;
+	private Fixture				fixture;
+	private FixtureDef			fixtureDef		= new FixtureDef();
 	
-	public Part(World world, Game game, float x, float y) throws SlickException{
+	public Part(World world, Game game, float x, float y) throws SlickException {
 		
 		this.world = world;
 		this.game = game;
 		this.x = x;
-		this.y = y;		
+		this.y = y;
 		
 		CircleShape circleShape = new CircleShape();
-		circleShape.m_radius = radius*0.75f;
+		circleShape.m_radius = radius * 0.75f;
 		
 		this.fixtureDef.shape = circleShape;
 		this.fixtureDef.isSensor = true;
-
+		
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyType.STATIC;
-//		bodyDef.type = BodyType.DYNAMIC;
-		bodyDef.position.set(x,y);
-
+		// bodyDef.type = BodyType.DYNAMIC;
+		bodyDef.position.set(x, y);
+		
 		this.body = world.createBody(bodyDef);
 		this.fixture = this.body.createFixture(fixtureDef);
 	}
 	
-	public void collect(){
+	public void collect() {
 		if (!this.collected) {
-			//MusicManager.getInstance().itemCollected();
+			// MusicManager.getInstance().itemCollected();
 			this.world.destroyBody(this.body);
 			this.game.getRidOfPart(this);
-//			this.game.getPlayer().increaseBoltCounter(BOLT_VALUE);
+			// this.game.getPlayer().increaseBoltCounter(BOLT_VALUE);
 			this.game.getPlayer().boltsCollected(BOLT_VALUE);
 			
 			this.collected = true;
@@ -70,41 +69,26 @@ public class Part {
 		}
 	}
 	
-	public void draw(Graphics g, boolean debugView){
-
-		if(collected){ 
+	public void draw(Graphics g, boolean debugView) {
+		
+		if (collected) {
 			return;
 		}
 		
 		if (debugView) {
 			this.drawOutline(g);
-		} else { 
+		} else {
 			this.drawImage();
-		}		
+		}
 	}
 	
-	public float getX() {
-		return x;
-	}
-
-	public float getY() {
-		return y;
-	}
-
-	public void drawImage(){
-		image.draw(this.body.getPosition().x - radius, this.body.getPosition().y -radius, radius*2f, radius*2f);
+	public void drawImage() {
+		image.draw(this.body.getPosition().x - radius, this.body.getPosition().y - radius, radius * 2f, radius * 2f);
 	}
 	
-	public void drawOutline(Graphics g){
-		g.drawArc(this.body.getPosition().x - this.radius*0.5f, this.body.getPosition().y - this.radius*0.5f, this.radius, this.radius, 0f, 360f);
-	}
-	
-	public void update(){
-
-		// make floating movement
-		this.floatingHeight = (float) (this.floatingSpeed * Math.sin( Math.toRadians( ++i%360f ) ));
-		this.body.setTransform( new Vec2 (this.body.getPosition().x, this.body.getPosition().y + this.floatingHeight), 0);
-
+	public void drawOutline(Graphics g) {
+		g.drawArc(this.body.getPosition().x - this.radius * 0.5f, this.body.getPosition().y - this.radius * 0.5f, this.radius, this.radius,
+				0f, 360f);
 	}
 	
 	public Body getBody() {
@@ -115,7 +99,23 @@ public class Part {
 		return fixture;
 	}
 	
+	public float getX() {
+		return x;
+	}
+	
+	public float getY() {
+		return y;
+	}
+	
 	public boolean isCollected() {
 		return collected;
+	}
+	
+	public void update() {
+		
+		// make floating movement
+		this.floatingHeight = (float) (this.floatingSpeed * Math.sin(Math.toRadians(++i % 360f)));
+		this.body.setTransform(new Vec2(this.body.getPosition().x, this.body.getPosition().y + this.floatingHeight), 0);
+		
 	}
 }

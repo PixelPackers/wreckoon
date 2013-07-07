@@ -4,19 +4,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class Level {
-
+	
 	@SuppressWarnings("unused")
-	private float version = 1.0f;
-	private Block[][] blocks;
-	private ArrayList<BackgroundObject> backgroundObjects;
-	private ArrayList<ZoomArea> zoomAreas;
-	private ArrayList<Checkpoint> checkpoints;
-	private ArrayList<Part> parts;
-	private ArrayList<SpawnPoint> enemies;
-	private ArrayList<Girder> girders;
-	private ArrayList<Generator> generators; 
-	private ArrayList<Conveyor> conveyors;
-	//private ArrayList<Tire> tires;
+	private float						version	= 1.0f;
+	private Block[][]					blocks;
+	private ArrayList<BackgroundObject>	backgroundObjects;
+	private ArrayList<ZoomArea>			zoomAreas;
+	private ArrayList<Checkpoint>		checkpoints;
+	private ArrayList<Part>				parts;
+	private ArrayList<SpawnPoint>		enemies;
+	private ArrayList<Girder>			girders;
+	private ArrayList<Generator>		generators;
+	private ArrayList<Conveyor>			conveyors;
+	
+	// private ArrayList<Tire> tires;
 	
 	public Level(int width, int height) {
 		this.blocks = new Block[width][height];
@@ -76,13 +77,13 @@ public class Level {
 		}
 		parts.add(p);
 	}
-		
-//	public void addTire(Tire t) {
-//		if (tires == null) {
-//			tires = new ArrayList<Tire>();
-//		}
-//		tires.add(t);
-//	}
+	
+	// public void addTire(Tire t) {
+	// if (tires == null) {
+	// tires = new ArrayList<Tire>();
+	// }
+	// tires.add(t);
+	// }
 	
 	public void addZoomArea(ZoomArea za) {
 		if (zoomAreas == null) {
@@ -127,14 +128,14 @@ public class Level {
 		return parts;
 	}
 	
-//	public ArrayList<Tire> getTires() {
-//		return tires;
-//	}
+	// public ArrayList<Tire> getTires() {
+	// return tires;
+	// }
 	
 	public int getWidth() {
 		return this.blocks.length;
 	}
-
+	
 	public ArrayList<ZoomArea> getZoomAreas() {
 		return zoomAreas;
 	}
@@ -145,9 +146,7 @@ public class Level {
 			for (int x = 0; x < tmp.length; ++x) {
 				for (int y = 0; y < tmp[0].length; ++y) {
 					if (x < this.getWidth() && y < this.getHeight()) {
-						tmp[x][y] = new Block(this.blocks[x][y].getType(),
-								this.blocks[x][y].getAngle(),
-								this.blocks[x][y].isFlipped());
+						tmp[x][y] = new Block(this.blocks[x][y].getType(), this.blocks[x][y].getAngle(), this.blocks[x][y].isFlipped());
 					} else {
 						tmp[x][y] = new Block(0, 0, false);
 					}
@@ -157,19 +156,18 @@ public class Level {
 			this.blocks = tmp;
 		}
 	}
-
+	
 	public void setBlock(int x, int y, int brush, int angle, boolean flipped) {
 		this.blocks[x][y].set(brush, angle, flipped);
 	}
-
+	
 	public void shift(int dX, int dY) {
 		Block[][] tmp = new Block[this.getWidth()][this.getHeight()];
 		for (int x = 0; x < this.getWidth(); ++x) {
 			for (int y = 0; y < this.getHeight(); ++y) {
 				int refX = (this.getWidth() + x - dX) % this.getWidth();
 				int refY = (this.getHeight() + y - dY) % this.getHeight();
-				tmp[x][y] = new Block(this.blocks[refX][refY].getType(),
-						this.blocks[refX][refY].getAngle(),
+				tmp[x][y] = new Block(this.blocks[refX][refY].getType(), this.blocks[refX][refY].getAngle(),
 						this.blocks[refX][refY].isFlipped());
 			}
 		}

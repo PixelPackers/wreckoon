@@ -17,28 +17,28 @@ import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Polygon;
 
 public class Tile {
-
-	private World	world;
-	private Body 	body;
 	
-	private float 	x;
-	private float 	y;
-	private int 	type;
-	private int 	angle;
-	private boolean flipped;
+	private World				world;
+	private Body				body;
 	
-	private static SpriteSheet img;
+	private float				x;
+	private float				y;
+	private int					type;
+	private int					angle;
+	private boolean				flipped;
 	
-	private static final float TILE_SIZE = 1f;
+	private static SpriteSheet	img;
 	
-	public Tile (World world, float x, float y, int type, int angle, boolean flipped) throws SlickException {
+	private static final float	TILE_SIZE	= 1f;
 	
-		this.world 		= world;
-		this.x			= x;
-		this.y			= y;
-		this.flipped	= flipped;
-		this.angle 		= angle;
-		this.type 		= type;
+	public Tile(World world, float x, float y, int type, int angle, boolean flipped) throws SlickException {
+		
+		this.world = world;
+		this.x = x;
+		this.y = y;
+		this.flipped = flipped;
+		this.angle = angle;
+		this.type = type;
 		
 		Tile.img = Images.getInstance().getSpriteSheet("images/tiles.png", 256, 256);
 		
@@ -49,31 +49,31 @@ public class Tile {
 		
 		ArrayList<Vec2[]> arrayList = new ArrayList<Vec2[]>();
 		arrayList = chooseTile();
-
+		
 		this.body = this.world.createBody(bodyDef);
-
-		FixtureDef fixtureDef	= new FixtureDef();
-//		fixtureDef.friction		= 0.8f;
-		fixtureDef.restitution	= 0f;
+		
+		FixtureDef fixtureDef = new FixtureDef();
+		// fixtureDef.friction = 0.8f;
+		fixtureDef.restitution = 0f;
 		
 		fixtureDef.filter.categoryBits = 1;
-//		fixtureDef.filter.maskBits = 1;
+		// fixtureDef.filter.maskBits = 1;
 		
-		for(Vec2[] verts : arrayList){
-
+		for (Vec2[] verts : arrayList) {
+			
 			PolygonShape polygonShape = new PolygonShape();
 			polygonShape.set(verts, verts.length);
-			fixtureDef.shape		= polygonShape;
+			fixtureDef.shape = polygonShape;
 			
 			this.body.createFixture(fixtureDef);
 		}
-			
+		
 	}
 	
 	public ArrayList<Vec2[]> chooseTile() {
-
+		
 		ArrayList<Vec2[]> fixtures = new ArrayList<Vec2[]>();
-		Vec2[] verts ;
+		Vec2[] verts;
 		int crap = 0;
 		float shit = (flipped) ? -1f : 1f;
 		
@@ -89,7 +89,7 @@ public class Tile {
 				verts[Math.abs(crap - 5)] = new Vec2(shit * 0.24804688f, -0.32421875f);
 				fixtures.add(verts);
 				break;
-	
+			
 			case 3:
 				verts = new Vec2[6];
 				crap = (flipped) ? 5 : 0;
@@ -101,7 +101,7 @@ public class Tile {
 				verts[Math.abs(crap - 5)] = new Vec2(shit * -0.25f, -0.40429688f);
 				fixtures.add(verts);
 				break;
-	
+			
 			case 4:
 				verts = new Vec2[6];
 				crap = (flipped) ? 5 : 0;
@@ -113,7 +113,7 @@ public class Tile {
 				verts[Math.abs(crap - 5)] = new Vec2(shit * -0.24804688f, 0.09375f);
 				fixtures.add(verts);
 				break;
-	
+			
 			case 6:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -131,7 +131,7 @@ public class Tile {
 				verts[Math.abs(crap - 4)] = new Vec2(shit * -0.32421875f, -0.23242188f);
 				fixtures.add(verts);
 				break;
-	
+			
 			case 8:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -148,7 +148,7 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * -0.2734375f, 0.31835938f);
 				fixtures.add(verts);
 				break;
-	
+			
 			case 9:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -165,7 +165,7 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * -0.24804688f, -0.203125f);
 				fixtures.add(verts);
 				break;
-	
+			
 			case 10:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -188,7 +188,7 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * 0.24609375f, -0.08984375f);
 				fixtures.add(verts);
 				break;
-	
+			
 			case 11:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -212,7 +212,7 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * 0.21875f, 0.21484375f);
 				fixtures.add(verts);
 				break;
-	
+			
 			case 14:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -230,7 +230,7 @@ public class Tile {
 				verts[Math.abs(crap - 4)] = new Vec2(shit * 0.16210938f, -0.40625f);
 				fixtures.add(verts);
 				break;
-	
+			
 			case 15:
 				verts = new Vec2[5];
 				crap = (flipped) ? 4 : 0;
@@ -248,7 +248,7 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * 0.1875f, -0.3203125f);
 				fixtures.add(verts);
 				break;
-	
+			
 			case 16:
 				verts = new Vec2[3];
 				crap = (flipped) ? 2 : 0;
@@ -257,7 +257,7 @@ public class Tile {
 				verts[Math.abs(crap - 2)] = new Vec2(shit * 0.5f, 0.25f);
 				fixtures.add(verts);
 				break;
-	
+			
 			case 17:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -267,7 +267,7 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * -0.5f, -0.25f);
 				fixtures.add(verts);
 				break;
-	
+			
 			case 18:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -291,7 +291,7 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * 0.16210938f, 0.041015625f);
 				fixtures.add(verts);
 				break;
-	
+			
 			case 19:
 				verts = new Vec2[5];
 				crap = (flipped) ? 4 : 0;
@@ -309,7 +309,7 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * 0.15625f, 0.18359375f);
 				fixtures.add(verts);
 				break;
-	
+			
 			case 20:
 				verts = new Vec2[5];
 				crap = (flipped) ? 4 : 0;
@@ -320,7 +320,7 @@ public class Tile {
 				verts[Math.abs(crap - 4)] = new Vec2(shit * -0.5f, 0.25f);
 				fixtures.add(verts);
 				break;
-	
+			
 			case 21:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -337,7 +337,7 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * -0.37304688f, -0.037109375f);
 				fixtures.add(verts);
 				break;
-	
+			
 			case 22:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -354,7 +354,7 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * 0.25f, -0.24804688f);
 				fixtures.add(verts);
 				break;
-	
+			
 			case 23:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -378,7 +378,7 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * 0.25195312f, -0.22460938f);
 				fixtures.add(verts);
 				break;
-	
+			
 			case 26:
 				verts = new Vec2[3];
 				crap = (flipped) ? 2 : 0;
@@ -387,7 +387,7 @@ public class Tile {
 				verts[Math.abs(crap - 2)] = new Vec2(shit * 0.5f, -0.25f);
 				fixtures.add(verts);
 				break;
-	
+			
 			case 28:
 				verts = new Vec2[5];
 				crap = (flipped) ? 4 : 0;
@@ -412,7 +412,7 @@ public class Tile {
 				verts[Math.abs(crap - 4)] = new Vec2(shit * 0.29492188f, -0.17773438f);
 				fixtures.add(verts);
 				break;
-	
+			
 			case 29:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -422,7 +422,7 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * -0.5f, -0.25f);
 				fixtures.add(verts);
 				break;
-	
+			
 			case 30:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -446,7 +446,7 @@ public class Tile {
 				verts[Math.abs(crap - 4)] = new Vec2(shit * 0.31835938f, -0.14648438f);
 				fixtures.add(verts);
 				break;
-	
+			
 			case 31:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -470,7 +470,7 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * 0.27929688f, -0.33984375f);
 				fixtures.add(verts);
 				break;
-	
+			
 			case 34:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -495,7 +495,7 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * 0.25f, 0.19921875f);
 				fixtures.add(verts);
 				break;
-	
+			
 			case 42:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -529,7 +529,7 @@ public class Tile {
 				verts[Math.abs(crap - 5)] = new Vec2(shit * 0.29492188f, -0.2890625f);
 				fixtures.add(verts);
 				break;
-	
+			
 			case 43:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -553,7 +553,7 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * 0.22460938f, 0.0f);
 				fixtures.add(verts);
 				break;
-				
+			
 			case 41:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -563,7 +563,7 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * -0.5f, -0.25f);
 				fixtures.add(verts);
 				break;
-
+			
 			case 50:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -573,7 +573,7 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * 0.26171875f, -0.28320312f);
 				fixtures.add(verts);
 				break;
-
+			
 			case 51:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -583,7 +583,7 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * -0.21289062f, -0.33007812f);
 				fixtures.add(verts);
 				break;
-
+			
 			case 52:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -600,7 +600,7 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * 0.28125f, -0.30859375f);
 				fixtures.add(verts);
 				break;
-
+			
 			case 53:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -610,7 +610,7 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * -0.5f, -0.25f);
 				fixtures.add(verts);
 				break;
-
+			
 			case 54:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -627,7 +627,7 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * 0.27539062f, -0.28515625f);
 				fixtures.add(verts);
 				break;
-
+			
 			case 55:
 				verts = new Vec2[5];
 				crap = (flipped) ? 4 : 0;
@@ -653,7 +653,7 @@ public class Tile {
 				verts[Math.abs(crap - 4)] = new Vec2(shit * 0.296875f, -0.3515625f);
 				fixtures.add(verts);
 				break;
-
+			
 			case 58:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -670,7 +670,7 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * 0.25390625f, -0.24414062f);
 				fixtures.add(verts);
 				break;
-				
+			
 			case 5:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -680,7 +680,7 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * -0.5f, -0.25f);
 				fixtures.add(verts);
 				break;
-
+			
 			case 7:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -690,7 +690,7 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * -0.5f, 0.25f);
 				fixtures.add(verts);
 				break;
-
+			
 			case 38:
 				verts = new Vec2[6];
 				crap = (flipped) ? 5 : 0;
@@ -702,7 +702,7 @@ public class Tile {
 				verts[Math.abs(crap - 5)] = new Vec2(shit * 0.16796875f, -0.39453125f);
 				fixtures.add(verts);
 				break;
-
+			
 			case 39:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -712,7 +712,7 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * -0.5f, -0.25f);
 				fixtures.add(verts);
 				break;
-
+			
 			case 40:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -722,7 +722,7 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * -0.5f, -0.25f);
 				fixtures.add(verts);
 				break;
-
+			
 			case 45:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -739,7 +739,7 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * -0.26757812f, -0.16210938f);
 				fixtures.add(verts);
 				break;
-
+			
 			case 46:
 				verts = new Vec2[4];
 				crap = (flipped) ? 3 : 0;
@@ -756,34 +756,33 @@ public class Tile {
 				verts[Math.abs(crap - 3)] = new Vec2(shit * 0.24023438f, -0.25585938f);
 				fixtures.add(verts);
 				break;
-
-			}
+		
+		}
 		return fixtures;
 	}
 	
-	public void draw(Graphics g, boolean debugView){
-		if (debugView || this.img == null) {
+	public void draw(Graphics g, boolean debugView) {
+		if (debugView || Tile.img == null) {
 			this.drawOutline(g);
-		} else { 
+		} else {
 			this.drawImage();
 		}
 	}
 	
 	public void drawImage() {
-		// FIXME magic numbers
-		//Image image = Tile.img.getSubImage(this.type % 12, this.type / 12).getFlippedCopy(flipped, false);
-		Image image = Tile.img.getSubImage((this.type % 12) * 512 + 2, (this.type / 12) * 512 + 2, 508, 508).getFlippedCopy(!flipped, false);
+		Image image = Tile.img.getSubImage((this.type % 12) * 512 + 2, (this.type / 12) * 512 + 2, 508, 508)
+				.getFlippedCopy(!flipped, false);
 		image.setRotation(180 + angle);
 		image.draw(this.x - TILE_SIZE * 0.5f, this.y - TILE_SIZE * 0.5f, TILE_SIZE, TILE_SIZE);
 	}
-
+	
 	public void drawOutline(Graphics g) {
 		Fixture fixtureList = this.body.getFixtureList();
-
+		
 		while (fixtureList != null) {
 			Polygon polygon = new Polygon();
 			PolygonShape polygonShape = (PolygonShape) fixtureList.getShape();
-
+			
 			Vec2[] verts = polygonShape.getVertices();
 			for (int i = 0; i < polygonShape.getVertexCount(); ++i) {
 				Vec2 worldPoint = body.getWorldPoint(verts[i]);
@@ -794,6 +793,6 @@ public class Tile {
 			g.draw(polygon);
 			fixtureList = fixtureList.getNext();
 		}
-
+		
 	}
 }

@@ -1,24 +1,21 @@
 package Game;
 
 import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Filter;
 import org.jbox2d.dynamics.World;
-import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
 public class Shred extends DropItem {
 	
-	private float pigSizeFactor;
-	private boolean grilled = false;
-		
-	public Shred(Game game, World world, Vec2 pos, String imgPath, float pigSizeFactor)
-			throws SlickException {
+	private float	pigSizeFactor;
+	private boolean	grilled	= false;
+	
+	public Shred(Game game, World world, Vec2 pos, String imgPath, float pigSizeFactor) throws SlickException {
 		super(game, world, pos, imgPath);
 		
 		this.pigSizeFactor = pigSizeFactor;
 		MIN_TIME = 115;
-		MAX_TIME = (int) ( 1800 * Math.random() );
+		MAX_TIME = (int) (1800 * Math.random());
 		
 		DRAW_FACTOR = 0.17f * pigSizeFactor;
 		
@@ -28,13 +25,14 @@ public class Shred extends DropItem {
 		this.getFixture().setFilterData(filter);
 	}
 	
-	public void collect(){
+	public void collect() {
 	}
 	
-	
-	@Override
-	public void update() {
-		super.update();
+	public void grilled() throws SlickException {
+		if (!grilled) {
+			super.image = Images.getInstance().getImage(image.getResourceReference().replace(".png", "laser.png"));
+			this.grilled = true;
+		}
 	}
 	
 	@Override
@@ -42,11 +40,9 @@ public class Shred extends DropItem {
 		return false;
 	}
 	
-	public void grilled() throws SlickException{
-		if(!grilled){
-			super.image = Images.getInstance().getImage(image.getResourceReference().replace(".png", "laser.png"));
-			this.grilled = true;
-		}
+	@Override
+	public void update() {
+		super.update();
 	}
 	
 }

@@ -10,42 +10,42 @@ import org.newdawn.slick.SlickException;
 
 public class Girder {
 	
-	private static float DENSITY = 8f;
-	private static float FRICTION = 0.5f;
-	private static float RESTITUTION = 0.2f;
+	private static float		DENSITY				= 8f;
+	private static float		FRICTION			= 0.5f;
+	private static float		RESTITUTION			= 0.2f;
 	
-	private float x, y;
-
-	private static final float GIRDER_HEIGHT = 0.375f;
-	private static final float GIRDER_WIDTH = 2f;
-	private static final float ROPE_WIDTH = 0.05f;
-	private static final float LOWER_LENGTH = 1f;
+	private float				x, y;
 	
-	private static Image tiedRopes;
-	private static Image longRope;
+	private static final float	GIRDER_HEIGHT		= 0.375f;
+	private static final float	GIRDER_WIDTH		= 2f;
+	private static final float	ROPE_WIDTH			= 0.05f;
+	private static final float	LOWER_LENGTH		= 1f;
 	
-	private float upperLength;
+	private static Image		tiedRopes;
+	private static Image		longRope;
 	
-	private GameObjectBox steelBeam;
-	private GameObjectBox rope[] = new GameObjectBox[2];
+	private float				upperLength;
 	
-	private RevoluteJointDef revoluteJointDef = new RevoluteJointDef();
+	private GameObjectBox		steelBeam;
+	private GameObjectBox		rope[]				= new GameObjectBox[2];
+	
+	private RevoluteJointDef	revoluteJointDef	= new RevoluteJointDef();
 	
 	public Girder(World world, float posX, float posY, float length) throws SlickException {
 		
 		this.x = posX;
 		this.y = posY;
-
+		
 		tiedRopes = Images.getInstance().getImage("images/ropeTriangle.png");
 		longRope = Images.getInstance().getImage("images/Rope.png");
 		
 		upperLength = length;
-
+		
 		rope[0] = new GameObjectBox(world, posX, posY, 0.3f, 0.3f, 0.5f, 0.3f, 0.3f, null, BodyType.STATIC, true);
 		rope[1] = new GameObjectBox(world, posX, posY + length, 0.4f, 0.4f, 6f, 0.3f, 0.3f, null, BodyType.DYNAMIC, true);
 		
-		steelBeam = new GameObjectBox(world, posX, posY + length + LOWER_LENGTH, GIRDER_WIDTH, GIRDER_HEIGHT, DENSITY, FRICTION, RESTITUTION,
-				"images/girder" + ((int) (Math.random() * 3 + 1)) + ".png", BodyType.DYNAMIC);
+		steelBeam = new GameObjectBox(world, posX, posY + length + LOWER_LENGTH, GIRDER_WIDTH, GIRDER_HEIGHT, DENSITY, FRICTION,
+				RESTITUTION, "images/girder" + ((int) (Math.random() * 3 + 1)) + ".png", BodyType.DYNAMIC);
 		steelBeam.getBody().setAngularDamping(1f);
 		steelBeam.getBody().setLinearDamping(1f);
 		
@@ -65,7 +65,7 @@ public class Girder {
 		
 	}
 	
-	public final void draw(Graphics g, boolean debugView){
+	public final void draw(Graphics g, boolean debugView) {
 		steelBeam.draw(g, debugView);
 		if (debugView) {
 			for (GameObjectBox r : rope) {
@@ -91,7 +91,7 @@ public class Girder {
 	public float getX() {
 		return x;
 	}
-
+	
 	public float getY() {
 		return y;
 	}
