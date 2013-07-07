@@ -26,7 +26,7 @@ public class Player {
 	private static final float	TAILWHIP_DISTANCE	= 5f;
 	private static final int	TAILWHIP_TIME		= 110;
 	private static final int 	GROUNDPOUND_AIRTIME = 30;
-	private static final int 	MAX_LASER_DURATION 		= 250;
+	private static final int 	MAX_LASER_DURATION 		= 450;
 	private static final int 	SHOCK_DURATION		= 200;
 	private static final int 	DEATH_WAIT_TIME		= 70;
 
@@ -848,9 +848,10 @@ public class Player {
 			this.doTailwhip = true;
 			this.tailwhipCounter = 0;
 			
-			float tailWidth 	= 0.7f*0.25f;
-			float tailHeight	= 0.2f*0.25f;
+			float tailWidth 	= 0.7f*0.5f;
+			float tailHeight	= 0.2f;
 			float direction = this.width;
+			float heightSpace = tailHeight*0.5f;
 			float distance = TAILWHIP_DISTANCE;
 			
 			if(this.movesLeft()){
@@ -861,10 +862,10 @@ public class Player {
 			this.getBody().setLinearVelocity( new Vec2(distance, body.getLinearVelocity().y) );
 			
 			Vec2[] vertsTail = new Vec2[]{
-				new Vec2( -tailWidth * 0.5f + direction, tailHeight * 0.5f ),
-				new Vec2( -tailWidth * 0.5f + direction, -tailHeight * 0.5f ),
-				new Vec2(  tailWidth * 0.5f + direction, -tailHeight * 0.5f ),
-				new Vec2(  tailWidth * 0.5f + direction, tailHeight * 0.5f )
+				new Vec2( -tailWidth * 0.5f + direction, tailHeight * 0.5f + heightSpace ),
+				new Vec2( -tailWidth * 0.5f + direction, -tailHeight * 0.5f + heightSpace ),
+				new Vec2(  tailWidth * 0.5f + direction, -tailHeight * 0.5f + heightSpace ),
+				new Vec2(  tailWidth * 0.5f + direction, tailHeight * 0.5f + heightSpace )
 			};
 
 			this.polygonShapeTail = new PolygonShape();

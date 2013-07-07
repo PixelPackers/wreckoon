@@ -36,11 +36,10 @@ public class MyContactListener implements ContactListener{
 			|| 	contact.getFixtureB() == game.getPlayer().getTailFixture() ) {
 			
 //			+ dynamic objects
-			for (GameObject gameObject : game.getDynamicObjects()){
-				if (	gameObject.getBody().getFixtureList() == contact.getFixtureB() 
-					||	gameObject.getBody().getFixtureList() == contact.getFixtureA()){
-					
-					gameObject.getBody().setLinearVelocity( new Vec2(0,-10) );
+			for (DropItem dropItem : game.getDropItems()){
+				if (	dropItem.getBody().getFixtureList() == contact.getFixtureB() 
+					||	dropItem.getBody().getFixtureList() == contact.getFixtureA()){
+					dropItem.throwback();
 //					break;
 				}
 			}

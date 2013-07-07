@@ -252,7 +252,7 @@ public abstract class Enemy extends GameObjectBox {
 		float force = 7.5f;
 		float x = (game.getPlayer().movesLeft()) ? -force : force;
 		
-		this.getBody().setLinearVelocity(new Vec2 (x, -force) );
+		this.getBody().setLinearVelocity(new Vec2 (x, -force*0.75f) );
 		
 		if(Math.random() < 0.5){
 			left = !left;
