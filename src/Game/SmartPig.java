@@ -17,6 +17,7 @@ public class SmartPig extends Enemy {
 	private boolean aggro = false;
 
 	private static final int MIN_SWITCH_TIME = 20;
+	private static final float GROUNDPOUND_TURN_AWAY_RADIUS = 2;
 	private int switchTimeCounter = 0;
 	
 	public SmartPig(Game game, float posX, float posY, float width, float height, float density, float friction, float restitution, String imgPath,
@@ -56,15 +57,14 @@ public class SmartPig extends Enemy {
 		if (!isDead() && !dizzy && !getsGrilled){ // movement
 			if(aggro){
 			
-				float x; 
+				float x = (playerIsLeft()) ? -speed : speed; 
 				
-				if(playerIsLeft() ){
-					x = -speed;
-					setLeft(true);
-				} else {
-					x = speed;
-					setLeft(false); 
+				if(player.isGroundPounding() && insideTurnAwayRadius() ){
+					x = -x;
 				}
+				
+				left =  (x < 0) ? true : false;
+				
 				if(this.isOnGround()){
 					this.getBody().setLinearVelocity(new Vec2(x, this.getBody().getLinearVelocity().y) );
 	//				this.getBody().applyLinearImpulse( new Vec2(x, 0*this.getBody().getLinearVelocity().y), this.getBody().getWorldCenter());
@@ -99,6 +99,13 @@ public class SmartPig extends Enemy {
 		}
 
 		++switchTimeCounter;
+	}
+
+	private boolean insideTurnAwayRadius() {
+
+
+		
+		return Math.abs( game.getPlayer().getBody().getPosition().x - getBody().getPosition().x) < GROUNDPOUND_TURN_AWAY_RADIUS;
 	}
 
 	@Override
@@ -159,8 +166,8 @@ public class SmartPig extends Enemy {
 		
 	}
 	@Override
-	public void throwBack() {
-		super.throwBack();
+	public void throwBack(boolean originalHit) {
+		super.throwBack(originalHit);
 		aggro = false;
 		this.currentAnimation = animations.get("disabled");
 	}

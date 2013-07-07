@@ -35,7 +35,7 @@ public class MyContactListener implements ContactListener{
 		if (	contact.getFixtureA() == game.getPlayer().getTailFixture()
 			|| 	contact.getFixtureB() == game.getPlayer().getTailFixture() ) {
 			
-//			+ dynamic objects
+//			tailwhip + dynamic objects
 			for (DropItem dropItem : game.getDropItems()){
 				if (	dropItem.getBody().getFixtureList() == contact.getFixtureB() 
 					||	dropItem.getBody().getFixtureList() == contact.getFixtureA()){
@@ -44,12 +44,12 @@ public class MyContactListener implements ContactListener{
 				}
 			}
 			
-//			+ enemies
+//			tailwhip + enemies
 			for( Enemy enemy : game.getEnemies()){
 				if( enemy.getFixture() == contact.getFixtureA() ||
 					enemy.getFixture() == contact.getFixtureB()
 				){
-					enemy.throwBack();
+					enemy.throwBack(true);
 				}
 			}
 		} 
@@ -58,7 +58,7 @@ public class MyContactListener implements ContactListener{
 		if (	(contact.getFixtureA() == game.getPlayer().getLaser().getFixture()
 			|| 	contact.getFixtureB() == game.getPlayer().getLaser().getFixture())) {
 
-			// + enemies
+			// laser + enemies
 			for( Enemy enemy : game.getEnemies()){
 				if( enemy.getFixture() == contact.getFixtureA() ||
 					enemy.getFixture() == contact.getFixtureB()
@@ -71,7 +71,7 @@ public class MyContactListener implements ContactListener{
 				}
 			}
 			
-			// + gameObject
+			// laser + gameObject
 			for (GameObject gameObject : game.getDynamicObjects()){
 				if (	gameObject.getBody().getFixtureList() == contact.getFixtureB() 
 					||	gameObject.getBody().getFixtureList() == contact.getFixtureA()){
@@ -81,7 +81,7 @@ public class MyContactListener implements ContactListener{
 				}
 			}
 			
-			// + dropitems
+			// laser + dropitems
 			Iterator iterator = game.getDropItems().iterator();
 			while (iterator.hasNext()){
 				DropItem dropItem = (DropItem) iterator.next();
@@ -126,7 +126,11 @@ public class MyContactListener implements ContactListener{
 						enemy.die();
 					}
 				}
-				
+			}
+
+			if (contact.getFixtureA().getFilterData().categoryBits == 4 || 
+				contact.getFixtureB().getFilterData().categoryBits == 4 ) {
+//				System.out.println("buja");
 			}
 		}
 		
@@ -213,17 +217,17 @@ public class MyContactListener implements ContactListener{
 			if ( !enemy.isDead() ){
 				
 //				enemy + missile
-				for(GameObject dynamicObject : game.getDynamicObjects() ){
-					if (enemy.getFixture() == contact.getFixtureA() || enemy.getFixture() == contact.getFixtureB() ){
-						if (dynamicObject.getFixture() == contact.getFixtureA() || dynamicObject.getFixture() == contact.getFixtureB() ){
-							if (Math.abs(dynamicObject.getBody().getLinearVelocity().x) > minKillingSpeed || 
-									Math.abs(dynamicObject.getBody().getLinearVelocity().y) > minKillingSpeed ){
-								enemy.die();
-								break;
-							}	
-						}
-					}
-				}
+//				for(GameObject dynamicObject : game.getDynamicObjects() ){
+//					if (enemy.getFixture() == contact.getFixtureA() || enemy.getFixture() == contact.getFixtureB() ){
+//						if (dynamicObject.getFixture() == contact.getFixtureA() || dynamicObject.getFixture() == contact.getFixtureB() ){
+//							if (Math.abs(dynamicObject.getBody().getLinearVelocity().x) > minKillingSpeed || 
+//									Math.abs(dynamicObject.getBody().getLinearVelocity().y) > minKillingSpeed ){
+//								enemy.die();
+//								break;
+//							}	
+//						}
+//					}
+//				}
 				
 //				enemy + spikes
 				for (Spike spike : game.getSpikes() ){
@@ -235,6 +239,29 @@ public class MyContactListener implements ContactListener{
 					}
 					
 				}
+				
+//				enemy + enemy
+				for( Enemy enemy2 : game.getEnemies()){
+					if(enemy == enemy2){
+						continue;
+					}
+//				
+					if (enemy.getFixture() == contact.getFixtureA() ||  enemy.getFixture() == contact.getFixtureB() ){
+						if (enemy2.getFixture() == contact.getFixtureA() ||  enemy2.getFixture() == contact.getFixtureB() ){
+						
+							if (enemy.dizzy && enemy.isOriginalHit()){
+								enemy2.throwBack(false);
+//								enemy.setOriginalHit(false);
+							}
+							if (enemy2.dizzy && enemy2.isOriginalHit()){
+								enemy.throwBack(false);
+//								enemy2.setOriginalHit(false);
+							}		
+						}
+					}		
+				}
+				
+					
 				
 			} // not dead end
 			

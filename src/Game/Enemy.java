@@ -53,6 +53,7 @@ public abstract class Enemy extends GameObjectBox {
 	protected boolean left = false;
 	protected boolean dizzy = false;
 	private boolean firstTimeRotation = true;
+	private boolean originalHit = false;
 	
 	private float conveyorSpeed = 0f;
 	
@@ -228,8 +229,9 @@ public abstract class Enemy extends GameObjectBox {
 
 	}
 	
-	public void throwBack(){
+	public void throwBack(boolean originalHit){
 
+		this.originalHit = originalHit;
 		dizzy = true;
 		dizzyCounter = 0;
 		dizzyRotationCounter = 0;
@@ -304,6 +306,11 @@ public abstract class Enemy extends GameObjectBox {
 			--health;
 		}
 		
+		if(getBody().getLinearVelocity().x < 1f	)
+		{
+			originalHit = false;
+		}
+		
 		++dieCounter;
 		++dizzyCounter;
 		++dizzyRotationCounter;
@@ -369,5 +376,11 @@ public abstract class Enemy extends GameObjectBox {
 	public void laserHitEnd(){
 		getsGrilled = false;
 	}
-	
+
+	public boolean isOriginalHit() {
+		return originalHit;
+	}
+	public void setOriginalHit(boolean originalHit) {
+		this.originalHit = originalHit;
+	}
 }

@@ -123,8 +123,8 @@ public class DumbPig extends Enemy{
 	}
 	
 	@Override
-	public void throwBack() {
-		super.throwBack();
+	public void throwBack(boolean originalHit) {
+		super.throwBack(originalHit);
 		this.currentAnimation = animations.get("disabled");
 	}
 	
