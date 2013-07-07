@@ -1144,12 +1144,8 @@ public class Player {
 			distance = -distance;
 		}
 		
-		this.doTailwhip = false;
-		if (isOnGround() && false) {
-			this.getBody().setLinearVelocity(new Vec2(-distance, body.getLinearVelocity().y));
-		}
-		
 		this.body.destroyFixture(this.fixtureTail);
+		this.doTailwhip = false;
 		
 	}
 	
@@ -1159,7 +1155,7 @@ public class Player {
 			return;
 		}
 		
-		if (!this.isGoingToCreateTailwhip && !this.groundPounding) {
+		if (!doTailwhip && !this.isGoingToCreateTailwhip && !this.groundPounding) {
 			
 			this.tailwhipCounter = 0;
 			
@@ -1391,7 +1387,7 @@ public class Player {
 						.setLinearVelocity(new Vec2(getBody().getLinearVelocity().x + conveyorSpeed, getBody().getLinearVelocity().y));
 			}
 			
-			if (isGoingToCreateTailwhip && tailwhipDelayCounter > TAILWHIP_DELAY) {
+			if (!doTailwhip && isGoingToCreateTailwhip && tailwhipDelayCounter > TAILWHIP_DELAY) {
 				tailwhip();
 			}
 			
