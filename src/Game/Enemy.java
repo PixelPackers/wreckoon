@@ -261,7 +261,8 @@ public abstract class Enemy extends GameObjectBox {
 	}
 	
 	public void die() {
-
+		Sounds.getInstance().play("pigdeath", Functions.random(0.8f, 1.2f), 1f);
+		
 		// sprite
 		game.getObjectsToRemove().add(this);
 		

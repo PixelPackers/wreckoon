@@ -67,7 +67,7 @@ public class DumbPig extends Enemy{
 			this.currentAnimation = animations.get("walk");
 		}
 		
-		if (getsGrilled) {
+		if (getsGrilled && !isDead()) {
 			this.currentAnimation = animations.get("shock");
 		}
 		

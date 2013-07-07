@@ -153,16 +153,17 @@ public class Game extends BasicGame {
 			}
 		}
 
-		// create the parts
+		if (level.getGirders() != null)
 		for (Girder gi : level.getGirders()) {
 			girders.add(new Girder(world, gi.getX(), gi.getY(), 7.75f));
 		}
 		
+		if (level.getGenerators() != null)
 		for (Generator ge : level.getGenerators()) {
 			generators.add(new Generator(world, ge.getX(), ge.getY(), 1.25f, 1.5f));
 		}
 
-		//conveyor.add(new Conveyor(world, 7f, 4f, 11f, 0.1f, 0.5f, 0.5f, 0.5f));
+		conveyors.add(new Conveyor(world, 7f, 4f, 1.8f, 0.4f, 0.5f, 0.5f, 0.5f));
 
 		player = new Player(world, 5f, 3f);
 		laser = new Laser(world, 0f, 0f);
@@ -172,6 +173,7 @@ public class Game extends BasicGame {
 		world.setContactListener(new MyContactListener(this));
 		
 		// create the enemies
+		if (level.getEnemies() != null)
 		for (SpawnPoint e : level.getEnemies()) {
 			switch (e.getType()) {
 				case 0:
@@ -183,10 +185,6 @@ public class Game extends BasicGame {
 			}
 		}
 
-//		for (int i = 0; i < 10; ++i) {
-//			enemies.add( new DumbPig(this, 1*i +10f, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC) );
-//			enemies.add( new SmartPig(this, 1f*i, 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
-//		}
 		initNormalSky();
 
 	}
@@ -314,7 +312,7 @@ public class Game extends BasicGame {
 				dropItems.remove(d);
 			}
 			dropItemsToRemove.clear();
-						
+			
 			for (Part p : parts) {
 				p.update();
 			}
@@ -503,12 +501,16 @@ public class Game extends BasicGame {
 		}
 		
 		for (Enemy enemy : enemies) {
-			if (enemy.getsGrilled) {
+			if (enemy.getsGrilled || enemy.isDead()) {
 				enemy.draw(g, debugView);
 			}
 		}
 		
 		g.popTransform();
+		
+		g.setColor(Color.blue);
+		g.fillRect(50, 50, player.getLaserTime()*5, 50);
+		g.setColor(Color.white);
 		
 		drawBoltCounter();
 		
@@ -538,9 +540,6 @@ public class Game extends BasicGame {
 //		g.drawString("pos: " + player.getBody().getPosition(), 200, 50);
 //		g.drawString("pigs: " + player.getPigCounter(), 10, 30);
 		g.drawString("laserc: " + player.getLaserTime(), 10, 30);
-		g.setColor(Color.blue);
-		g.fillRect(50, 50, player.getLaserTime()*5, 50);
-		g.setColor(Color.white);
 		
 		
 		g.drawString("left thumbstick angle: " +  xbox.getLeftThumbDirection() + "\n" +
@@ -716,6 +715,7 @@ public class Game extends BasicGame {
 			useZoomAreas = !useZoomAreas;
 		}
 		
+		if (level.getCheckpoints() != null)
 		for (Checkpoint cp : level.getCheckpoints()) {
 			if (cp.isInArea(player.getBody().getPosition().x, player.getBody().getPosition().y)) {
 				player.setCheckpoint(cp);
@@ -725,6 +725,7 @@ public class Game extends BasicGame {
 		// TODO Kamera Smoothness muss auch angepasst werden, je nach Zoom
 		if (useZoomAreas) {
 			float biggestZoom = 0f;
+			if (level.getZoomAreas() != null)
 			for (ZoomArea za: level.getZoomAreas()) {
 				Vec2 pos = player.getBody().getPosition();
 				if (za.isInArea(pos.x, pos.y)) {
@@ -802,10 +803,13 @@ public class Game extends BasicGame {
 		if (xbox.isButtonRightThumbDown()) {
 			DOOMSDAY = !DOOMSDAY;
 		}
-		if(input.isKeyPressed(Input.KEY_ENTER)){
+		if(xbox.isButtonLeftThumbDown() || input.isKeyPressed(Input.KEY_ENTER)){
 			debugView = !debugView;			
 		}
 		
+		if (input.isKeyDown(Input.KEY_N)) {
+			laserAngle = laserTargetAngle = 0d;
+		}
 
 
 		// TODO crappy, weils keine keyUp() methode gibt. die reihenfolge muss auch so erhalten bleiben, sonsts is immer false
@@ -974,7 +978,5 @@ public class Game extends BasicGame {
 	public static ArrayList<DropItem> getDropItemsToRemove() {
 		return dropItemsToRemove;
 	}
-	
-	
 	
 }

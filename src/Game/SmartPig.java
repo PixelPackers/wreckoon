@@ -18,6 +18,7 @@ public class SmartPig extends Enemy {
 
 	private static final int MIN_SWITCH_TIME = 20;
 	private int switchTimeCounter = 0;
+	private static int aggroPigCounter;
 	
 	public SmartPig(Game game, float posX, float posY, float width, float height, float density, float friction, float restitution, String imgPath,
 			BodyType bodyType) throws SlickException {
@@ -44,9 +45,11 @@ public class SmartPig extends Enemy {
 		if( !player.isDead() &&  ((distance < AGGRO_DISTANCE && aggro) ||
 				(distance < AGGRO_DISTANCE && playerIsLeft() == left) ) ){
 			aggro = true;
+			++aggroPigCounter;			
 		} else {
 			if(aggro) {
 				aggro = false;
+				--aggroPigCounter;
 				if(Math.random() < 0.5){
 					left = !left;
 				}
@@ -94,7 +97,7 @@ public class SmartPig extends Enemy {
 			}
 		}
 		
-		if (getsGrilled) {
+		if (getsGrilled && !isDead()) {
 			this.currentAnimation = animations.get("shock");
 		}
 

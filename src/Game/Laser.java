@@ -49,6 +49,10 @@ public class Laser extends GameObjectPolygon {
 			this.drawImage(g);
 	}
 	
+	public boolean hitsPigs() {
+		return laserContacts.size() > 0;
+	}
+	
 	public void drawImage(Graphics g) {
 		g.pushTransform();
 		g.rotate(getBody().getPosition().x, getBody().getPosition().y, (float) Math.toDegrees(getBody().getAngle()));

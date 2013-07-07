@@ -47,11 +47,11 @@ public class Player {
 	private int laserCounter 		= 0;
 	private int biteCounter 		= 0;
 	private int floatingCounter 	= 0;
-	private int boltCounter			= 110;
+	private int boltCounter			= 0;
 	private int tmpBoltAmount		= 0;
 	private int pigCounter			= 0;
 	private int deathTimeCounter	= 0;
-	private int laserTime           = 0;
+	private int laserTime           = 10000000;
 	
 	private float jumpPower				= -10f*2f;
 	private float wallJumpPowerFactor	= 0.3f;
@@ -265,11 +265,11 @@ public class Player {
 		
 		
 		// player body hitbox
-		Vec2[] vertsSensor = new Vec2[]{
-			new Vec2(-height * 0.5f,  width * 0*0.5f),
-			new Vec2(-height * 0.5f, -width * 0.5f),
-			new Vec2( height * 0.5f, -width * 0.5f),
-			new Vec2( height * 0.5f,  width * 0*0.5f)
+		Vec2[] vertsPlayerBox = new Vec2[]{
+			new Vec2(-width * 0.45f,  height * 0f),
+			new Vec2(-width * 0.45f, -height * 0.5f),
+			new Vec2( width * 0.45f, -height * 0.5f),
+			new Vec2( width * 0.45f,  height * 0f)
 		};
 		
 //		Vec2[] vertsSensor = new Vec2[]{				
@@ -283,15 +283,15 @@ public class Player {
 //				new Vec2(-width * 0.25f, -height *  0.5f)
 //			};
 
-		PolygonShape secondPolygonShape = new PolygonShape();
-		secondPolygonShape.set(vertsSensor, vertsSensor.length);
+		PolygonShape playerPolygonShape = new PolygonShape();
+		playerPolygonShape.set(vertsPlayerBox, vertsPlayerBox.length);
 		
 		this.secondFixtureDef.density 	= DENSITY;
 		this.secondFixtureDef.friction 	= FRICTION;
 		// XXX braucht ma das? evtl wegen vom reifen wegbouncen? selbes wie oben
 //		this.secondFixtureDef.restitution = 0f;
-		this.secondFixtureDef.shape = secondPolygonShape;
-		this.secondPolygonShape = secondPolygonShape;
+		this.secondFixtureDef.shape = playerPolygonShape;
+		this.secondPolygonShape = playerPolygonShape;
 		
 		secondFixtureDef.filter.categoryBits = 2;
 		secondFixtureDef.filter.maskBits = 1 + 4 + 8;
@@ -397,6 +397,8 @@ public class Player {
 				this.getBody().setLinearVelocity(new Vec2 (body.getLinearVelocity().x, -force) );
 			}
 			
+			Sounds.getInstance().play("death", 1f, Functions.random(0.9f, 1.0f));
+			
 			deathTimeCounter = 0;
 			lock();
 		}
@@ -406,6 +408,7 @@ public class Player {
 		if (debugView) {
 			this.drawOutline(g);
 			wheel.drawOutline(g);
+			laser.drawOutline(g);
 		} else {
 			this.drawImage();
 		}
@@ -605,11 +608,12 @@ public class Player {
 			if (this.biting && this.currentAnimation.isStopped() ) {
 				this.currentAnimation = animations.get("shock");
 				biteShockLoading = true;
+				Sounds.getInstance().loop("bite", 1f, 1f);
 			}
 	
 			if	(this.biting && /*biteCounter == SHOCK_DURATION*/ stopBiting) {
 				stopBiting = false;
-				biteFinalize();		
+				biteFinalize();
 			}
 	
 	
@@ -761,6 +765,8 @@ public class Player {
 			float jumpSpeedX = this.body.getLinearVelocity().x;
 			float jumpSpeedY = this.jumpPower; 
 			
+			Sounds.getInstance().play("jump", Functions.random(0.9f, 1.1f), 1f);
+			
 			if (this.isOnGround()){
 
 				if ( this.isRunning() ) {
@@ -847,6 +853,8 @@ public class Player {
 			
 			this.doTailwhip = true;
 			this.tailwhipCounter = 0;
+			
+			Sounds.getInstance().play("tailwhip", 0.6f, Functions.random(0.8f, 1.2f));
 			
 			float tailWidth 	= 0.7f*0.25f;
 			float tailHeight	= 0.2f*0.25f;
@@ -1034,7 +1042,9 @@ public class Player {
 	private void createLaser(){
 
 		if(!waitingForLaserToBeKilled){
-			this.laserActive = true;	
+			this.laserActive = true;
+			
+			Sounds.getInstance().loop("laser", Functions.random(0.8f, 1.2f), 1f);
 			
 			Iterator<GameObject> iterator = laser.getLaserContacts().iterator();
 			while (iterator.hasNext()){
@@ -1071,6 +1081,8 @@ public class Player {
 //		if(laserActive){ // wenn laser taste gedrückt wurde, aber bevor geschossen wurde, abgebrochen
 //			this.laserAble = false;
 //		}
+		
+		Sounds.getInstance().stop("laser");
 		
 		this.laserStarted = false;
 		this.laserActive = false;
@@ -1110,7 +1122,7 @@ public class Player {
 		biteShockLoading = false;
 		this.currentAnimation = animations.get("idle");
 //		this.laserAble = true;
-
+		Sounds.getInstance().stop("bite");
 		unlock();
 	}
 	
