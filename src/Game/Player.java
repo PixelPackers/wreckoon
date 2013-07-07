@@ -25,10 +25,13 @@ public class Player {
 	private static final float DENSITY = 11f;
 	private static final float	TAILWHIP_DISTANCE	= 5f;
 	private static final int	TAILWHIP_TIME		= 110;
+	private static final int	TAILWHIP_DELAY		= 5;
+	private static final int	TAILWHIP_DURATION	= 20;
 	private static final int 	GROUNDPOUND_AIRTIME = 30;
-	private static final int 	MAX_LASER_DURATION 		= 250;
+	private static final int 	MAX_LASER_DURATION 		= 450;
 	private static final int 	SHOCK_DURATION		= 200;
 	private static final int 	DEATH_WAIT_TIME		= 70;
+	private static final int 	GROUNDPOUND_DELAY 	= 50;
 
 	private final float MAX_VELOCITY_WALKING = 1.75f;
 	private final float MAX_VELOCITY_RUNNING = 5f;
@@ -37,12 +40,12 @@ public class Player {
 	private final float FRICTION = 1f;
     private static final boolean ENDLESS_LASER = true;
 
+    
 	
 	private int groundPoundCounter	= 0;
 	private int tailwhipCounter		= 0;
+	private int tailwhipDelayCounter= 0;	
 	private int idleCounter			= 0;
-	private int dizzyCounter		= 0;
-	private int dizzyIncrease		=-1;
 	private int jumpCounter 		= 0;
 	private int laserCounter 		= 0;
 	private int biteCounter 		= 0;
@@ -75,6 +78,7 @@ public class Player {
 	private boolean waitingForLaserToBeKilled = false;
 	private boolean frontflipping = false;
 	private boolean stopBiting = false;
+	private boolean isGoingToCreateTailwhip = false;
 	
 	
 	private boolean locked = false;
@@ -524,17 +528,12 @@ public class Player {
 				this.groundpound();	
 			}
 			
-			// TODO konstante fuer speed
-			if( this.tailwhipCounter > 20f && this.doTailwhip ){
-				this.tailwhipFinalize();
-			}
+		
 			
 	//		if(getSensorGroundCollision().isColliding() && this.body.getLinearVelocity().y < 0f){
 			if(isOnGround() || isOnWall()){
 				
-				if(groundPounding || wasLasering){
-					this.groundPounding = false;
-					dizzyIncrease = -1;
+				if(wasLasering){
 					unlock();
 				}
 				this.jumpingFromWall = false;
@@ -542,13 +541,8 @@ public class Player {
 				wasLasering = false;
 			}
 			
-	
 			
-			if(dizzyCounter > 0){
-				this.dizzy = true;
-			} else {
-				this.dizzy = false;
-			}
+	
 	//		this.adjustHitboxes();
 			
 			
@@ -558,7 +552,7 @@ public class Player {
 			
 			this.telekinesis();
 	
-			if( this.isOnGround() /*&& !this.isRunning() */&& !this.doTailwhip && idleCounter > 2 && !this.dead && !this.biting && !locked) {
+			if( isOnGround() /*&& !this.isRunning() */&& !isGoingToCreateTailwhip && !doTailwhip && idleCounter > 2 && !dead && !biting && !locked) {
 				this.currentAnimation = animations.get("idle");
 			}
 			
@@ -576,7 +570,7 @@ public class Player {
 				this.currentAnimation = animations.get("runJump");
 			}
 			
-			if(!isOnGround() && !isJumpingFromWall() && !groundPounding && !dead && !laserStarted && !doTailwhip && !frontflipping) {
+			if(!isOnGround() && !isJumpingFromWall() && !groundPounding && !dead && !laserStarted && !isGoingToCreateTailwhip && !doTailwhip && !frontflipping) {
 				this.currentAnimation = animations.get("runJump");
 			}
 			
@@ -589,6 +583,7 @@ public class Player {
 			}
 			
 			if (this.isOnGround() && this.dizzy){
+				// gugu
 				this.currentAnimation = animations.get("groundpoundImpact");
 			}
 	
@@ -625,6 +620,14 @@ public class Player {
 			// TODO überprüfen ob das jetzt mit lauf band funkt
 			if(this.conveyorSpeed != 0){
 				this.getBody().setLinearVelocity( new Vec2(getBody().getLinearVelocity().x + conveyorSpeed, getBody().getLinearVelocity().y) );
+			}
+			
+			if(isGoingToCreateTailwhip && tailwhipDelayCounter > TAILWHIP_DELAY){
+				tailwhip();
+			}
+			
+			if( this.tailwhipCounter > TAILWHIP_DURATION && this.doTailwhip ){
+				this.tailwhipFinalize();
 			}
 		} else {
 			if (deathTimeCounter > DEATH_WAIT_TIME) {
@@ -719,7 +722,7 @@ public class Player {
 		if (velocityX < -maxVelocity) this.body.setLinearVelocity(new Vec2(-maxVelocity, velocityY));
 		
 		//*/
-		if(!groundPounding && !doTailwhip && this.isOnGround() && jumpCounter > 5){
+		if(!groundPounding && !isGoingToCreateTailwhip && !doTailwhip && this.isOnGround() && jumpCounter > 5){
 //			if(this.running){
 //				this.currentAnimation = animations.get("run");
 //			} else {
@@ -808,7 +811,7 @@ public class Player {
 	 		return;
 	 	} 
 		
-		if(groundPoundCounter > 50 && !groundPounding){
+		if(groundPoundCounter > GROUNDPOUND_DELAY && !groundPounding){
 			
 
 	 		lock();
@@ -819,8 +822,8 @@ public class Player {
 			
 			this.groundPounding = true;
 			this.groundPoundCounter = 0;
-			this.dizzyCounter = 0;
-			this.dizzyIncrease = 1; // positive
+			
+			godmode = true;
 			
 			this.groundpound();
 			
@@ -836,7 +839,7 @@ public class Player {
 
 		if( this.groundPoundCounter > GROUNDPOUND_AIRTIME ) {
 			this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, groundPoundPower));
-			unlock();
+//			unlock();
 		} else {
 			this.getBody().setLinearVelocity(new Vec2(0f,0f));
 		}
@@ -848,17 +851,16 @@ public class Player {
 			return;
 		}
 		
-		if ( !this.doTailwhip && !this.groundPounding /* && this.isOnGround()*/ ) {
+		if ( !this.isGoingToCreateTailwhip&& !this.groundPounding ) {
 			
-			
-			this.doTailwhip = true;
 			this.tailwhipCounter = 0;
 			
 			Sounds.getInstance().play("tailwhip", 0.6f, Functions.random(0.8f, 1.2f));
 			
-			float tailWidth 	= 0.7f*0.25f;
-			float tailHeight	= 0.2f*0.25f;
-			float direction = this.width;
+			float tailWidth 	= 0.5f;
+			float tailHeight	= 0.2f;
+			float direction = this.width - tailWidth*0.35f;
+			float heightSpace = tailHeight*0.5f;
 			float distance = TAILWHIP_DISTANCE;
 			
 			if(this.movesLeft()){
@@ -869,10 +871,10 @@ public class Player {
 			this.getBody().setLinearVelocity( new Vec2(distance, body.getLinearVelocity().y) );
 			
 			Vec2[] vertsTail = new Vec2[]{
-				new Vec2( -tailWidth * 0.5f + direction, tailHeight * 0.5f ),
-				new Vec2( -tailWidth * 0.5f + direction, -tailHeight * 0.5f ),
-				new Vec2(  tailWidth * 0.5f + direction, -tailHeight * 0.5f ),
-				new Vec2(  tailWidth * 0.5f + direction, tailHeight * 0.5f )
+				new Vec2( -tailWidth * 0.5f + direction, tailHeight * 0.5f + heightSpace ),
+				new Vec2( -tailWidth * 0.5f + direction, -tailHeight * 0.5f + heightSpace ),
+				new Vec2(  tailWidth * 0.5f + direction, -tailHeight * 0.5f + heightSpace ),
+				new Vec2(  tailWidth * 0.5f + direction, tailHeight * 0.5f + heightSpace )
 			};
 
 			this.polygonShapeTail = new PolygonShape();
@@ -886,13 +888,17 @@ public class Player {
 			this.currentAnimation.restart();
 			
 			this.running = true;
-			this.tailwhip();
+			isGoingToCreateTailwhip = true;
+			tailwhipDelayCounter = 0;
 			
 			
 			
 		}
 	}
 	private void tailwhip(){
+		isGoingToCreateTailwhip = false;
+
+		this.doTailwhip = true;
 		this.fixtureTail = this.body.createFixture(this.fixtureDefTail);
 	}
 	
@@ -1141,11 +1147,11 @@ public class Player {
 			++shootingPower;
 		}
 		++idleCounter;
-		dizzyCounter += dizzyIncrease;
 		++jumpCounter;
 		++laserCounter;
 		++biteCounter;
 		++deathTimeCounter;
+		++tailwhipDelayCounter;
 	}
 	
 	
@@ -1444,5 +1450,21 @@ public class Player {
     
     public void stopBiting(){
     	stopBiting = true;
+    }
+    
+    public void stopGroundpounding(){
+    	if(groundPounding){
+//    		currentAnimation.stop();
+			this.groundPounding = false;
+			unlock();
+			godmode = false;
+
+    	}
+
+		currentAnimation = animations.get("groundpoundImpact");    	
+    }
+    
+    public boolean isAttacking(){
+    	return doTailwhip || laserStarted || laserActive || groundPounding;
     }
 }

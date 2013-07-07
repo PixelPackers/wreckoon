@@ -31,6 +31,8 @@ public class Game extends BasicGame {
 	private static int screenHeight = 900;
 	private static boolean fullScreen = false;
 	private static boolean DEFAULT_RUNNING = true;
+	private static int MAX_SPAWN_ENEMIES = 30;
+	
 	/*/
 	private static int screenWidth = 1920;
 	private static int screenHeight = 1080;
@@ -259,8 +261,11 @@ public class Game extends BasicGame {
 			if(DOOMSDAY){
 				cam.wiggle((player.isLaserActive()) ? 1f : 0.5f);
 				
-				if (doomsdayCounter > 450 ) {
+				if (doomsdayCounter > 450 && enemies.size() < MAX_SPAWN_ENEMIES) {
 					enemies.add(new SmartPig(this, player.getBody().getPosition().x - 5f, player.getBody().getPosition().y - 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+					enemies.add(new SmartPig(this, player.getBody().getPosition().x + 5f, player.getBody().getPosition().y - 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+					enemies.add(new DumbPig(this, player.getBody().getPosition().x - 5f, player.getBody().getPosition().y - 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+					enemies.add(new DumbPig(this, player.getBody().getPosition().x + 5f, player.getBody().getPosition().y - 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
 					doomsdayCounter = 0;
 				}
 				++doomsdayCounter;
@@ -797,7 +802,7 @@ public class Game extends BasicGame {
 			}
 			
 
-			enemies.add(new SmartPig(this, player.getBody().getPosition().x + 5f, player.getBody().getPosition().y - 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+//			enemies.add(new SmartPig(this, player.getBody().getPosition().x + 5f, player.getBody().getPosition().y - 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
 		}
 
 		if (xbox.isButtonRightThumbDown()) {

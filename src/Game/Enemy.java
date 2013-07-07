@@ -53,6 +53,7 @@ public abstract class Enemy extends GameObjectBox {
 	protected boolean left = false;
 	protected boolean dizzy = false;
 	private boolean firstTimeRotation = true;
+	private boolean originalHit = false;
 	
 	private float conveyorSpeed = 0f;
 	
@@ -228,8 +229,9 @@ public abstract class Enemy extends GameObjectBox {
 
 	}
 	
-	public void throwBack(){
+	public void throwBack(boolean originalHit){
 
+		this.originalHit = originalHit;
 		dizzy = true;
 		dizzyCounter = 0;
 		dizzyRotationCounter = 0;
@@ -252,7 +254,7 @@ public abstract class Enemy extends GameObjectBox {
 		float force = 7.5f;
 		float x = (game.getPlayer().movesLeft()) ? -force : force;
 		
-		this.getBody().setLinearVelocity(new Vec2 (x, -force) );
+		this.getBody().setLinearVelocity(new Vec2 (x, -force*0.75f) );
 		
 		if(Math.random() < 0.5){
 			left = !left;
@@ -269,6 +271,8 @@ public abstract class Enemy extends GameObjectBox {
 		this.dead = true;
 		this.dieCounter = 0;
 		game.getPlayer().increasePigCounter();
+		
+		getBody().getFixtureList().setSensor(true);
 	}
 
 	public boolean isDead() {
@@ -303,6 +307,11 @@ public abstract class Enemy extends GameObjectBox {
 		
 		if (getsGrilled){
 			--health;
+		}
+		
+		if(getBody().getLinearVelocity().x < 1f	)
+		{
+			originalHit = false;
 		}
 		
 		++dieCounter;
@@ -370,5 +379,11 @@ public abstract class Enemy extends GameObjectBox {
 	public void laserHitEnd(){
 		getsGrilled = false;
 	}
-	
+
+	public boolean isOriginalHit() {
+		return originalHit;
+	}
+	public void setOriginalHit(boolean originalHit) {
+		this.originalHit = originalHit;
+	}
 }

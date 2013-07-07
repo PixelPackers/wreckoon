@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.Island;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
@@ -17,6 +18,7 @@ public class SmartPig extends Enemy {
 	private boolean aggro = false;
 
 	private static final int MIN_SWITCH_TIME = 20;
+	private static final float GROUNDPOUND_TURN_AWAY_RADIUS = 2;
 	private int switchTimeCounter = 0;
 	private static int aggroPigCounter;
 	
@@ -59,15 +61,14 @@ public class SmartPig extends Enemy {
 		if (!isDead() && !dizzy && !getsGrilled){ // movement
 			if(aggro){
 			
-				float x; 
+				float x = (playerIsLeft()) ? -speed : speed; 
 				
-				if(playerIsLeft() ){
-					x = -speed;
-					setLeft(true);
-				} else {
-					x = speed;
-					setLeft(false); 
+				if ( (player.isAttacking() && insideTurnAwayRadius() ) || (player.isLaserActive() || player.isLaserStarted() ) ){
+					x = -x;
 				}
+				
+				left =  (x < 0) ? true : false;
+				
 				if(this.isOnGround()){
 					this.getBody().setLinearVelocity(new Vec2(x, this.getBody().getLinearVelocity().y) );
 	//				this.getBody().applyLinearImpulse( new Vec2(x, 0*this.getBody().getLinearVelocity().y), this.getBody().getWorldCenter());
@@ -102,6 +103,13 @@ public class SmartPig extends Enemy {
 		}
 
 		++switchTimeCounter;
+	}
+
+	private boolean insideTurnAwayRadius() {
+
+
+		
+		return Math.abs( game.getPlayer().getBody().getPosition().x - getBody().getPosition().x) < GROUNDPOUND_TURN_AWAY_RADIUS;
 	}
 
 	@Override
@@ -162,8 +170,8 @@ public class SmartPig extends Enemy {
 		
 	}
 	@Override
-	public void throwBack() {
-		super.throwBack();
+	public void throwBack(boolean originalHit) {
+		super.throwBack(originalHit);
 		aggro = false;
 		this.currentAnimation = animations.get("disabled");
 	}
