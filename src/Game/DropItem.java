@@ -81,6 +81,7 @@ public abstract class DropItem extends GameObjectPolygon {
 
 	public void throwback() {
 
+		// TODO random
 		float force = 7.5f;
 		float x = (game.getPlayer().movesLeft()) ? -force : force;
 		

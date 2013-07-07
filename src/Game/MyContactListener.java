@@ -81,18 +81,16 @@ public class MyContactListener implements ContactListener{
 				}
 			}
 			
-			// shreds grill party
+			// + dropitems
 			Iterator iterator = game.getDropItems().iterator();
 			while (iterator.hasNext()){
 				DropItem dropItem = (DropItem) iterator.next();
 				
-				if( dropItem instanceof Shred ){
-					Shred shred = (Shred) dropItem;
-					
+				if (	dropItem.getFixture() == contact.getFixtureB() 
+						||	dropItem.getFixture() == contact.getFixtureA()){
 
-					if (	shred.getFixture() == contact.getFixtureB() 
-						||	shred.getFixture() == contact.getFixtureA()){
-
+					if( dropItem instanceof Shred ){
+						Shred shred = (Shred) dropItem;
 
 						if(game.getPlayer().isLaserActive()){
 							try {
@@ -105,7 +103,11 @@ public class MyContactListener implements ContactListener{
 							game.getPlayer().getLaser().getLaserContacts().add(shred);
 						}
 					}
+					if(game.getPlayer().isLaserActive()){
+						dropItem.throwback();
+					}
 				}
+				
 			}
 			
 			
