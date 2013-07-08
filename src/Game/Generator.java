@@ -61,9 +61,6 @@ public class Generator extends GameObjectBox {
 	
 	public void repair() {
 		if (!repaired ) {
-			
-//			game.get
-			System.out.println("repaired");
 			repaired = true;	
 		}
 	}
