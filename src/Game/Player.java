@@ -257,7 +257,6 @@ public class Player {
 					if(boltCounter >= REPAIR_BOLT_PRICE){
 
 						lock();
-						System.out.println("wpan");
 						game.addSpreadBolts(REPAIR_BOLT_PRICE);
 						
 						repairGenerator();
