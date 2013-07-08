@@ -56,7 +56,7 @@ public class Tile {
 		// fixtureDef.friction = 0.8f;
 		fixtureDef.restitution = 0f;
 		
-		fixtureDef.filter.categoryBits = 1;
+		fixtureDef.filter.categoryBits = 33;
 		// fixtureDef.filter.maskBits = 1;
 		
 		for (Vec2[] verts : arrayList) {

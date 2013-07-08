@@ -596,7 +596,6 @@ public class Player {
 	}
 	
 	private void groundpound() {
-		
 		if (this.groundPoundCounter > GROUNDPOUND_AIRTIME) {
 			this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, groundPoundPower));
 			// unlock();
@@ -606,7 +605,6 @@ public class Player {
 	}
 	
 	public void groundpoundInit() {
-		
 		if (locked || wasLasering) {
 			return;
 		}
@@ -1032,9 +1030,8 @@ public class Player {
 			distance = -distance;
 		}
 		
-		this.doTailwhip = false;
-		
 		this.body.destroyFixture(this.fixtureTail);
+		this.doTailwhip = false;
 		
 	}
 	
@@ -1044,7 +1041,7 @@ public class Player {
 			return;
 		}
 		
-		if (!this.isGoingToCreateTailwhip && !this.groundPounding) {
+		if (!doTailwhip && !this.isGoingToCreateTailwhip && !this.groundPounding) {
 			
 			this.tailwhipCounter = 0;
 			
@@ -1274,7 +1271,7 @@ public class Player {
 						.setLinearVelocity(new Vec2(getBody().getLinearVelocity().x + conveyorSpeed, getBody().getLinearVelocity().y));
 			}
 			
-			if (isGoingToCreateTailwhip && tailwhipDelayCounter > TAILWHIP_DELAY) {
+			if (!doTailwhip && isGoingToCreateTailwhip && tailwhipDelayCounter > TAILWHIP_DELAY) {
 				tailwhip();
 			}
 			
