@@ -17,7 +17,7 @@ public abstract class GameObject {
 	private FixtureDef	fixtureDef;
 	private Fixture		fixture;
 	
-	private Image		img;
+	protected Image		img;
 	
 	public GameObject(World world, float posX, float posY, float density, float friction, float restitution, String imgPath,
 			BodyType bodyType) throws SlickException {

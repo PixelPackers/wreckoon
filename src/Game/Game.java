@@ -228,15 +228,16 @@ public class Game extends BasicGame {
 		nut.draw(screenWidth - 130, 36);
 		drawRightAlignedDigits(boltGUIAngle, screenWidth - 150, 40);
 		
-		energy.getSprite(0, 0).draw(screenWidth - 360, 125);
-		
 		float energybar = ((float) player.getLaserTime() / (float)player.getMaxLaserTime()) * 325f;
+		energy.getSprite(0, 0).draw(
+				screenWidth - 360, 125,
+				screenWidth - 360 + (325 - energybar), 125 + 42,
+				0, 0, 325 - energybar, 42);
+		
 		energy.getSprite(0, 1).draw(
 				screenWidth - 360 + 325 - energybar, 125,
 				screenWidth - 360 + 325, 125 + 42,
 				325 - energybar, 0, 325, 42);
-		
-		energy.getSprite(0, 2).draw(screenWidth - 360, 125);
 	}
 	
 	private void drawCheckpoints(Graphics g) {
@@ -378,7 +379,8 @@ public class Game extends BasicGame {
 	}
 	
 	private void setupXBox() {
-		xbox = new XboxController();
+		//xbox = new XboxController();
+		xbox = new XboxController(is64bit()? "xboxcontroller64" : "xboxcontroller", 1, 50, 50);
 		xbox.setLeftThumbDeadZone(THUMBSTICK_DEADZONE);
 		xbox.setRightThumbDeadZone(THUMBSTICK_DEADZONE);
 		xbox.setLeftTriggerDeadZone(TRIGGER_DEADZONE);
@@ -1080,6 +1082,10 @@ public class Game extends BasicGame {
 	}
 	public void addSpreadBolts(int spreadBolts){
 		this.spreadBolts += spreadBolts;
+	}
+	
+	static boolean is64bit() {
+	  return System.getProperty("sun.arch.data.model").equals("64");
 	}
 	
 }

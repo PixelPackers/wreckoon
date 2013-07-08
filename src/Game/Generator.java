@@ -17,7 +17,7 @@ public class Generator extends GameObjectBox {
 	
 	public Generator(World world, float posX, float posY, float width, float height) throws SlickException {
 		super(world, posX, posY, width, height, 0, 0, 0, null, BodyType.STATIC, true);
-		
+		img = Images.getInstance().getImage("images/generatorbroken.png");
 		this.position.x = posX;
 		this.position.y = posY;
 		this.width = width;
@@ -27,8 +27,12 @@ public class Generator extends GameObjectBox {
 	
 	@Override
 	public void drawImage() {
+		if (repaired) {
+			animation.draw(position.x - width * 0.5f, position.y - height * 0.5f, width, height);
+		} else {
+			img.draw(position.x - width * 0.5f, position.y - height * 0.5f, width, height);
+		}
 		
-		animation.draw(position.x - width * 0.5f, position.y - height * 0.5f, width, height);
 		
 	}
 	
@@ -60,9 +64,7 @@ public class Generator extends GameObjectBox {
 	
 	
 	public void repair() {
-		if (!repaired ) {
-			repaired = true;	
-		}
+		repaired = true;	
 	}
 	public boolean isRepaired() {
 		return repaired;
