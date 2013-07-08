@@ -412,7 +412,7 @@ public class Player {
 		// }
 		
 		Sounds.getInstance().stop("laser");
-		Sounds.getInstance().play("laserreverb", 1f, 1f);
+		if (laserActive) Sounds.getInstance().play("laserreverb", 0.5f, 1f);
 		
 		this.laserStarted = false;
 		this.laserActive = false;

@@ -17,6 +17,7 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
+import org.newdawn.slick.Music;
 import org.newdawn.slick.ShapeFill;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
@@ -110,6 +111,8 @@ public class Game extends BasicGame {
 	private double							xboxRightThumbMagnitude;
 	private double							xboxLeftTrigger;
 	private double							xboxRightTrigger;
+	
+	private static Music					bgMusic, bgMusic2;
 	
 	public static ArrayList<Conveyor> getConveyors() {
 		return conveyors;
@@ -360,6 +363,10 @@ public class Game extends BasicGame {
 		
 		initNormalSky();
 		
+		bgMusic = new Music("audio/menu.ogg");
+		bgMusic2 = new Music("audio/menumelody.ogg");
+		bgMusic.loop();
+		bgMusic2.loop();
 	}
 	
 	private void setupXBox() {
@@ -482,6 +489,18 @@ public class Game extends BasicGame {
 		
 		if (input.isKeyPressed(Input.KEY_SPACE) || input.isKeyPressed(Input.KEY_W) || input.isKeyPressed(Input.KEY_UP)) {
 			actionJump();
+		}
+		
+		int duration = 250;
+		
+		if (input.isKeyPressed(Input.KEY_DELETE)) {
+			bgMusic.fade(duration, 0f, false);
+			bgMusic2.fade(duration, 1f, false);
+		}
+		
+		if (input.isKeyPressed(Input.KEY_INSERT)) {
+			bgMusic.fade(duration, 1f, false);
+			bgMusic2.fade(duration, 0f, false);
 		}
 		
 		// / XXX MAGIC NUMBERS
@@ -758,7 +777,7 @@ public class Game extends BasicGame {
 		
 		for (Part part : parts) {
 			part.draw(g, debugView);
-		}		
+		}
 		
 		for (Enemy enemy : enemies) {
 			if (!enemy.getsGrilled) {

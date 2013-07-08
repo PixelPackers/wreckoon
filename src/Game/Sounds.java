@@ -3,6 +3,7 @@ package Game;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.openal.Audio;
 import org.newdawn.slick.openal.AudioLoader;
@@ -21,6 +22,7 @@ public class Sounds {
 	}
 	
 	private HashMap<String, Audio>	sounds	= new HashMap<String, Audio>();
+	private HashMap<String, Music>	tracks	= new HashMap<String, Music>();
 	
 	private Sounds() {}
 	
@@ -39,9 +41,15 @@ public class Sounds {
 			putSound("pigaggro");
 			putSound("tailwhip");
 			putSound("fence");
+			//putSound("bgmusic", "audio/menu.ogg");
+			//tracks.put("bgmusic", new Music("audio/menu.ogg"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public Music getTrack(String name) {
+		return tracks.get(name);
 	}
 	
 	public void loop(String sound, float pitch, float volume) {
@@ -51,6 +59,10 @@ public class Sounds {
 	public void play(String sound, float pitch, float volume) {
 		sounds.get(sound).playAsSoundEffect(pitch, volume, false);
 	}
+	
+//	public void playAsMusic(String sound, float pitch, float volume) {
+//		sounds.get(sound).playAsMusic(pitch, volume, false);
+//	}
 	
 	private void putSound(String name) throws IOException {
 		putSound(name, "audio/" + name + ".ogg");
