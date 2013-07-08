@@ -189,7 +189,7 @@ public class Player {
 	}
 	
 	public void accelerate(float magnitude) {
-		if (!locked) {
+		if (!locked || (locked && groundPounding) ) {
 			float velocityX = this.body.getLinearVelocity().x;
 			float velocityY = this.body.getLinearVelocity().y;
 			
