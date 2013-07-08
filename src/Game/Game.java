@@ -926,7 +926,7 @@ public class Game extends BasicGame {
 				++doomsdayCounter;
 				
 				if(player.isDead()){
-					System.out.println(doomsdayCounter / 60);
+					// TODO draw statistics
 				}
 			} else {
 				cam.wiggle((player.isLaserActive()) ? 1f : 0f);
