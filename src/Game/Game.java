@@ -987,7 +987,7 @@ public class Game extends BasicGame {
 				killLaser();
 			}
 			
-			if (spreadBolts != 0) {
+			if (spreadBolts != 0 && player.isRepairing()) {
 				
 				for(int i=0; i<1; ++i) {
 					if(spreadBolts > 0 && spreadBolts % 10==0) {
@@ -997,6 +997,8 @@ public class Game extends BasicGame {
 					}
 				}
 				--spreadBolts;
+			} else {
+				spreadBolts = 0;
 			}
 			
 			world.step(delta / 1000f, 18, 6);

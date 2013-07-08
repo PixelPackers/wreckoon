@@ -32,6 +32,7 @@ public class Player {
 	private static final int			DEATH_WAIT_TIME				= 70;
 	private static final int			GROUNDPOUND_DELAY			= 50;
 	private static final int			REPAIR_BOLT_PRICE			= 100;
+	private static final int			REPAIR_TIME					= 100;
 	
 	private final float					MAX_VELOCITY				= 5f;
 	private final float					ACC_RUNNING					= 0.4375f;
@@ -46,6 +47,8 @@ public class Player {
 	private int							biteCounter					= 0;
 	private int							floatingCounter				= 0;
 	private int							boltCounter					= 0;
+	private int							repairTimeCounter			= 0;
+	
 	private int							tmpBoltAmount				= 110;
 	private int							pigCounter					= 0;
 	private int							deathTimeCounter			= 0;
@@ -74,6 +77,7 @@ public class Player {
 	private boolean						frontflipping				= false;
 	private boolean						stopBiting					= false;
 	private boolean						isGoingToCreateTailwhip		= false;
+	private boolean						repairing					= false;
 	
 	private boolean						locked						= false;
 	private boolean						godmode						= false;
@@ -253,9 +257,10 @@ public class Player {
 					if(boltCounter >= REPAIR_BOLT_PRICE){
 
 						lock();
-						generator.repair();
+						System.out.println("wpan");
+						game.addSpreadBolts(REPAIR_BOLT_PRICE);
+						
 						repairGenerator();
-						payForRepair();
 					}
 					
 				} else {
@@ -278,13 +283,17 @@ public class Player {
 	}
 	
 	private void payForRepair() {
+
+		generator.repair();
 		boltCounter -= REPAIR_BOLT_PRICE;
-		game.addSpreadBolts(REPAIR_BOLT_PRICE);	
+		repairing = false;
 		unlock();
 	}
 	
 	private void repairGenerator() {
-		this.currentAnimation = animations.get("repair");
+
+		repairing = true;
+		repairTimeCounter = 0;
 	}
 	
 	private void biteFinalize() {
@@ -640,6 +649,7 @@ public class Player {
 		++biteCounter;
 		++deathTimeCounter;
 		++tailwhipDelayCounter;
+		++repairTimeCounter;
 	}
 	
 	public void increasePigCounter() {
@@ -665,6 +675,7 @@ public class Player {
 		SpriteSheet sheetBite = Images.getInstance().getSpriteSheet("images/bite.png", 227, 288);
 		SpriteSheet sheetShock = Images.getInstance().getSpriteSheet("images/shock.png", 227, 288);
 		SpriteSheet sheetLaser = Images.getInstance().getSpriteSheet("images/lasercycle.png", 300, 270);
+		SpriteSheet sheetRepair = Images.getInstance().getSpriteSheet("images/repair.png", 275, 288);
 		
 		Animation animationWallJump = new Animation(sheetWallJump, 70);
 		Animation animationTailwhip = new Animation(sheetTailwhip, TAILWHIP_TIME);
@@ -690,6 +701,7 @@ public class Player {
 		animations.put("groundpoundImpact", animationGroundpoundImpact);
 		animations.put("death", animationDeath);
 		animations.put("deathAir", new Animation(sheetDeathAir, 150));
+		animations.put("repair", new Animation(sheetRepair, 150));
 		
 		// animations.put("walkJump", animationWalkJump);
 		// animations.put("walkJumpAir", new Animation(sheetWalkJumpAir, 100));
@@ -710,6 +722,7 @@ public class Player {
 		animationOffsets.put("images/groundpoundimpact.png", new Vec2(-0.5f, -0.6f));
 		animationOffsets.put("images/death.png", new Vec2(-0.6f, -0.3f));
 		animationOffsets.put("images/deathair.png", new Vec2(-0.6f, -0.3f));
+		animationOffsets.put("images/repair.png", new Vec2(-0.45f, -0.7f));
 		
 		// animationOffsets.put("images/walkjump.png", new Vec2(0f, 0f));
 		// animationOffsets.put("images/walkjumpAir.png", new Vec2(0f, 0f));
@@ -852,6 +865,7 @@ public class Player {
 		dead = false;
 		deadAndOnGround = false;
 		biting = false;
+		repairing = false;
 		unlock();
 	}
 	
@@ -1123,7 +1137,17 @@ public class Player {
 			if (this.tailwhipCounter > TAILWHIP_DURATION && this.doTailwhip) {
 				this.tailwhipFinalize();
 			}
-		} else {
+			
+			if (repairing){
+				if( repairTimeCounter < REPAIR_TIME){
+					game.addSpreadBolts(REPAIR_BOLT_PRICE);
+					this.currentAnimation = animations.get("repair");
+				} else {
+					payForRepair();
+				}
+			}
+			
+		} else { // dead
 			if (deathTimeCounter > DEATH_WAIT_TIME) {
 				revive();
 			}
@@ -1152,5 +1176,9 @@ public class Player {
 	
 	public boolean maxPower(){
 		return laserTime == MAX_LASER_DURATION;
+	}
+	
+	public boolean isRepairing() {
+		return repairing;
 	}
 }
