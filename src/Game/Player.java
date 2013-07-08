@@ -874,7 +874,6 @@ public class Player {
 	}
 	
 	public void setConveyorSpeed(float conveyorSpeed) {
-		System.out.println(conveyorSpeed);
 		this.conveyorSpeed += conveyorSpeed;
 	}
 	

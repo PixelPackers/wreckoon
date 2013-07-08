@@ -18,7 +18,6 @@ public class Conveyor extends GameObjectBox {
 		
 		super(world, posX, posY, width, height, 0, 0.3f, 0, null, BodyType.STATIC);
 		
-		System.out.println(left);
 		if (left) speed = -speed;
 		
 		x = posX;
