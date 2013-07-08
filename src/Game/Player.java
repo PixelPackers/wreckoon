@@ -28,9 +28,11 @@ public class Player {
 	private static final int			TAILWHIP_DELAY				= 5;
 	private static final int			TAILWHIP_DURATION			= 20;
 	private static final int			GROUNDPOUND_AIRTIME			= 30;
-	private static final int			MAX_LASER_DURATION			= 450;
+	private static final int			MAX_LASER_DURATION			= 250;
 	private static final int			DEATH_WAIT_TIME				= 70;
 	private static final int			GROUNDPOUND_DELAY			= 50;
+	private static final int			REPAIR_BOLT_PRICE			= 100;
+	private static final int			SHOCK_DURATION				= 200;
 	
 	private final float					MAX_VELOCITY				= 5f;
 	private final float					ACC_RUNNING					= 0.4375f;
@@ -45,10 +47,10 @@ public class Player {
 	private int							biteCounter					= 0;
 	private int							floatingCounter				= 0;
 	private int							boltCounter					= 0;
-	private int							tmpBoltAmount				= 0;
+	private int							tmpBoltAmount				= 110;
 	private int							pigCounter					= 0;
 	private int							deathTimeCounter			= 0;
-	private int							laserTime					= 10000000;
+	private int							laserTime					= 50;
 	
 	private float						jumpPower					= -10f * 2f;
 	private float						wallJumpPowerFactor			= 0.3f;
@@ -122,6 +124,7 @@ public class Player {
 	private HashMap<String, Vec2>		animationOffsets			= new HashMap<String, Vec2>();
 	private Animation					currentAnimation;
 	private Checkpoint					lastCheckpoint				= new Checkpoint(2f, 10f, 3f, 11f);
+	private Generator					generator					= null;
 	
 	public Player(World world, float posX, float posY) throws SlickException {
 		
@@ -235,43 +238,51 @@ public class Player {
 			--laserTime;
 		}
 		
-		if (biteShockLoading && boltCounter >= 0) {
-			
-			int step = (boltCounter > 2) ? 2 : boltCounter;
-			
-			if (laserTime <= MAX_LASER_DURATION - step + 1) {
-				
-				laserTime += step;
-			}
-			
-			boltCounter -= step;
-			
-			dropElectroBolt();
-			
-			if (boltCounter == 0) {
-				biteFinalize();
-			}
-			
-		}
+//		if (biteShockLoading && boltCounter >= 0) {
+//			
+//			int step = (boltCounter > 2) ? 2 : boltCounter;
+//			
+//			if (laserTime <= MAX_LASER_DURATION - step + 1) {
+//				
+//				laserTime += step;
+//			}
+//			
+//			boltCounter -= step;
+//			
+//			dropElectroBolt();
+//			
+//			if (boltCounter == 0) {
+//				biteFinalize();
+//			}
+//			
+//		}
 		
 	}
 	
 	public void bite() {
-		// if(!this.biting && !locked && !laserAble && boltCounter >0/*>=
-		// BOLT_PRICE_FOR_LASER*/){
-		if (!this.biting && !locked && boltCounter > 0/* >= BOLT_PRICE_FOR_LASER */) {
+		
+		if (!this.biting && !locked && this.isOnGround()) {
 			
-			if (this.ableToGetLaser && this.isOnGround()) {
-				
-				lock();
-				
-				this.biting = true;
-				this.biteCounter = 0;
-				
-				this.body.setLinearVelocity(new Vec2(0f, 0f));
-				
-				this.currentAnimation = animations.get("bite");
-				this.currentAnimation.restart();
+			if (generator != null) {			
+				if(!generator.isRepaired() ){
+					if(boltCounter >= REPAIR_BOLT_PRICE){
+						lock();	
+						generator.repair();
+						payForRepair();
+					}
+					
+				} else {
+
+					lock();	
+					this.biting = true;
+					this.biteCounter = 0;
+					
+					this.body.setLinearVelocity(new Vec2(0f, 0f));
+					
+					this.currentAnimation = animations.get("bite");
+					this.currentAnimation.restart();
+					
+				}
 				
 			}
 			
@@ -279,7 +290,14 @@ public class Player {
 		
 	}
 	
+	private void payForRepair() {
+		boltCounter -= REPAIR_BOLT_PRICE;
+		unlock();
+	}
+	
 	private void biteFinalize() {
+
+		laserTime = MAX_LASER_DURATION;
 		this.biting = false;
 		biteShockLoading = false;
 		this.currentAnimation = animations.get("idle");
@@ -701,6 +719,7 @@ public class Player {
 		Animation animationDeath = new Animation(sheetDeath, 200);
 		Animation animationWalkJump = new Animation(sheetWalkJump, 80);		
 		Animation animationBite = new Animation(sheetBite, 100);
+		animationBite.setLooping(false);
 		
 		animations.put("run", new Animation(sheetRun, 100));
 		animations.put("walk", new Animation(sheetWalk, 100));
@@ -1249,13 +1268,13 @@ public class Player {
 				}
 			}
 			
-			if (this.biting && this.currentAnimation.isStopped()) {
+			if (this.biting && (currentAnimation == null || this.currentAnimation.isStopped())) {
 				this.currentAnimation = animations.get("shock");
 				biteShockLoading = true;
 				Sounds.getInstance().loop("bite", 1f, 1f);
 			}
 			
-			if (this.biting && /* biteCounter == SHOCK_DURATION */stopBiting) {
+			if (this.biting && biteCounter == SHOCK_DURATION) {
 				stopBiting = false;
 				biteFinalize();
 			}
@@ -1292,5 +1311,12 @@ public class Player {
 		accountTmpBoltAmount();
 		
 		increaseCounters();
+	}
+	
+	public Generator getGenerator() {
+		return generator;
+	}
+	public void setGenerator(Generator generator) {
+		this.generator = generator;
 	}
 }
