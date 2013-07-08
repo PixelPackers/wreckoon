@@ -20,6 +20,7 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.Music;
 import org.newdawn.slick.ShapeFill;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.Sound;
 import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.fills.GradientFill;
 import org.newdawn.slick.geom.Rectangle;
@@ -112,8 +113,6 @@ public class Game extends BasicGame {
 	private double							xboxLeftTrigger;
 	private double							xboxRightTrigger;
 	
-	private static Music					bgMusic, bgMusic2;
-	
 	public static ArrayList<Conveyor> getConveyors() {
 		return conveyors;
 	}
@@ -166,6 +165,7 @@ public class Game extends BasicGame {
 	private Color	earthColor		= new Color(164, 74, 13);
 	
 	public double	skyColorGlow	= 0;
+	private SpriteSheet	energy;
 	
 	public Game() {
 		super("The Raccooning");
@@ -217,7 +217,7 @@ public class Game extends BasicGame {
 		}
 	}
 	
-	private void drawBoltCounter() throws SlickException {
+	private void drawInterface() throws SlickException {
 		int boltGUIAngle = player.getBoltCounter();
 		Image nut = Images.getInstance().getImage("images/nut2.png");
 		smoothBoltGUIAngle = Functions.curveValue(boltGUIAngle, smoothBoltGUIAngle, 10);
@@ -225,6 +225,16 @@ public class Game extends BasicGame {
 		nut.setAlpha(1f);
 		nut.draw(screenWidth - 130, 36);
 		drawRightAlignedDigits(boltGUIAngle, screenWidth - 150, 40);
+		
+		energy.getSprite(0, 0).draw(screenWidth - 360, 125);
+		
+		float energybar = ((float) player.getLaserTime() / (float)player.getMaxLaserTime()) * 325f;
+		energy.getSprite(0, 1).draw(
+				screenWidth - 360 + 325 - energybar, 125,
+				screenWidth - 360 + 325, 125 + 42,
+				325 - energybar, 0, 325, 42);
+		
+		energy.getSprite(0, 2).draw(screenWidth - 360, 125);
 	}
 	
 	private void drawCheckpoints(Graphics g) {
@@ -298,6 +308,7 @@ public class Game extends BasicGame {
 		
 		pauseImage = Images.getInstance().getImage("images/Pause.png");
 		digits = Images.getInstance().getSpriteSheet("images/digits.png", 50, 80);
+		energy = Images.getInstance().getSpriteSheet("images/energy.png", 325, 42);
 		
 		world = new World(new Vec2(0f, 20f), false);
 		
@@ -362,11 +373,6 @@ public class Game extends BasicGame {
 			}
 		
 		initNormalSky();
-		
-		bgMusic = new Music("audio/menu.ogg");
-		bgMusic2 = new Music("audio/menumelody.ogg");
-		bgMusic.loop();
-		bgMusic2.loop();
 	}
 	
 	private void setupXBox() {
@@ -492,16 +498,6 @@ public class Game extends BasicGame {
 		}
 		
 		int duration = 250;
-		
-		if (input.isKeyPressed(Input.KEY_DELETE)) {
-			bgMusic.fade(duration, 0f, false);
-			bgMusic2.fade(duration, 1f, false);
-		}
-		
-		if (input.isKeyPressed(Input.KEY_INSERT)) {
-			bgMusic.fade(duration, 1f, false);
-			bgMusic2.fade(duration, 0f, false);
-		}
 		
 		// / XXX MAGIC NUMBERS
 		// / max gegenlenken
@@ -826,11 +822,7 @@ public class Game extends BasicGame {
 		
 		g.popTransform();
 		
-		 g.setColor(Color.blue);
-		 g.fillRect(50, 50, player.getLaserTime() * 5, 50);
-		 g.setColor(Color.white);
-		
-		drawBoltCounter();
+		drawInterface();
 		
 		if (curMode == Mode.PAUSE) {
 			g.setColor(new Color(0f, 0f, 0f, 0.3f));

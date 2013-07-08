@@ -3,8 +3,6 @@ package Game;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.newdawn.slick.Music;
-import org.newdawn.slick.SlickException;
 import org.newdawn.slick.openal.Audio;
 import org.newdawn.slick.openal.AudioLoader;
 import org.newdawn.slick.util.ResourceLoader;
@@ -22,9 +20,9 @@ public class Sounds {
 	}
 	
 	private HashMap<String, Audio>	sounds	= new HashMap<String, Audio>();
-	private HashMap<String, Music>	tracks	= new HashMap<String, Music>();
 	
-	private Sounds() {}
+	private Sounds() {
+	}
 	
 	public boolean isPlaying(String sound) {
 		return sounds.get(sound).isPlaying();
@@ -41,15 +39,19 @@ public class Sounds {
 			putSound("pigaggro");
 			putSound("tailwhip");
 			putSound("fence");
-			//putSound("bgmusic", "audio/menu.ogg");
-			//tracks.put("bgmusic", new Music("audio/menu.ogg"));
+			putSound("bgmusic", "audio/menu.ogg");
+			putSound("bgmusic2", "audio/menu.ogg");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public Music getTrack(String name) {
-		return tracks.get(name);
+	public Audio getSound(String sound) {
+		return sounds.get(sound);
+	}
+	
+	public void loopMusic(String sound, float pitch, float volume) {
+		sounds.get(sound).playAsMusic(pitch, volume, true);
 	}
 	
 	public void loop(String sound, float pitch, float volume) {
@@ -60,9 +62,9 @@ public class Sounds {
 		sounds.get(sound).playAsSoundEffect(pitch, volume, false);
 	}
 	
-//	public void playAsMusic(String sound, float pitch, float volume) {
-//		sounds.get(sound).playAsMusic(pitch, volume, false);
-//	}
+	// public void playAsMusic(String sound, float pitch, float volume) {
+	// sounds.get(sound).playAsMusic(pitch, volume, false);
+	// }
 	
 	private void putSound(String name) throws IOException {
 		putSound(name, "audio/" + name + ".ogg");

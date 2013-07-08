@@ -1319,4 +1319,8 @@ public class Player {
 	public void setGenerator(Generator generator) {
 		this.generator = generator;
 	}
+
+	public int getMaxLaserTime() {
+		return MAX_LASER_DURATION;
+	}
 }
