@@ -16,8 +16,7 @@ public class Level {
 	private ArrayList<Girder>			girders;
 	private ArrayList<Generator>		generators;
 	private ArrayList<Conveyor>			conveyors;
-	
-	// private ArrayList<Tire> tires;
+	private ArrayList<Tire>				tires;
 	
 	public Level(int width, int height) {
 		this.blocks = new Block[width][height];
@@ -78,12 +77,12 @@ public class Level {
 		parts.add(p);
 	}
 	
-	// public void addTire(Tire t) {
-	// if (tires == null) {
-	// tires = new ArrayList<Tire>();
-	// }
-	// tires.add(t);
-	// }
+	public void addTire(Tire t) {
+		if (tires == null) {
+			tires = new ArrayList<Tire>();
+		}
+		tires.add(t);
+	}
 	
 	public void addZoomArea(ZoomArea za) {
 		if (zoomAreas == null) {
@@ -128,9 +127,9 @@ public class Level {
 		return parts;
 	}
 	
-	// public ArrayList<Tire> getTires() {
-	// return tires;
-	// }
+	public ArrayList<Tire> getTires() {
+		return tires;
+	}
 	
 	public int getWidth() {
 		return this.blocks.length;

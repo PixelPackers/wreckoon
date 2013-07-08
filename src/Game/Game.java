@@ -67,6 +67,7 @@ public class Game extends BasicGame {
 	private static ArrayList<Generator>		generators			= new ArrayList<Generator>();
 	private static ArrayList<Spike>			spikes				= new ArrayList<Spike>();
 	private static ArrayList<Conveyor>		conveyors			= new ArrayList<Conveyor>();
+	private static ArrayList<Tire>		tires					= new ArrayList<Tire>();
 	// private static ArrayList<Bolt> bolts = new ArrayList<Bolt>();
 	// private static ArrayList<Nut> nuts = new ArrayList<Nut>();
 	// private static ArrayList<Shred> shreds = new ArrayList<Shred>();
@@ -353,7 +354,15 @@ public class Game extends BasicGame {
 				generators.add(new Generator(world, ge.getX(), ge.getY(), 1.25f, 1.5f));
 			}
 		
-		conveyors.add(new Conveyor(world, 7f, 4f, 1.8f, 0.4f, 0.5f, 0.5f, 0.5f));
+		if (level.getConveyors() != null)
+			for (Conveyor ge : level.getConveyors()) {
+				conveyors.add(new Conveyor(world, ge.getX(), ge.getY(), 1.8f, 0.4f, 0.5f, 0.5f, 0.5f, ge.isLeft()));
+			}
+		
+		if (level.getTires() != null)
+			for (Tire e : level.getTires()) {
+				tires.add(new Tire(world, e.getX(), e.getY(), 0.5f));
+			}
 		
 		player = new Player(this, 5f, 3f);
 		laser = new Laser(world, 0f, 0f);
@@ -376,6 +385,7 @@ public class Game extends BasicGame {
 			}
 		
 		initNormalSky();
+		
 	}
 	
 	private void setupXBox() {
