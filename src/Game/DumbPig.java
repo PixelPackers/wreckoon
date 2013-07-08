@@ -10,7 +10,7 @@ public class DumbPig extends Enemy {
 	
 	// units are update cycles
 	private final static int	DIRECTION_SWITCH_MIN_TIME	= 25;
-	private final static int	MIN_IDLE_WAITING_TIME		= 50;
+	private final static int	MIN_IDLE_WAITING_TIME		= 100;
 	private final static int	MAX_IDLE_WAITING_TIME		= 150;
 	private int					idleTime;
 	
@@ -115,8 +115,9 @@ public class DumbPig extends Enemy {
 				this.idle = false;
 				updateCounter = 0;
 			}
-			
-			this.currentAnimation = animations.get("walk");
+			if(!idle){
+				this.currentAnimation = animations.get("walk");
+			}
 		}
 		
 		if (getsGrilled && !isDead()) {

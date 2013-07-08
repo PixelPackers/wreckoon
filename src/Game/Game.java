@@ -195,6 +195,8 @@ public class Game extends BasicGame {
 		skyColorGlow += 0.01;
 		double x = Math.sin(skyColorGlow) * max;
 		
+		
+		
 		Color skyGradientColor1 = new Color((int) (100 + x), 0, 0);
 		Color skyGradientColor2 = new Color(0, 0, 0);
 		
@@ -689,9 +691,20 @@ public class Game extends BasicGame {
 	}
 	
 	private void actionDoomsday() {
-		DOOMSDAY = !DOOMSDAY;
+		initDoomsday();
 	}
 	
+	private void initDoomsday() {
+
+		DOOMSDAY = !DOOMSDAY;
+		doomsdayCounter = 0;
+		
+	}
+	
+	private void endDoomsday(){
+		DOOMSDAY = false;
+	}
+
 	private void actionTailwhip() {
 		player.tailwhipInit();
 	}
@@ -852,6 +865,8 @@ public class Game extends BasicGame {
 		// + "\n" + "laser angle: " + laserAngle
 		// + "\nlaser target angle: " + laserTargetAngle + "\ntiles drawn: " +
 		// tilesDrawn, 10, 50);
+		g.drawString("time:" + doomsdayCounter/ 60f, 50, 50);
+		g.drawString("pigs alive: " + enemies.size(), 50, 100);
 	}
 	
 	// public static ArrayList<Shred> getShreds() {
@@ -911,18 +926,18 @@ public class Game extends BasicGame {
 			if (DOOMSDAY) {
 				cam.wiggle((player.isLaserActive()) ? 1f : 0.5f);
 				
-				if (doomsdayCounter > 450 && enemies.size() < MAX_SPAWN_ENEMIES) {
-					enemies.add(new SmartPig(this, player.getBody().getPosition().x - 5f, player.getBody().getPosition().y - 5f, 0.5f,
-							0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
-					enemies.add(new SmartPig(this, player.getBody().getPosition().x + 5f, player.getBody().getPosition().y - 5f, 0.5f,
-							0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
-					enemies.add(new DumbPig(this, player.getBody().getPosition().x - 5f, player.getBody().getPosition().y - 5f, 0.5f, 0.5f,
-							3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
-					enemies.add(new DumbPig(this, player.getBody().getPosition().x + 5f, player.getBody().getPosition().y - 5f, 0.5f, 0.5f,
-							3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
-					doomsdayCounter = 0;
+				if (doomsdayCounter%450 == 0 && enemies.size() < MAX_SPAWN_ENEMIES) {
+					enemies.add(new SmartPig(this, player.getBody().getPosition().x - 5f, player.getBody().getPosition().y - 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+					enemies.add(new SmartPig(this, player.getBody().getPosition().x + 5f, player.getBody().getPosition().y - 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+					enemies.add(new DumbPig(this, player.getBody().getPosition().x - 5f, player.getBody().getPosition().y - 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+					enemies.add(new DumbPig(this, player.getBody().getPosition().x + 5f, player.getBody().getPosition().y - 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
 				}
+				
 				++doomsdayCounter;
+				
+				if(player.isDead()){
+					System.out.println(doomsdayCounter / 60);
+				}
 			} else {
 				cam.wiggle((player.isLaserActive()) ? 1f : 0f);
 			}
@@ -997,7 +1012,7 @@ public class Game extends BasicGame {
 				killLaser();
 			}
 			
-			if (spreadBolts != 0) {
+			if (spreadBolts != 0 && player.isRepairing()) {
 				
 				for(int i=0; i<1; ++i) {
 					if(spreadBolts > 0 && spreadBolts % 10==0) {
@@ -1007,6 +1022,8 @@ public class Game extends BasicGame {
 					}
 				}
 				--spreadBolts;
+			} else {
+				spreadBolts = 0;
 			}
 			
 			world.step(delta / 1000f, 18, 6);

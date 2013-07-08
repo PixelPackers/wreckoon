@@ -59,6 +59,7 @@ public class House {
 		
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.restitution = 0f;
+		fixtureDef.filter.categoryBits = 33;
 		
 		for (Vec2[] verts : arrayList) {
 			PolygonShape polygonShape = new PolygonShape();
