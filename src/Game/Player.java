@@ -840,6 +840,7 @@ public class Player {
 	
 	
 	public void lock() {
+		getBody().setLinearVelocity( new Vec2(0f, 0f) );
 		locked = true;
 	}
 	
@@ -882,11 +883,9 @@ public class Player {
 	}
 	
 	public void setLeft(boolean left) {
-		if (locked && !laserActive) {
-			return;
+		if ( (!locked || laserActive) || (locked && groundPounding) ) {
+			this.left = left;			
 		}
-		
-		this.left = left;
 	}
 	
 	public void setMovementButtonIsDown(boolean movementButtonIsDown) {

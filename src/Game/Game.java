@@ -872,6 +872,7 @@ public class Game extends BasicGame {
 		// tilesDrawn, 10, 50);
 		g.drawString("time:" + doomsdayCounter/ 60f, 50, 50);
 		g.drawString("pigs alive: " + enemies.size(), 50, 100);
+		g.drawString("pigs killed: " + player.getPigCounter(), 50, 150);
 	}
 	
 	// public static ArrayList<Shred> getShreds() {
