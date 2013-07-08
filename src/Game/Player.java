@@ -82,7 +82,8 @@ public class Player {
 	
 	private float						conveyorSpeed				= 0f;
 	
-	private World						world;
+	private Game						game;
+//	private World						world;
 	
 	private float						width						= 0.48f;
 	private float						height						= 0.48f;
@@ -115,9 +116,10 @@ public class Player {
 	private Checkpoint					lastCheckpoint				= new Checkpoint(2f, 10f, 3f, 11f);
 	private Generator					generator					= null;
 	
-	public Player(World world, float posX, float posY) throws SlickException {
+	public Player(Game game, float posX, float posY) throws SlickException {
 		
-		this.world = world;
+		this.game = game;
+//		this.world = world;
 		this.bodyDef.type = BodyType.DYNAMIC;
 		this.bodyDef.position.set(posX, posY);
 		
@@ -132,9 +134,9 @@ public class Player {
 		
 		initAnimations();
 		
-		this.body = world.createBody(bodyDef);
+		this.body = game.getWorld().createBody(bodyDef);
 		
-		wheel = new GameObjectCircle(world, 0f, 0f, width * 0.5f, 5f, FRICTION, 0f, null, BodyType.DYNAMIC);
+		wheel = new GameObjectCircle(game.getWorld(), 0f, 0f, width * 0.5f, 5f, FRICTION, 0f, null, BodyType.DYNAMIC);
 		wheel.getBody().setAngularDamping(100000000f);
 		
 		Filter filter = new Filter();
@@ -153,7 +155,7 @@ public class Player {
 		revoluteJointDef.collideConnected = false;
 		revoluteJointDef.localAnchorA.set(new Vec2(0f, 0f));
 		revoluteJointDef.localAnchorB.set(new Vec2(0f, 0f));
-		world.createJoint(revoluteJointDef);
+		game.getWorld().createJoint(revoluteJointDef);
 		
 		this.body.setFixedRotation(true);
 		
@@ -246,17 +248,18 @@ public class Player {
 		if (!this.biting && !locked && this.isOnGround()) {
 
 			if (generator != null) {
-				
-				lock();		
-				
+					
 				if(!generator.isRepaired() ){
 					if(boltCounter >= REPAIR_BOLT_PRICE){
+
+						lock();
 						generator.repair();
 						payForRepair();
 					}
 					
 				} else {
 
+					lock();
 					this.biting = true;
 					this.biteCounter = 0;
 					
@@ -275,11 +278,7 @@ public class Player {
 	
 	private void payForRepair() {
 		boltCounter -= REPAIR_BOLT_PRICE;
-		
-//		game.dropItems.add(new Bolt(this, world, player.getBody().getPosition().add(new Vec2(0, -1)), "images/bolt"
-//				+ ((int) (Math.random() * 3) + 1) + ".png"));
-		
-		
+		game.addSpreadBolts(REPAIR_BOLT_PRICE);	
 		unlock();
 	}
 	

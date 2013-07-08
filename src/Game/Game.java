@@ -47,8 +47,10 @@ public class Game extends BasicGame {
 	
 	private static boolean					DOOMSDAY			= false;
 	private static boolean					useZoomAreas		= false;
-	private static float					tragetZoom			= 128f;
-	private static float					zoom				= tragetZoom;
+	private static float					targetZoom			= 128f;
+	private static float					zoom				= targetZoom;
+	
+	private static int						spreadBolts 			= 0;
 	
 	private static final float				MANUAL_ZOOM_STEP	= 4f;
 	private static double					laserAngle;
@@ -352,7 +354,7 @@ public class Game extends BasicGame {
 		
 		conveyors.add(new Conveyor(world, 7f, 4f, 1.8f, 0.4f, 0.5f, 0.5f, 0.5f));
 		
-		player = new Player(world, 5f, 3f);
+		player = new Player(this, 5f, 3f);
 		laser = new Laser(world, 0f, 0f);
 		player.setLaser(laser);
 		
@@ -555,9 +557,9 @@ public class Game extends BasicGame {
 					}
 				}
 			if (biggestZoom > 0.001f) {
-				tragetZoom = biggestZoom;
+				targetZoom = biggestZoom;
 			}
-			zoom = Functions.curveValue(tragetZoom, zoom, 30);
+			zoom = Functions.curveValue(targetZoom, zoom, 30);
 		} else {
 			if (input.isKeyDown(Input.KEY_E)) {
 				if (zoom < 200) {
@@ -610,15 +612,7 @@ public class Game extends BasicGame {
 			float size = (float) Math.random() * (max_size - min_size) + min_size;
 			
 			for (int i = 0; i < 4; ++i) {
-				
-				// dynamicObjects.add( new GameObjectCircle(world,
-				// player.getBody().getPosition().x,
-				// player.getBody().getPosition().y - size * 2, size, 1f, 0.5f,
-				// 0f, "images/player.png", BodyType.DYNAMIC));
-				dropItems.add(new Bolt(this, world, player.getBody().getPosition().add(new Vec2(0, -1)), "images/bolt"
-						+ ((int) (Math.random() * 3) + 1) + ".png"));
-				dropItems.add(new Nut(this, world, player.getBody().getPosition().add(new Vec2(0, -1)), "images/nut"
-						+ ((int) (Math.random() * 3) + 1) + ".png"));
+					spreadBolts(true);
 			}
 			
 			// enemies.add(new SmartPig(this, player.getBody().getPosition().x +
@@ -991,6 +985,18 @@ public class Game extends BasicGame {
 				killLaser();
 			}
 			
+			if (spreadBolts != 0) {
+				
+				for(int i=0; i<1; ++i) {
+					if(spreadBolts > 0 && spreadBolts % 10==0) {
+						spreadBolts(false);
+					} else {
+						break;
+					}
+				}
+				--spreadBolts;
+			}
+			
 			world.step(delta / 1000f, 18, 6);
 			
 		}
@@ -1052,6 +1058,28 @@ public class Game extends BasicGame {
 	
 	public boolean isTiltedUp(double direction, double magnitude) {
 		return Math.abs(magnitude) > THUMBSTICK_DEADZONE && direction >= 315d && direction <= 45d;
+	}
+	public void spreadBolts(boolean collectable) throws SlickException{
+		if(collectable){
+			dropItems.add(new Bolt(this, world, player.getBody().getPosition().add(new Vec2(0, -1)), "images/bolt" + ((int) (Math.random() * 3) + 1) + ".png"));
+			dropItems.add(new Nut(this, world, player.getBody().getPosition().add(new Vec2(0, -1)), "images/nut" + ((int) (Math.random() * 3) + 1) + ".png"));
+		} else {
+
+			DropItem newDropItem;
+			
+			if(Math.random() < 0.5d){
+				newDropItem = new GeneratorBolt(this, world, player.getBody().getPosition().add(new Vec2(0, -0f)), "images/bolt" + ((int) (Math.random() * 3) + 1) + ".png");
+			} else {
+				newDropItem = new GeneratorNut(this, world, player.getBody().getPosition().add(new Vec2(0, -0f)), "images/nut" + ((int) (Math.random() * 3) + 1) + ".png");
+			}
+			
+			float factor = 7f;
+			newDropItem.getBody().setLinearVelocity( new Vec2 ((float)(Math.random()-0.5f)*factor,-factor));
+			dropItems.add(newDropItem);
+		}
+	}
+	public void addSpreadBolts(int spreadBolts){
+		this.spreadBolts += spreadBolts;
 	}
 	
 }
