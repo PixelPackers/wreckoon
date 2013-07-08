@@ -285,7 +285,7 @@ public class Game extends BasicGame {
 	
 	@Override
 	public void init(GameContainer gc) throws SlickException {
-		// MusicManager.getInstance().bgMusic();
+		Sounds.getInstance().loadAudioFiles();
 		
 		setupXBox();
 		
@@ -401,7 +401,8 @@ public class Game extends BasicGame {
 			}
 			
 			public void leftThumb(boolean pressed) {
-				actionDebugView();
+				if (pressed)
+					actionDebugView();
 			}
 			
 			public void leftThumbDirection(double direction) {
@@ -425,7 +426,8 @@ public class Game extends BasicGame {
 			}
 			
 			public void rightThumb(boolean pressed) {
-				actionDoomsday();
+				if (pressed)
+					actionDoomsday();
 			}
 			
 			public void rightThumbDirection(double direction) {
@@ -494,7 +496,7 @@ public class Game extends BasicGame {
 		}
 		
 		if (input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
-			if (player.movesLeft()) {
+			if (player.isLookingLeft()) {
 				player.accelerate(1f);
 			}
 		}
@@ -505,7 +507,7 @@ public class Game extends BasicGame {
 		}
 		
 		if (input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D)) {
-			if (!player.movesLeft()) {
+			if (!player.isLookingLeft()) {
 				player.accelerate(1f);
 			}
 		}
@@ -696,43 +698,13 @@ public class Game extends BasicGame {
 	}
 	
 	private void actionRight() {
-		if (player.isCharging()) {
-			// player.getShootingDirection().x += 1;
-			player.increaseShootingDirection(1, 0);
-		} else {
-			// if (player.isOnGround()) {
-			player.setLeft(false);
-			// }
-			if (!player.movesLeft()) {
-				player.accelerate((float) xboxLeftThumbMagnitude);
-			}
-			// else if (player.getBody().getLinearVelocity().x <
-			// -minCounterSteerSpeed) {
-			// player.setLeft(false);
-			// player.accelerate();
-			// player.setLeft(true);
-			// }
-		}
+		player.setLeft(false);
+		player.accelerate((float) Math.abs(polarToX(xboxLeftThumbDirection, xboxLeftThumbMagnitude)));
 	}
 	
 	private void actionLeft() {
-		if (player.isCharging()) {
-			// player.getShootingDirection().x -= 1;
-			player.increaseShootingDirection(-1, 0);
-		} else {
-			// if (player.isOnGround()) {
-			player.setLeft(true);
-			// }
-			if (player.movesLeft()) {
-				player.accelerate((float) xboxLeftThumbMagnitude);
-			}
-			// else if( player.getBody().getLinearVelocity().x >
-			// minCounterSteerSpeed) {
-			// player.setLeft(true);
-			// player.accelerate();
-			// player.setLeft(false);
-			// }
-		}
+		player.setLeft(true);
+		player.accelerate((float) Math.abs(polarToX(xboxLeftThumbDirection, xboxLeftThumbMagnitude)));
 	}
 	
 	private void actionJump() {
@@ -780,23 +752,13 @@ public class Game extends BasicGame {
 			staticObj.draw(g, debugView);
 		}
 		
-		GameObject glowingObj = chooseTelekinesisTarget();
-		for (GameObject ball : dynamicObjects) {
-			
-			Color tmpColor;
-			tmpColor = g.getColor();
-			
-			if (ball == glowingObj) {
-				g.setColor(new Color(155, 155, 255));
-			}
-			ball.draw(g, debugView);
-			g.setColor(tmpColor);
-			
+		for (DropItem d : dropItems) {
+			d.draw(g, debugView);
 		}
 		
 		for (Part part : parts) {
 			part.draw(g, debugView);
-		}
+		}		
 		
 		for (Enemy enemy : enemies) {
 			if (!enemy.getsGrilled) {
@@ -831,20 +793,6 @@ public class Game extends BasicGame {
 			c.draw(g, debugView);
 		}
 		
-		// for(Bolt b : bolts){
-		// b.draw(g, debugView);
-		// }
-		// for(Nut n : nuts){
-		// n.draw(g, debugView);
-		// }
-		// for(Shred s : shreds){
-		// s.draw(g, debugView);
-		// }
-		
-		for (DropItem d : dropItems) {
-			d.draw(g, debugView);
-		}
-		
 		house.drawFront(g, debugView);
 		
 		if (player.isLaserActive()) {
@@ -859,9 +807,9 @@ public class Game extends BasicGame {
 		
 		g.popTransform();
 		
-		g.setColor(Color.blue);
-		g.fillRect(50, 50, player.getLaserTime() * 5, 50);
-		g.setColor(Color.white);
+		// g.setColor(Color.blue);
+		// g.fillRect(50, 50, player.getLaserTime() * 5, 50);
+		// g.setColor(Color.white);
 		
 		drawBoltCounter();
 		
@@ -1086,7 +1034,7 @@ public class Game extends BasicGame {
 	
 	private int getBlockY(float screenY) {
 		float blockY = (screenY - screenHeight / 2) / zoom + 0.5f + cam.getY();
-		return (int) Math.max(0, Math.min(blockY, level.getHeight() - 1));
+		return (int) Math.max(0, Math.min(blockY - 1, level.getHeight() - 1));
 	}
 	
 	public boolean isTiltedDown(double direction, double magnitude) {

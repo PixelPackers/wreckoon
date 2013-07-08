@@ -70,7 +70,7 @@ public abstract class DropItem extends GameObjectPolygon {
 		// dann thrown
 		// TODO random
 		float force = 7.5f;
-		float x = (game.getPlayer().movesLeft()) ? -force : force;
+		float x = (game.getPlayer().isLookingLeft()) ? -force : force;
 		
 		this.getBody().setLinearVelocity(new Vec2(x, -force * 0.75f));
 		

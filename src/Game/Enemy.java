@@ -231,7 +231,7 @@ public abstract class Enemy extends GameObjectBox {
 	protected abstract void initAnimations() throws SlickException;
 	
 	public void initRotation() {
-		this.rotDir = (game.getPlayer().movesLeft()) ? -1 : 1;;
+		this.rotDir = (game.getPlayer().isLookingLeft()) ? -1 : 1;;
 		firstTimeRotation = true;
 		rotate();
 	}
@@ -281,7 +281,7 @@ public abstract class Enemy extends GameObjectBox {
 	public void rotate() {
 		
 		float force = 7.5f;
-		float x = (game.getPlayer().movesLeft()) ? -force : force;
+		float x = (game.getPlayer().isLookingLeft()) ? -force : force;
 		
 		this.getBody().setLinearVelocity(new Vec2(x, -force * 0.75f));
 		

@@ -29,16 +29,12 @@ public class Player {
 	private static final int			TAILWHIP_DURATION			= 20;
 	private static final int			GROUNDPOUND_AIRTIME			= 30;
 	private static final int			MAX_LASER_DURATION			= 450;
-	private static final int			SHOCK_DURATION				= 200;
 	private static final int			DEATH_WAIT_TIME				= 70;
 	private static final int			GROUNDPOUND_DELAY			= 50;
 	
-	private final float					MAX_VELOCITY_WALKING		= 1.75f;
-	private final float					MAX_VELOCITY_RUNNING		= 5f;
-	private final float					ACC_WALKING					= 0.375f;
+	private final float					MAX_VELOCITY				= 5f;
 	private final float					ACC_RUNNING					= 0.4375f;
 	private final float					FRICTION					= 1f;
-	private static final boolean		ENDLESS_LASER				= true;
 	
 	private int							groundPoundCounter			= 0;
 	private int							tailwhipCounter				= 0;
@@ -80,10 +76,6 @@ public class Player {
 	
 	private boolean						locked						= false;
 	private boolean						godmode						= false;
-	
-	// XXX ??
-	private float						accelerationX				= ACC_WALKING;
-	private float						maxVelocity					= MAX_VELOCITY_WALKING;
 	
 	private GameObjectCircle			wheel;
 	
@@ -199,62 +191,27 @@ public class Player {
 	}
 	
 	public void accelerate(float magnitude) {
-		
-		if (locked)
-			return;
-		
-		float velocityX = this.body.getLinearVelocity().x;
-		float velocityY = this.body.getLinearVelocity().y;
-		
-		/*
-		 * if (left){ // TODO Math.abs, verbraucht das mehr rechenleistung? als
-		 * ob man die checkt obs pos sind? this.accelerationX =
-		 * -Math.abs(this.accelerationX); this.maxVelocity =
-		 * -Math.abs(this.maxVelocity); } else { this.accelerationX =
-		 * Math.abs(this.accelerationX); this.maxVelocity =
-		 * Math.abs(this.maxVelocity); } if(Math.abs(velocityX + accelerationX)
-		 * < Math.abs(maxVelocity)){ velocityX += accelerationX; }
-		 * this.body.setLinearVelocity(new Vec2(velocityX, velocityY)); /
-		 */
-		// another movement approach by using linearImpulse
-		// / XXX MAGIC NUMBERS
-		// float speed = (left) ? -15 : 15;
-		// if ( Math.abs(velocityX + accelerationX) < Math.abs(maxVelocity)*1.5f
-		// ) {
-		// this.body.applyLinearImpulse(new Vec2(speed, 0),
-		// this.body.getPosition());
-		// }
-		
-		// third approach
-		float speed = (left) ? -50 * magnitude : 50 * magnitude;
-		// if ( Math.abs(velocityX + accelerationX) < Math.abs(maxVelocity) ) {
-		// this.body.applyForce( new Vec2(speed, 0), this.body.getPosition() );
-		// }
-		
-		if (velocityX + accelerationX <= maxVelocity && velocityX - accelerationX >= -maxVelocity) {
-			// this.body.applyForce(new Vec2(speed, 0),
-			// this.body.getPosition());
-		}
-		this.body.applyForce(new Vec2(speed, 0), this.body.getPosition());
-		if (velocityX > maxVelocity)
-			this.body.setLinearVelocity(new Vec2(maxVelocity, velocityY));
-		if (velocityX < -maxVelocity)
-			this.body.setLinearVelocity(new Vec2(-maxVelocity, velocityY));
-		
-		// */
-		if (!groundPounding && !isGoingToCreateTailwhip && !doTailwhip && this.isOnGround() && jumpCounter > 5) {
-			// if(this.running){
-			// this.currentAnimation = animations.get("run");
-			// } else {
-			// this.currentAnimation = animations.get("walk");
-			// }
-			if (Math.abs(getBody().getLinearVelocity().x) > 1.8d) {
-				this.currentAnimation = animations.get("run");
-			} else {
-				this.currentAnimation = animations.get("walk");
+		if (!locked) {
+			float velocityX = this.body.getLinearVelocity().x;
+			float velocityY = this.body.getLinearVelocity().y;
+			
+			float speed = (left) ? -50 * magnitude : 50 * magnitude;
+			
+			this.body.applyForce(new Vec2(speed, 0), this.body.getPosition());
+			if (velocityX > MAX_VELOCITY)
+				this.body.setLinearVelocity(new Vec2(MAX_VELOCITY, velocityY));
+			if (velocityX < -MAX_VELOCITY)
+				this.body.setLinearVelocity(new Vec2(-MAX_VELOCITY, velocityY));
+			
+			if (!groundPounding && !isGoingToCreateTailwhip && !doTailwhip && this.isOnGround() && jumpCounter > 5) {
+				if (Math.abs(getBody().getLinearVelocity().x) > 1.8d) {
+					this.currentAnimation = animations.get("run");
+				} else {
+					this.currentAnimation = animations.get("walk");
+				}
 			}
+			idleCounter = 0;
 		}
-		idleCounter = 0;
 	}
 	
 	private void accountTmpBoltAmount() {
@@ -455,6 +412,7 @@ public class Player {
 		// }
 		
 		Sounds.getInstance().stop("laser");
+		Sounds.getInstance().play("laserreverb", 1f, 1f);
 		
 		this.laserStarted = false;
 		this.laserActive = false;
@@ -509,8 +467,7 @@ public class Player {
 		drawWidth = (left) ? drawWidth : -drawWidth;
 		
 		Vec2 offset = animationOffsets.get(currentAnimation.getImage(0).getResourceReference());
-		float scale = 0.5f;
-		currentAnimation.draw(position.x + ((left) ? -offset.x : offset.x), position.y + offset.y, -drawWidth * scale, drawHeight * scale);
+		currentAnimation.draw(position.x + ((left) ? -offset.x : offset.x), position.y + offset.y, -drawWidth * 0.5f, drawHeight * 0.5f);
 	}
 	
 	public void drawOutline(Graphics g) {
@@ -548,12 +505,6 @@ public class Player {
 	
 	private void dropElectroBolt() {
 		
-	}
-	
-	public void frontflip() {
-		frontflipping = true;
-		this.currentAnimation = animations.get("groundpound");
-		this.currentAnimation.restart();
 	}
 	
 	public Body getBody() {
@@ -663,7 +614,7 @@ public class Player {
 		if (groundPoundCounter > GROUNDPOUND_DELAY && !groundPounding) {
 			
 			lock();
-			// FIXME wegen movement evtl doch nicht locken? spzeial lock für
+			// FIXME wegen movement evtl doch nicht locken? spezial lock für
 			// movement?
 			
 			this.currentAnimation = animations.get("groundpound");
@@ -742,29 +693,16 @@ public class Player {
 		SpriteSheet sheetLaser = Images.getInstance().getSpriteSheet("images/lasercycle.png", 300, 270);
 		
 		Animation animationWallJump = new Animation(sheetWallJump, 70);
-		animationWallJump.setLooping(false);
-		
 		Animation animationTailwhip = new Animation(sheetTailwhip, TAILWHIP_TIME);
-		animationTailwhip.setLooping(false);
-		
 		Animation animationIdle = new Animation(sheetIdle, 200);
 		animationIdle.setPingPong(true);
-		
 		Animation animationGroundpoundRoll = new Animation(sheetGroundpoundRoll, 100);
 		animationGroundpoundRoll.setLooping(false);
 		Animation animationGroundpoundAir = new Animation(sheetGroundpoundAir, 50);
-		// animationGroundpoundRoll.setLooping(false);
 		Animation animationGroundpoundImpact = new Animation(sheetGroundpoundImpact, 80);
-		// animationGroundpoundImpact.setLooping(false);
-		
 		Animation animationDeath = new Animation(sheetDeath, 200);
-		animationDeath.setLooping(false);
-		
-		Animation animationWalkJump = new Animation(sheetWalkJump, 80);
-		animationWalkJump.setLooping(false);
-		
+		Animation animationWalkJump = new Animation(sheetWalkJump, 80);		
 		Animation animationBite = new Animation(sheetBite, 100);
-		animationBite.setLooping(false);
 		
 		animations.put("run", new Animation(sheetRun, 100));
 		animations.put("walk", new Animation(sheetWalk, 100));
@@ -780,6 +718,7 @@ public class Player {
 		
 		// animations.put("walkJump", animationWalkJump);
 		// animations.put("walkJumpAir", new Animation(sheetWalkJumpAir, 100));
+		
 		animations.put("runJump", new Animation(sheetRunJump, 100));
 		animations.put("bite", animationBite);
 		animations.put("shock", new Animation(sheetShock, 100));
@@ -799,6 +738,7 @@ public class Player {
 		
 		// animationOffsets.put("images/walkjump.png", new Vec2(0f, 0f));
 		// animationOffsets.put("images/walkjumpAir.png", new Vec2(0f, 0f));
+		
 		animationOffsets.put("images/flycycle.png", new Vec2(-0.65f, -0.3f)); // runjump
 		animationOffsets.put("images/bite.png", new Vec2(-0.45f, -0.7f));
 		animationOffsets.put("images/shock.png", new Vec2(-0.45f, -0.7f));
@@ -901,7 +841,7 @@ public class Player {
 			
 			if (this.isOnGround()) {
 				
-				this.currentAnimation = animations.get("walkJump");
+				this.currentAnimation = animations.get("runJump");
 				this.currentAnimation.restart();
 				
 			} else {
@@ -954,7 +894,7 @@ public class Player {
 		float lockObjY = lockedObject.getBody().getPosition().y;
 		
 		// float speed = 0.5f * 1f/Math.abs(distanceX);
-		float speed = MAX_VELOCITY_RUNNING;
+		float speed = MAX_VELOCITY;
 		
 		float toleranceX = 0.5f;
 		
@@ -974,7 +914,7 @@ public class Player {
 		
 	}
 	
-	public boolean movesLeft() {
+	public boolean isLookingLeft() {
 		return this.left;
 	}
 	
@@ -1088,14 +1028,11 @@ public class Player {
 		
 		float distance = TAILWHIP_DISTANCE;
 		
-		if (this.movesLeft()) {
+		if (this.isLookingLeft()) {
 			distance = -distance;
 		}
 		
 		this.doTailwhip = false;
-		if (isOnGround() && false) {
-			this.getBody().setLinearVelocity(new Vec2(-distance, body.getLinearVelocity().y));
-		}
 		
 		this.body.destroyFixture(this.fixtureTail);
 		
@@ -1119,7 +1056,7 @@ public class Player {
 			float heightSpace = tailHeight * 0.5f;
 			float distance = TAILWHIP_DISTANCE;
 			
-			if (this.movesLeft()) {
+			if (this.isLookingLeft()) {
 				direction = -direction;
 				distance = -distance;
 			}
@@ -1157,7 +1094,7 @@ public class Player {
 			
 			if (lockedObject != null) {
 				
-				int directionMultiplier = (this.movesLeft()) ? -1 : 1;
+				int directionMultiplier = (this.isLookingLeft()) ? -1 : 1;
 				
 				float playerX = this.getBody().getPosition().x;
 				float playerY = this.getBody().getPosition().y;
@@ -1197,7 +1134,6 @@ public class Player {
 	}
 	
 	public void update() {
-		
 		if (!dead) {
 			
 			adjustLaserTime();
@@ -1295,8 +1231,8 @@ public class Player {
 				frontflipping = false;
 			}
 			
-			if (this.isGroundPounding() && !this.isOnGround() && this.currentAnimation.isStopped()) {
-				this.currentAnimation = animations.get("groundpoundAir");
+			if (isGroundPounding() && !isOnGround() && (currentAnimation == null || currentAnimation.isStopped())) {
+				currentAnimation = animations.get("groundpoundAir");
 			}
 			
 			if (this.isOnGround() && this.dizzy) {
@@ -1327,7 +1263,7 @@ public class Player {
 				biteFinalize();
 			}
 			
-			if (this.laserStarted && this.currentAnimation.isStopped()) {
+			if (this.laserStarted && (currentAnimation == null || currentAnimation.isStopped())) {
 				this.currentAnimation = animations.get("laser");
 				createLaser();
 			}

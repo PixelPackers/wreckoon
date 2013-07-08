@@ -22,27 +22,26 @@ public class Sounds {
 	
 	private HashMap<String, Audio>	sounds	= new HashMap<String, Audio>();
 	
-	private Sounds() {
-		try {
-			loadAudioFiles();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+	private Sounds() {}
 	
 	public boolean isPlaying(String sound) {
 		return sounds.get(sound).isPlaying();
 	}
 	
-	private void loadAudioFiles() throws SlickException, IOException {
-		putSound("jump");
-		putSound("pigdeath");
-		putSound("laser", "audio/laser3.ogg");
-		putSound("death");
-		putSound("bite");
-		putSound("pigaggro");
-		putSound("tailwhip");
-		putSound("fence");
+	public void loadAudioFiles() {
+		try {
+			putSound("jump");
+			putSound("pigdeath");
+			putSound("laser", "audio/laser3.ogg");
+			putSound("laserreverb");
+			putSound("death");
+			putSound("bite");
+			putSound("pigaggro");
+			putSound("tailwhip");
+			putSound("fence");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void loop(String sound, float pitch, float volume) {
