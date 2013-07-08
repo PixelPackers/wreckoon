@@ -120,7 +120,6 @@ public class MyContactListener implements ContactListener {
 				// groundpound + boden
 				if (contact.getFixtureA().getFilterData().categoryBits == 33 || contact.getFixtureB().getFilterData().categoryBits == 33) {
 					game.getPlayer().stopGroundpounding();
-					System.out.println("32");
 				}
 			}
 			
@@ -162,7 +161,7 @@ public class MyContactListener implements ContactListener {
 			// player + generator
 			for (Generator gen : Game.getGenerators()) {
 				if (gen.getFixture() == contact.getFixtureA() || gen.getFixture() == contact.getFixtureB()) {
-					game.getPlayer().setAbleToGetLaser(true);
+					game.getPlayer().setGenerator(gen);
 					break;
 				}
 			}
@@ -294,7 +293,7 @@ public class MyContactListener implements ContactListener {
 			// player + generator
 			for (Generator gen : Game.getGenerators()) {
 				if (gen.getFixture() == contact.getFixtureA() || gen.getFixture() == contact.getFixtureB()) {
-					game.getPlayer().setAbleToGetLaser(false);
+					game.getPlayer().setGenerator(null);
 					break;
 				}
 			}

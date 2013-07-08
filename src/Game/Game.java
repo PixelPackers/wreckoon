@@ -826,9 +826,9 @@ public class Game extends BasicGame {
 		
 		g.popTransform();
 		
-		// g.setColor(Color.blue);
-		// g.fillRect(50, 50, player.getLaserTime() * 5, 50);
-		// g.setColor(Color.white);
+		 g.setColor(Color.blue);
+		 g.fillRect(50, 50, player.getLaserTime() * 5, 50);
+		 g.setColor(Color.white);
 		
 		drawBoltCounter();
 		

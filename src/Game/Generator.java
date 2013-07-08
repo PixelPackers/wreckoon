@@ -13,6 +13,7 @@ public class Generator extends GameObjectBox {
 	private float		x, y;
 	
 	private Animation	animation;
+	private boolean repaired = false;
 	
 	public Generator(World world, float posX, float posY, float width, float height) throws SlickException {
 		super(world, posX, posY, width, height, 0, 0, 0, null, BodyType.STATIC, true);
@@ -55,6 +56,19 @@ public class Generator extends GameObjectBox {
 		animation = new Animation(spriteSheet, 100);
 		animation.setPingPong(true);
 		animation.start();
+	}
+	
+	
+	public void repair() {
+		if (!repaired ) {
+			
+//			game.get
+			System.out.println("repaired");
+			repaired = true;	
+		}
+	}
+	public boolean isRepaired() {
+		return repaired;
 	}
 	
 }
