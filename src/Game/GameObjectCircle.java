@@ -36,4 +36,8 @@ public class GameObjectCircle extends GameObject {
 		g.drawArc(pos.x - this.radius, pos.y - this.radius, this.radius * 2, this.radius * 2, 0f, 360f);
 	}
 	
+	public float getRadius() {
+		return radius;
+	}
+	
 }

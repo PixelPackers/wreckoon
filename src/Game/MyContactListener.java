@@ -135,6 +135,12 @@ public class MyContactListener implements ContactListener {
 			}
 		}
 		
+		for (Tire tire : game.getTires()) {
+			if (contact.getFixtureA() == tire.getFixture() || contact.getFixtureB() == tire.getFixture()) {
+				tire.bounce(1.2f);
+			}
+		}
+		
 		// player contact
 		if (playerContact(contact)) {
 			
