@@ -1119,5 +1119,9 @@ public class Game extends BasicGame {
 	static boolean is64bit() {
 	  return System.getProperty("sun.arch.data.model").equals("64");
 	}
+
+	public ArrayList<Tire> getTires() {
+		return tires;
+	}
 	
 }
