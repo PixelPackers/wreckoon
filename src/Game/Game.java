@@ -363,8 +363,10 @@ public class Game extends BasicGame {
 		
 		if (level.getTires() != null)
 			for (Tire e : level.getTires()) {
-				tires.add(new Tire(world, e.getX(), e.getY(), 0.5f));
+				tires.add(new Tire(world, e.getX(), e.getY(), 0.7321f));
 			}
+		
+		tires.add(new Tire(world, 5, 15, 0.7321f));
 		
 		player = new Player(this, 5f, 3f);
 		laser = new Laser(world, 0f, 0f);
@@ -766,11 +768,15 @@ public class Game extends BasicGame {
 		g.setColor(earthColor);
 		g.fillRect(-21.5f, level.getHeight() - 1f, level.getWidth() + 21f, 10f);
 		
-		house.draw(g, debugView);
+		for (Tire t : tires) {
+			t.draw(g, debugView);
+		}
 		
 		for (Generator ge : generators) {
 			ge.draw(g, debugView);
 		}
+		
+		house.draw(g, debugView);
 		
 		for (GameObject staticObj : staticObjects) {
 			staticObj.draw(g, debugView);
@@ -837,9 +843,8 @@ public class Game extends BasicGame {
 			g.setColor(new Color(0f, 0f, 0f, 0.3f));
 			g.fillRect(0, 0, screenWidth, screenHeight);
 			pauseImage.drawCentered(screenWidth * 0.5f, screenHeight * 0.4f);
-		} else {
-			g.setColor(Color.white);
 		}
+		g.setColor(Color.white);
 		
 		// drawZoomAreas(g);
 		// drawCheckpoints(g);
