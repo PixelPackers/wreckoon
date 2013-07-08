@@ -350,13 +350,7 @@ public class Player {
 	}
 	
 	private void createSensors() {
-		
-		// delete old sensors
-		for (MySensor mySensor : sensorList) {
-			this.body.destroyFixture(mySensor.getFixture());
-		}
-		this.sensorList = new ArrayList<MySensor>();
-		
+			
 		// wall collision sensors
 		float sensorSizeWidth = width * 0.125f;
 		float sensorSizeHeight = height * 0.1f;
