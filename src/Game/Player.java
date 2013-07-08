@@ -32,7 +32,6 @@ public class Player {
 	private static final int			DEATH_WAIT_TIME				= 70;
 	private static final int			GROUNDPOUND_DELAY			= 50;
 	private static final int			REPAIR_BOLT_PRICE			= 100;
-	private static final int			SHOCK_DURATION				= 200;
 	
 	private final float					MAX_VELOCITY				= 5f;
 	private final float					ACC_RUNNING					= 0.4375f;
@@ -81,18 +80,8 @@ public class Player {
 	
 	private GameObjectCircle			wheel;
 	
-	private GameObject					lockedObject				= null;
-	private boolean						charging					= false;
-	private float						shootingPower				= 0f;
-	private float						maxShootingPower			= 50f * 0.25f;
-	private Vec2						lockedPlayerPosition;
-	private Vec2						shootingDirection			= new Vec2(1, 1);
-	private float						floatingDistanceX			= 3f * 0.25f;
-	private float						floatingDistanceY			= 3f * 0.25f;
-	
 	private float						conveyorSpeed				= 0f;
 	
-	private float						maxPlayerRotation			= 10f;
 	private World						world;
 	
 	private float						width						= 0.48f;
@@ -238,42 +227,36 @@ public class Player {
 			--laserTime;
 		}
 		
-//		if (biteShockLoading && boltCounter >= 0) {
-//			
-//			int step = (boltCounter > 2) ? 2 : boltCounter;
-//			
-//			if (laserTime <= MAX_LASER_DURATION - step + 1) {
-//				
-//				laserTime += step;
-//			}
-//			
-//			boltCounter -= step;
-//			
-//			dropElectroBolt();
-//			
-//			if (boltCounter == 0) {
-//				biteFinalize();
-//			}
-//			
-//		}
+		if (biteShockLoading) {
+			if(laserTime < MAX_LASER_DURATION){
+				int step = (boltCounter > 2) ? 2 : boltCounter;
+				
+				laserTime += step;
+				dropElectroBolt();
+			} else  {
+				biteFinalize();
+			}
+			
+		}
 		
 	}
 	
 	public void bite() {
 		
 		if (!this.biting && !locked && this.isOnGround()) {
-			
-			if (generator != null) {			
+
+			if (generator != null) {
+				
+				lock();		
+				
 				if(!generator.isRepaired() ){
 					if(boltCounter >= REPAIR_BOLT_PRICE){
-						lock();	
 						generator.repair();
 						payForRepair();
 					}
 					
 				} else {
 
-					lock();	
 					this.biting = true;
 					this.biteCounter = 0;
 					
@@ -292,15 +275,20 @@ public class Player {
 	
 	private void payForRepair() {
 		boltCounter -= REPAIR_BOLT_PRICE;
+		
+//		game.dropItems.add(new Bolt(this, world, player.getBody().getPosition().add(new Vec2(0, -1)), "images/bolt"
+//				+ ((int) (Math.random() * 3) + 1) + ".png"));
+		
+		
 		unlock();
 	}
 	
 	private void biteFinalize() {
 
-		laserTime = MAX_LASER_DURATION;
 		this.biting = false;
 		biteShockLoading = false;
 		this.currentAnimation = animations.get("idle");
+		stopBiting = false;
 		// this.laserAble = true;
 		Sounds.getInstance().stop("bite");
 		unlock();
@@ -561,14 +549,6 @@ public class Player {
 		return laserTime;
 	}
 	
-	public GameObject getLockedObject() {
-		return this.lockedObject;
-	}
-	
-	public Vec2 getLockedPlayerPosition() {
-		return lockedPlayerPosition;
-	}
-	
 	public int getPigCounter() {
 		return pigCounter;
 	}
@@ -595,14 +575,6 @@ public class Player {
 	
 	public MySensor getSensorTopRight() {
 		return sensorTopRight;
-	}
-	
-	public Vec2 getShootingDirection() {
-		return shootingDirection;
-	}
-	
-	public float getShootingPower() {
-		return shootingPower;
 	}
 	
 	public Fixture getTailFixture() {
@@ -647,10 +619,6 @@ public class Player {
 		
 	}
 	
-	public boolean hasLockedObject() {
-		return this.lockedObject != null;
-	}
-	
 	public void increaseBoltCounter() {
 		++boltCounter;
 	}
@@ -662,9 +630,6 @@ public class Player {
 	private void increaseCounters() {
 		++groundPoundCounter;
 		++tailwhipCounter;
-		if (shootingPower < maxShootingPower) {
-			++shootingPower;
-		}
 		++idleCounter;
 		++jumpCounter;
 		++laserCounter;
@@ -675,17 +640,6 @@ public class Player {
 	
 	public void increasePigCounter() {
 		++pigCounter;
-	}
-	
-	public void increaseShootingDirection(float x, float y) {
-		
-		int maxRadius = 25;
-		this.shootingDirection.x += x;
-		this.shootingDirection.y += y;
-		
-		this.shootingDirection.normalize();
-		this.shootingDirection = this.shootingDirection.mul(maxRadius);
-		
 	}
 	
 	private void initAnimations() throws SlickException {
@@ -767,26 +721,15 @@ public class Player {
 	// laser
 	public void initializeLaser() {
 		
-		// FIXME weg mit dem
-		// if(dead){
-		// unlock();
-		// dead=false;
-		// return;
-		// }
-		if (locked) {
-			return;
+		if (!locked) {
+			lock();
+			
+			this.laserStarted = true;
+			
+			laserCounter = 0;
+			this.currentAnimation = animations.get("groundpound");
+			this.currentAnimation.restart();
 		}
-		
-		// if (ENDLESS_LASER || !this.laserStarted && this.laserAble) {
-		
-		lock();
-		
-		this.laserStarted = true;
-		
-		laserCounter = 0;
-		this.currentAnimation = animations.get("groundpound");
-		this.currentAnimation.restart();
-		// }
 	}
 	
 	public boolean isAttacking() {
@@ -795,10 +738,6 @@ public class Player {
 	
 	public boolean isBiting() {
 		return biting;
-	}
-	
-	public boolean isCharging() {
-		return this.charging;
 	}
 	
 	public boolean isDead() {
@@ -891,54 +830,14 @@ public class Player {
 		return sensorBottomLeft.isColliding() && sensorTopLeft.isColliding();
 	}
 	
-	// public boolean shouldntMove() {
-	// return this.dizzy && false;
-	// // mit charging funkt telekinese ziel steuerung nicht mehr...
-	// // return this.isCharging() || this.dizzy;
-	// }
 	
 	public void lock() {
 		locked = true;
 	}
 	
-	public void lockObject(GameObject lockObj) {
-		this.lockedObject = lockObj;
-	}
-	
-	private void moveFloatingObjectToTarget(float targetX, float targetY) {
-		
-		float lockObjX = lockedObject.getBody().getPosition().x;
-		float lockObjY = lockedObject.getBody().getPosition().y;
-		
-		// float speed = 0.5f * 1f/Math.abs(distanceX);
-		float speed = MAX_VELOCITY;
-		
-		float toleranceX = 0.5f;
-		
-		if (lockObjX + toleranceX < targetX)
-			lockedObject.getBody().setLinearVelocity(new Vec2(speed, lockedObject.getBody().m_linearVelocity.y));
-		else if (lockObjX - toleranceX > targetX)
-			lockedObject.getBody().setLinearVelocity(new Vec2(-speed, lockedObject.getBody().m_linearVelocity.y));
-		else { // within tolerance
-				// lockedObject.getBody().setLinearVelocity( new
-				// Vec2(lockedObject.getBody().m_linearVelocity.x*0.5f,
-				// lockedObject.getBody().m_linearVelocity.y ));
-			lockedObject.getBody().setLinearVelocity(new Vec2(lockedObject.getBody().m_linearVelocity.x * 0.5f, 0));
-		}
-		
-		lockObjY = targetY + (float) (Math.sin(Math.toRadians(++floatingCounter % 360f)));
-		lockedObject.getBody().setTransform(new Vec2(lockObjX, lockObjY), 0);
-		
-	}
-	
+
 	public boolean isLookingLeft() {
 		return this.left;
-	}
-	
-	public void releaseObject() {
-		if (this.hasLockedObject()) {
-			lockedObject = null;
-		}
 	}
 	
 	private void revive() {
@@ -960,9 +859,6 @@ public class Player {
 		this.ableToGetLaser = ableToGetLaser;
 	}
 	
-	public void setCharging(boolean charging) {
-		this.charging = charging;
-	}
 	
 	public void setCheckpoint(Checkpoint cp) {
 		lastCheckpoint = cp;
@@ -984,38 +880,11 @@ public class Player {
 		this.left = left;
 	}
 	
-	public void setLockedPlayerPosition(Vec2 lockedPlayerPosition) {
-		this.lockedPlayerPosition = lockedPlayerPosition;
-	}
-	
 	public void setMovementButtonIsDown(boolean movementButtonIsDown) {
-	}
-	
-	public void setShootingPower(float shootingPower) {
-		this.shootingPower = shootingPower;
 	}
 	
 	public void setWaitingForLaserToBeKilled(boolean waitingForLaserToBeKilled) {
 		this.waitingForLaserToBeKilled = waitingForLaserToBeKilled;
-	}
-	
-	public void shoot() {
-		
-		this.shootingDirection.normalize();
-		
-		lockedObject.getBody().setLinearVelocity(shootingDirection.mul(this.getShootingPower()));
-		
-		this.releaseObject();
-		this.setCharging(false);
-	}
-	
-	public void startCharging() {
-		
-		this.setShootingPower(0);
-		this.setCharging(true);
-		this.setLockedPlayerPosition(this.getBody().getPosition());
-		this.shootingDirection = new Vec2(lockedObject.getBody().getPosition().x - this.getBody().getPosition().x, lockedObject.getBody()
-				.getPosition().y - this.getBody().getPosition().y);
 	}
 	
 	public void stopBiting() {
@@ -1100,51 +969,6 @@ public class Player {
 		}
 	}
 	
-	public void telekinesis() {
-		
-		if (locked) {
-			return;
-		}
-		
-		if (!this.isCharging()) {
-			
-			if (lockedObject != null) {
-				
-				int directionMultiplier = (this.isLookingLeft()) ? -1 : 1;
-				
-				float playerX = this.getBody().getPosition().x;
-				float playerY = this.getBody().getPosition().y;
-				
-				float targetX = playerX + floatingDistanceX * directionMultiplier;
-				float targetY = playerY - floatingDistanceY;
-				
-				// object tracks player movement
-				moveFloatingObjectToTarget(targetX, targetY);
-				
-			}
-		} else { // charging
-		
-			Vec2 placement = this.shootingDirection.clone();
-			placement.normalize();
-			placement = placement.mul((float) Math.sqrt(floatingDistanceX * floatingDistanceX + floatingDistanceY * floatingDistanceY));
-			
-			// *
-			lockedObject.getBody().setTransform(
-					new Vec2(this.getBody().getPosition().x + placement.x, this.getBody().getPosition().y + placement.y), 0);
-			
-			Vec2 antiGravity = this.world.getGravity().negate();
-			antiGravity = antiGravity.mul(lockedObject.getBody().getMass());
-			lockedObject.getBody().applyForce(antiGravity, lockedObject.getBody().getPosition());
-			
-			/*
-			 * / moveFloatingObjectToTarget(this.getBody().getPosition().x +
-			 * placement.x, this.getBody().getPosition().y + placement.y); //
-			 */
-			
-		}
-		
-	}
-	
 	public void unlock() {
 		locked = false;
 	}
@@ -1217,8 +1041,6 @@ public class Player {
 				wasLasering = false;
 			}
 			
-			this.telekinesis();
-			
 			if (isOnGround() /* && !this.isRunning() */&& !isGoingToCreateTailwhip && !doTailwhip && idleCounter > 2 && !dead && !biting
 					&& !locked) {
 				this.currentAnimation = animations.get("idle");
@@ -1274,9 +1096,9 @@ public class Player {
 				Sounds.getInstance().loop("bite", 1f, 1f);
 			}
 			
-			if (this.biting && biteCounter == SHOCK_DURATION) {
-				stopBiting = false;
-				biteFinalize();
+			if (this.biting && stopBiting ){
+					biteFinalize();
+			
 			}
 			
 			if (this.laserStarted && (currentAnimation == null || currentAnimation.isStopped())) {
@@ -1322,5 +1144,9 @@ public class Player {
 
 	public int getMaxLaserTime() {
 		return MAX_LASER_DURATION;
+	}
+	
+	public boolean maxPower(){
+		return laserTime == MAX_LASER_DURATION;
 	}
 }

@@ -646,16 +646,7 @@ public class Game extends BasicGame {
 		if (input.isKeyDown(Input.KEY_N)) {
 			shootkeyDown = true;
 		}
-		
-		if (player.hasLockedObject()) {
-			if (shootkeyDown) {
-				if (!player.isCharging()) {
-					player.startCharging();
-				}
-			} else if (player.isCharging()) {
-				player.shoot();
-			}
-		}
+
 		
 		if (input.isKeyPressed(Input.KEY_J)) {
 			actionLaserStart();
@@ -680,8 +671,9 @@ public class Game extends BasicGame {
 	private void actionLaserStart() {
 		player.setWaitingForLaserToBeKilled(false);
 		
-		if (!player.isBiting()) {
-			player.bite();
+		if (player.getGenerator() != null) {
+				player.bite();
+		} else {
 			player.initializeLaser();
 		}
 	}
@@ -699,7 +691,7 @@ public class Game extends BasicGame {
 	}
 	
 	private void actionGroundpound() {
-		if (!player.isCharging() && !player.isOnGround()) {
+		if (!player.isOnGround()) {
 			player.groundpoundInit();
 		}
 		// } else if (player.isOnWall()){
@@ -723,9 +715,7 @@ public class Game extends BasicGame {
 	}
 	
 	private void actionJump() {
-		if (!player.isCharging()) {
-			player.jump();
-		}
+		player.jump();
 	}
 	
 	private String readFile(String file) throws IOException {
