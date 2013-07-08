@@ -251,8 +251,10 @@ public class Player {
 		
 		if (!this.biting && !locked && this.isOnGround()) {
 
-			if (generator != null) {
-					
+			if ( generator != null) {
+
+				getBody().setLinearVelocity(new Vec2(0,0));
+				
 				if(!generator.isRepaired() ){
 					if(boltCounter >= REPAIR_BOLT_PRICE){
 
@@ -274,11 +276,8 @@ public class Player {
 					this.currentAnimation.restart();
 					
 				}
-				
 			}
-			
-		}
-		
+		}		
 	}
 	
 	private void payForRepair() {
@@ -290,7 +289,6 @@ public class Player {
 	}
 	
 	private void repairGenerator() {
-
 		repairing = true;
 		repairTimeCounter = 0;
 	}
