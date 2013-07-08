@@ -254,6 +254,7 @@ public class Player {
 
 						lock();
 						generator.repair();
+						repairGenerator();
 						payForRepair();
 					}
 					
@@ -280,6 +281,10 @@ public class Player {
 		boltCounter -= REPAIR_BOLT_PRICE;
 		game.addSpreadBolts(REPAIR_BOLT_PRICE);	
 		unlock();
+	}
+	
+	private void repairGenerator() {
+		this.currentAnimation = animations.get("repair");
 	}
 	
 	private void biteFinalize() {
