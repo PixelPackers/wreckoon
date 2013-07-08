@@ -178,7 +178,6 @@ public class MyContactListener implements ContactListener {
 				if (conveyor.getFixture() == contact.getFixtureA() || conveyor.getFixture() == contact.getFixtureB()) {
 					game.getPlayer().setConveyorSpeed(conveyor.getSpeed());
 				}
-				break;
 			}
 			
 			// player + dropItems
@@ -301,9 +300,8 @@ public class MyContactListener implements ContactListener {
 			// player + conveyor
 			for (Conveyor conveyor : game.getConveyors()) {
 				if (conveyor.getFixture() == contact.getFixtureA() || conveyor.getFixture() == contact.getFixtureB()) {
-					game.getPlayer().setConveyorSpeed(0);
+					game.getPlayer().setConveyorSpeed(-conveyor.getSpeed());
 				}
-				break;
 			}
 			
 			// player + dropItems
@@ -333,7 +331,7 @@ public class MyContactListener implements ContactListener {
 			for (Conveyor conveyor : game.getConveyors()) {
 				if (enemy.getFixture() == contact.getFixtureA() || enemy.getFixture() == contact.getFixtureB()) {
 					if (conveyor.getFixture() == contact.getFixtureA() || conveyor.getFixture() == contact.getFixtureB()) {
-						enemy.setConveyorSpeed(0);
+						enemy.setConveyorSpeed(-conveyor.getSpeed());
 					}
 				}
 			}

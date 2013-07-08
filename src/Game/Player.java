@@ -874,7 +874,8 @@ public class Player {
 	}
 	
 	public void setConveyorSpeed(float conveyorSpeed) {
-		this.conveyorSpeed = conveyorSpeed;
+		System.out.println(conveyorSpeed);
+		this.conveyorSpeed += conveyorSpeed;
 	}
 	
 	public void setLaser(Laser laser) {
@@ -1117,8 +1118,7 @@ public class Player {
 			
 			// TODO überprüfen ob das jetzt mit lauf band funkt
 			if (this.conveyorSpeed != 0) {
-				this.getBody()
-						.setLinearVelocity(new Vec2(getBody().getLinearVelocity().x + conveyorSpeed, getBody().getLinearVelocity().y));
+				this.getBody().setLinearVelocity(new Vec2(getBody().getLinearVelocity().x + conveyorSpeed, getBody().getLinearVelocity().y));
 			}
 			
 			if (!doTailwhip && isGoingToCreateTailwhip && tailwhipDelayCounter > TAILWHIP_DELAY) {
