@@ -681,8 +681,8 @@ public class Game extends BasicGame {
 	private void actionLaserStart() {
 		player.setWaitingForLaserToBeKilled(false);
 		
-		if (player.getGenerator() != null) {
-				player.bite();
+		if (player.getGenerator() != null &&  !player.maxPower()) {
+			player.bite();
 		} else {
 			player.initializeLaser();
 		}

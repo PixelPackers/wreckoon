@@ -33,6 +33,7 @@ public class Player {
 	private static final int			GROUNDPOUND_DELAY			= 50;
 	private static final int			REPAIR_BOLT_PRICE			= 100;
 	private static final int			REPAIR_TIME					= 100;
+	private static final int			GODMODE_DURATION			= 100;
 	
 	private final float					MAX_VELOCITY				= 5f;
 	private final float					ACC_RUNNING					= 0.4375f;
@@ -48,6 +49,7 @@ public class Player {
 	private int							floatingCounter				= 0;
 	private int							boltCounter					= 0;
 	private int							repairTimeCounter			= 0;
+	private int							godmodeCounter				= 0; // nach spawn kurz unverwundbar
 	
 	private int							tmpBoltAmount				= 110;
 	private int							pigCounter					= 0;
@@ -213,16 +215,19 @@ public class Player {
 	}
 	
 	private void accountTmpBoltAmount() {
-		
+		int amount = (tmpBoltAmount < 0) ? -tmpBoltAmount : tmpBoltAmount;
 		int max = 7;
 		// int max = (int) (tmpBoltAmount/20)+1; // "curve value" je kleiner
 		// desto weniger wird verrechnet
 		
-		int currAmount = (tmpBoltAmount >= max) ? max : tmpBoltAmount;
+		int incDec = (tmpBoltAmount < 0) ? 1 : -1;
+		
+		int currAmount = (amount >= max) ? max : amount;
 		
 		for (int i = 0; i < currAmount; ++i) {
-			increaseBoltCounter();
-			tmpBoltAmount -= 1;
+//			increaseBoltCounter();
+			boltCounter -= incDec;
+			tmpBoltAmount += incDec;
 		}
 		
 	}
@@ -249,13 +254,13 @@ public class Player {
 	
 	public void bite() {
 		
-		if (!this.biting && !locked && this.isOnGround()) {
+		if (!this.biting && !locked && this.isOnGround() && !maxPower()) {
 
 			if ( generator != null) {
 
 				getBody().setLinearVelocity(new Vec2(0,0));
 				
-				if(!generator.isRepaired() ){
+				if(!generator.isRepaired()){
 					if(boltCounter >= REPAIR_BOLT_PRICE){
 
 						lock();
@@ -283,7 +288,8 @@ public class Player {
 	private void payForRepair() {
 
 		generator.repair();
-		boltCounter -= REPAIR_BOLT_PRICE;
+//		boltCounter -= REPAIR_BOLT_PRICE;
+		tmpBoltAmount -= REPAIR_BOLT_PRICE;
 		repairing = false;
 		unlock();
 	}
@@ -434,7 +440,7 @@ public class Player {
 	}
 	
 	public void die(boolean throwback) {
-		if (!dead) {
+		if (!dead && godmodeCounter > GODMODE_DURATION) {
 			if (!godmode) {
 				this.currentAnimation = animations.get("deathAir");
 				this.dead = true;
@@ -641,6 +647,7 @@ public class Player {
 		++deathTimeCounter;
 		++tailwhipDelayCounter;
 		++repairTimeCounter;
+		++godmodeCounter;
 	}
 	
 	public void increasePigCounter() {
@@ -859,6 +866,7 @@ public class Player {
 		biting = false;
 		repairing = false;
 		unlock();
+		godmodeCounter = 0;
 	}
 	
 	public boolean rightWallColliding() {
@@ -884,7 +892,7 @@ public class Player {
 	
 	public void setLeft(boolean left) {
 		if ( (!locked || laserActive) || (locked && groundPounding) ) {
-			this.left = left;			
+			this.left = left;
 		}
 	}
 	
@@ -1164,7 +1172,9 @@ public class Player {
 	}
 	
 	public boolean maxPower(){
-		return laserTime == MAX_LASER_DURATION;
+		System.out.println("lasertime: " + laserTime);
+		System.out.println("max laser dur: " + MAX_LASER_DURATION);
+		return laserTime >= MAX_LASER_DURATION;
 	}
 	
 	public boolean isRepairing() {
