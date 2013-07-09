@@ -725,7 +725,6 @@ public class Game extends BasicGame {
 	}
 	
 	private void initDoomsday() {
-		Statistics.getInstance().resetStats();
 		DOOMSDAY = true;
 		doomsdayCounter = 0;
 		

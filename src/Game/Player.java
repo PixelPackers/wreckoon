@@ -462,6 +462,7 @@ public class Player {
 			
 			deathTimeCounter = 0;
 			lock();
+			Statistics.getInstance().incPlayerDeaths();
 		}
 	}
 	
@@ -599,7 +600,6 @@ public class Player {
 	
 	private void groundpound() {
 		if (this.groundPoundCounter > GROUNDPOUND_AIRTIME) {
-			Statistics.getInstance().incGroundpoundCounter();
 			this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, groundPoundPower));
 		} else {
 			this.getBody().setLinearVelocity(new Vec2(0f, 0f));
@@ -607,24 +607,24 @@ public class Player {
 	}
 	
 	public void groundpoundInit() {
-		if (locked || wasLasering) {
-			return;
-		}
-		
-		if (groundPoundCounter > GROUNDPOUND_DELAY && !groundPounding) {
+		if (!locked && !wasLasering) {		
 			
-			lock();
-			
-			this.currentAnimation = animations.get("groundpound");
-			this.currentAnimation.restart();
-			
-			this.groundPounding = true;
-			this.groundPoundCounter = 0;
-			
-			godmode = true;
-			
-			this.groundpound();
-			
+			if (groundPoundCounter > GROUNDPOUND_DELAY && !groundPounding && !isOnWall()) {
+				
+				lock();
+				
+				this.currentAnimation = animations.get("groundpound");
+				this.currentAnimation.restart();
+				
+				this.groundPounding = true;
+				this.groundPoundCounter = 0;
+				
+				godmode = true;
+	
+				Statistics.getInstance().incGroundpoundCounter();
+				this.groundpound();
+				
+			}
 		}
 		
 	}

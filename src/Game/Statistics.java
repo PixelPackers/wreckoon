@@ -7,22 +7,23 @@ public class Statistics {
 	private static final Statistics instance = new Statistics();
 
 	// initialise in resetStats() to make sure we reset every counter we need
-	private int							laserActivationCounter;
-	private int							laserEnergyCounter;
-	private int							wholeSpentBolts;
-	private int							wholeCollectedBolts;
-	private int							tailwhipCounter;
-	private int							groundpoundCounter;
-	private int							generatorsRepaired;
-	private int							generatorsUsed;
-	private int							killedPigsCounter;
-	private int							tailwhipKills;
-	private int							groundPoundKills;
-	private int							laserKills;
-	private int							ambushKills;
-	private int							originalTailwhipKill;
-	private int							bounceofTailwhipKill;
-	private int 						timeCounter;
+	private int	laserActivationCounter;
+	private int	laserEnergyCounter;
+	private int	wholeSpentBolts;
+	private int	wholeCollectedBolts;
+	private int	tailwhipCounter;
+	private int	groundpoundCounter;
+	private int	generatorsRepaired;
+	private int	generatorsUsed;
+	private int	killedPigsCounter;
+	private int	tailwhipKills;
+	private int	groundPoundKills;
+	private int	laserKills;
+	private int	ambushKills;
+	private int	originalTailwhipKill;
+	private int	bounceofTailwhipKill;
+	private int timeCounter;
+	private int playerDeaths;
 	
 
 	private Statistics() {}
@@ -48,6 +49,7 @@ public class Statistics {
 		killedPigsCounter 			= 0;
 		originalTailwhipKill		= 0;
 		bounceofTailwhipKill		= 0;
+		playerDeaths				= 0;
 	}
 
 	public void printStats(){
@@ -62,23 +64,23 @@ public class Statistics {
 	
 	public String toString() {
 		return 
-		"Time: "				+ getTime()			 									+ " Seconds.\n"+
-
-		"total Pigs killed " 		+ Statistics.getInstance().getKilledPigsCounter() 		+ "\n"+
-		"\t with tailwhip: " 		+ Statistics.getInstance().getTailwhipKills() 			+ "\n"+
-		"\t\t (original): " 		+ Statistics.getInstance().getOriginalTailwhipKill() 	+ "\n"+
-		"\t\t (bounce off): "		+ Statistics.getInstance().getBounceofTailwhipKill()	+ "\n"+
-		"\t with groundpound: " 	+ Statistics.getInstance().getGroundPoundKills() 		+ "\n"+
-		"\t with laser: " 			+ Statistics.getInstance().getLaserKills()		 		+ "\n"+
-		"\t ambush kills: " 		+ Statistics.getInstance().getAmbushKills()		 		+ "\n"+
-		"Laser activated: "			+ Statistics.getInstance().getLaserActivationCounter() 	+ "\n"+
-		"Generators repaired: " 	+ Statistics.getInstance().getGeneratorsRepaired() 		+ " broken generators.\n"+
-		"You used generators" 		+ Statistics.getInstance().getGeneratorsUsed() 			+ " times.\n"+
-		"Groundpounds: " 			+ Statistics.getInstance().getGroundpoundCounter() 		+ " times with Groundpound.\n"+
-		"You used " 				+ Statistics.getInstance().getLaserEnergyCounter() 		+ " laserenergy.\n"+
-		"You attacked " 			+ Statistics.getInstance().getTailwhipCounter() 		+ " times with tailwhip.\n"+
-		"You collected " 			+ Statistics.getInstance().getWholeCollectedBolts() 	+ " Bolts/Nuts.\n"+
-		"You used " 				+ Statistics.getInstance().getWholeSpentBolts() 		+ " Bolts/Nuts.\n"+
+		"Deaths: "					+ playerDeaths				+ "\n"+
+		"Time: "					+ getTime()			 		+ "\n"+
+		"total Pigs killed " 		+ killedPigsCounter 		+ "\n"+
+		"\t with tailwhip: " 		+ tailwhipKills				+ "\n"+
+		"\t\t (original): " 		+ originalTailwhipKill	 	+ "\n"+
+		"\t\t (bounce off): "		+ bounceofTailwhipKill		+ "\n"+
+		"\t with groundpound: " 	+ groundPoundKills 			+ "\n"+
+		"\t with laser: " 			+ laserKills		 		+ "\n"+
+		"\t ambush kills: " 		+ ambushKills		 		+ "\n"+
+		"Laser activated: "			+ laserActivationCounter 	+ "\n"+
+		"Generators repaired: " 	+ generatorsRepaired 		+ "\n"+
+		"You used generators: " 	+ generatorsUsed 			+ "\n"+
+		"tailwhips used: " 			+ tailwhipCounter			+ "\n"+
+		"Groundpounds used: " 		+ groundpoundCounter 		+ "\n"+
+		"Enery used: " 				+ laserEnergyCounter 		+ "\n"+
+		"Collected bolts: " 		+ wholeCollectedBolts 		+ "\n"+
+		"used bolts: " 				+ wholeSpentBolts 			+ "\n"+
 		"";
 		
 	}
@@ -208,8 +210,12 @@ public class Statistics {
 		++bounceofTailwhipKill;
 	}
 
+	public int getPlayerDeaths() {
+		return playerDeaths;
+	}
 
-	
-	
+	public void incPlayerDeaths() {
+		++playerDeaths;
+	}
 	
 }
