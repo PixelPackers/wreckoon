@@ -1172,8 +1172,6 @@ public class Player {
 	}
 	
 	public boolean maxPower(){
-		System.out.println("lasertime: " + laserTime);
-		System.out.println("max laser dur: " + MAX_LASER_DURATION);
 		return laserTime >= MAX_LASER_DURATION;
 	}
 	
