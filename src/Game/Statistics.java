@@ -24,6 +24,7 @@ public class Statistics {
 	private int	bounceofTailwhipKill;
 	private int timeCounter;
 	private int playerDeaths;
+	private int suicides;
 	
 
 	private Statistics() {}
@@ -33,23 +34,24 @@ public class Statistics {
 	}
 	
 	public void resetStats() {
-		timeCounter 				= 0;
-		generatorsRepaired 			= 0;
-		generatorsUsed 				= 0;
-		groundpoundCounter 			= 0;
-		laserActivationCounter 		= 0;
-		laserEnergyCounter 			= 0;
-		tailwhipCounter 			= 0;
-		wholeCollectedBolts 		= 0;
-		wholeSpentBolts 			= 0;
-		laserKills					= 0;
-		ambushKills					= 0;
-		groundPoundKills			= 0;
-		tailwhipKills				= 0;
-		killedPigsCounter 			= 0;
-		originalTailwhipKill		= 0;
-		bounceofTailwhipKill		= 0;
-		playerDeaths				= 0;
+		timeCounter 			= 0;
+		generatorsRepaired 		= 0;
+		generatorsUsed 			= 0;
+		groundpoundCounter 		= 0;
+		laserActivationCounter 	= 0;
+		laserEnergyCounter 		= 0;
+		tailwhipCounter 		= 0;
+		wholeCollectedBolts 	= 0;
+		wholeSpentBolts 		= 0;
+		laserKills				= 0;
+		ambushKills				= 0;
+		groundPoundKills		= 0;
+		tailwhipKills			= 0;
+		killedPigsCounter 		= 0;
+		originalTailwhipKill	= 0;
+		bounceofTailwhipKill	= 0;
+		playerDeaths			= 0;
+		suicides				= 0;
 	}
 
 	public void printStats(){
@@ -73,6 +75,7 @@ public class Statistics {
 		"\t with groundpound: " 	+ groundPoundKills 			+ "\n"+
 		"\t with laser: " 			+ laserKills		 		+ "\n"+
 		"\t ambush kills: " 		+ ambushKills		 		+ "\n"+
+		"\t suicides: " 			+ suicides					+ "\n"+
 		"Laser activated: "			+ laserActivationCounter 	+ "\n"+
 		"Generators repaired: " 	+ generatorsRepaired 		+ "\n"+
 		"You used generators: " 	+ generatorsUsed 			+ "\n"+
@@ -216,6 +219,14 @@ public class Statistics {
 
 	public void incPlayerDeaths() {
 		++playerDeaths;
+	}
+
+	public int getSuicides() {
+		return suicides;
+	}
+
+	public void incSuicides() {
+		++suicides;
 	}
 	
 }

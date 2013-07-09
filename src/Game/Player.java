@@ -33,7 +33,7 @@ public class Player {
 	private static final int			GROUNDPOUND_DELAY			= 50;
 	private static final int			REPAIR_BOLT_PRICE			= 100;
 	private static final int			REPAIR_TIME					= 100;
-	private static final int			GODMODE_DURATION			= 100;
+	private static final int			GODMODE_DURATION			= 40;
 	
 	private final float					MAX_VELOCITY				= 5f;
 	private final float					ACC_RUNNING					= 0.4375f;

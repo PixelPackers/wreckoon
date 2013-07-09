@@ -168,17 +168,12 @@ public abstract class Enemy extends GameObjectBox {
 
 		Statistics.getInstance().incKilledPigsCounter();
 		
-		if(dizzy){
-			if(originalHit){
-				Statistics.getInstance().incOriginalTailwhipKill();
-			} else {
-				Statistics.getInstance().incBounceofTailwhipKill();
-			}
-			Statistics.getInstance().incTailwhipKills();
-		} else if (getsGrilled){
+		if (getsGrilled){
 			Statistics.getInstance().incLaserKills();
-		} else {
+		} else if(game.getPlayer().isGroundPounding()){
 			Statistics.getInstance().incGroundPoundKills();
+		} else if(!dizzy){
+			Statistics.getInstance().incSuicides();
 		}
 	}
 
@@ -329,6 +324,15 @@ public abstract class Enemy extends GameObjectBox {
 		
 		// FIXME magic numbers
 		health -= 4;
+		
+		if(health < 0){
+			if(originalHit){
+				Statistics.getInstance().incOriginalTailwhipKill();
+			} else {
+				Statistics.getInstance().incBounceofTailwhipKill();
+			}
+			Statistics.getInstance().incTailwhipKills();
+		}
 		
 		initRotation();
 	}
