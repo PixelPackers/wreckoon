@@ -515,15 +515,6 @@ public class Game extends BasicGame {
 			actionJump();
 		}
 		
-		int duration = 250;
-		
-		// / XXX MAGIC NUMBERS
-		// / max gegenlenken
-		float minCounterSteerSpeed = (!player.isJumpingFromWall()) ? -5 : 5;
-		// FIXME set this to 420 to see the bug... only works in one direction
-		float slowDownForce = 5f;
-		float slowDownThreshold = 0.5f;
-		
 		if (isTiltedLeft(xboxLeftThumbDirection, xboxLeftThumbMagnitude) || input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
 			actionLeft();
 		}
@@ -680,12 +671,8 @@ public class Game extends BasicGame {
 	
 	private void actionLaserStart() {
 		player.setWaitingForLaserToBeKilled(false);
-		
-//		if (player.getGenerator() != null &&  !player.maxPower()) {
-			player.bite();
-//		} else {
-			player.initializeLaser();
-//		}
+		player.bite();
+		player.initializeLaser();
 	}
 	
 	private void actionDebugView() {
@@ -698,13 +685,34 @@ public class Game extends BasicGame {
 	
 	private void initDoomsday() {
 
+		player.resetStats();
 		DOOMSDAY = !DOOMSDAY;
 		doomsdayCounter = 0;
+		
+//		TODO start dub step
 		
 	}
 	
 	private void endDoomsday(){
+		printDoomsdayStatistics();
 		DOOMSDAY = false;
+	}
+
+	private void printDoomsdayStatistics() {
+		
+		float x = ((int) (doomsdayCounter/60f*100))/100f;
+		
+		System.out.println("You survived "				+ x 										+ " Seconds.");
+		System.out.println("You killed " 				+ player.getPigCounter() 					+ " Pigs.");
+		System.out.println("You activated your Laser "	+ player.getStats_laserActivationCounter() 	+ " times.");
+		System.out.println("You repaired " 				+ player.getStats_generatorsRepaired() 		+ " broken generators.");
+		System.out.println("You used generators" 		+ player.getStats_generatorsUsed() 			+ " times.");
+		System.out.println("You attacked " 				+ player.getStats_groundpoundCounter() 		+ " times with Groundpound.");
+		System.out.println("You used " 					+ player.getStats_laserEnergyCounter() 		+ " laserenergy.");
+		System.out.println("You attacked " 				+ player.getStats_tailwhipCounter() 		+ " times with tailwhip.");
+		System.out.println("You collected " 			+ player.getStats_wholeCollectedBolts() 	+ " Bolts/Nuts.");
+		System.out.println("You used " 					+ player.getStats_wholeSpentBolts() 		+ " Bolts/Nuts.");
+		
 	}
 
 	private void actionTailwhip() {
@@ -942,7 +950,7 @@ public class Game extends BasicGame {
 				++doomsdayCounter;
 				
 				if(player.isDead()){
-					// TODO draw statistics
+					endDoomsday();
 				}
 			} else {
 				cam.wiggle((player.isLaserActive()) ? 1f : 0f);

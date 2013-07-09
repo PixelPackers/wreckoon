@@ -7,9 +7,6 @@ import org.newdawn.slick.openal.Audio;
 import org.newdawn.slick.openal.AudioLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
-// FIXME wenn er das erste mal audio abspielt, hängts leicht, kA evtl muss der
-// dann erst den musicManager initialisieren oder kA
-// wenn dann bg music von anfang an is, sollts doch hin haun... kA
 
 public class Sounds {
 	
