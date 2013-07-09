@@ -680,13 +680,17 @@ public class Game extends BasicGame {
 	}
 	
 	private void actionDoomsday() {
-		initDoomsday();
+		if(!DOOMSDAY){
+			initDoomsday();
+		} else {
+			endDoomsday();
+		}
 	}
 	
 	private void initDoomsday() {
 
 		Statistics.getInstance().resetStats();
-		DOOMSDAY = !DOOMSDAY;
+		DOOMSDAY = true;
 		doomsdayCounter = 0;
 		
 //		TODO start dub step
@@ -700,22 +704,7 @@ public class Game extends BasicGame {
 
 	private void printDoomsdayStatistics() {
 		
-		float x = ((int) (doomsdayCounter/60f*100))/100f;
-		
-		System.out.println("You survived "				+ x 										+ " Seconds.");
-		System.out.println("You killed " 				+ Statistics.getInstance().getKilledPigsCounter() 					+ " Pigs.");
-		System.out.println("You activated your Laser "	+ Statistics.getInstance().getLaserActivationCounter() 	+ " times.");
-		System.out.println("You repaired " 				+ Statistics.getInstance().getGeneratorsRepaired() 		+ " broken generators.");
-		System.out.println("You used generators" 		+ Statistics.getInstance().getGeneratorsUsed() 			+ " times.");
-		System.out.println("You attacked " 				+ Statistics.getInstance().getGroundpoundCounter() 		+ " times with Groundpound.");
-		System.out.println("You used " 					+ Statistics.getInstance().getLaserEnergyCounter() 		+ " laserenergy.");
-		System.out.println("You attacked " 				+ Statistics.getInstance().getTailwhipCounter() 		+ " times with tailwhip.");
-		System.out.println("You collected " 			+ Statistics.getInstance().getWholeCollectedBolts() 	+ " Bolts/Nuts.");
-		System.out.println("You used " 					+ Statistics.getInstance().getWholeSpentBolts() 		+ " Bolts/Nuts.");
-		System.out.println("tailwhip kill " 			+ Statistics.getInstance().getTailwhipKills() 			+ " .");
-		System.out.println("groundpound kill " 			+ Statistics.getInstance().getGroundPoundKills() 		+ " .");
-		System.out.println("laser kill " 				+ Statistics.getInstance().getLaserKills()		 		+ " .");
-		System.out.println("ambush kill " 				+ Statistics.getInstance().getAmbushKills()		 		+ " .");
+		Statistics.getInstance().printStats();
 		
 	}
 

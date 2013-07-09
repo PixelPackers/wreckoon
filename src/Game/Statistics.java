@@ -18,6 +18,9 @@ public class Statistics {
 	private int							groundPoundKills;
 	private int							laserKills;
 	private int							ambushKills;
+	private int							originalTailwhipKill;
+	private int							bounceofTailwhipKill;
+	private int 						timeCounter;
 	
 
 	public static Statistics getInstance() {
@@ -25,6 +28,7 @@ public class Statistics {
 	}
 	
 	public void resetStats() {
+		timeCounter 				= 0;
 		generatorsRepaired 			= 0;
 		generatorsUsed 				= 0;
 		groundpoundCounter 			= 0;
@@ -33,8 +37,37 @@ public class Statistics {
 		tailwhipCounter 			= 0;
 		wholeCollectedBolts 		= 0;
 		wholeSpentBolts 			= 0;
+		laserKills					= 0;
+		ambushKills					= 0;
+		groundPoundKills			= 0;
+		tailwhipKills				= 0;
+		killedPigsCounter 			= 0;
+		originalTailwhipKill		= 0;
+		bounceofTailwhipKill		= 0;
 	}
 
+	public void printStats(){
+
+		float time = ((int) (timeCounter/60f*100))/100f;
+		
+		System.out.println("You survived "				+ time			 										+ " Seconds.");
+		System.out.println("You killed " 				+ Statistics.getInstance().getKilledPigsCounter() 		+ " Pigs.");
+		System.out.println("You activated your Laser "	+ Statistics.getInstance().getLaserActivationCounter() 	+ " times.");
+		System.out.println("You repaired " 				+ Statistics.getInstance().getGeneratorsRepaired() 		+ " broken generators.");
+		System.out.println("You used generators" 		+ Statistics.getInstance().getGeneratorsUsed() 			+ " times.");
+		System.out.println("You attacked " 				+ Statistics.getInstance().getGroundpoundCounter() 		+ " times with Groundpound.");
+		System.out.println("You used " 					+ Statistics.getInstance().getLaserEnergyCounter() 		+ " laserenergy.");
+		System.out.println("You attacked " 				+ Statistics.getInstance().getTailwhipCounter() 		+ " times with tailwhip.");
+		System.out.println("You collected " 			+ Statistics.getInstance().getWholeCollectedBolts() 	+ " Bolts/Nuts.");
+		System.out.println("You used " 					+ Statistics.getInstance().getWholeSpentBolts() 		+ " Bolts/Nuts.");
+		System.out.println("tailwhip kill " 			+ Statistics.getInstance().getTailwhipKills() 			+ " .");
+		System.out.println("groundpound kill " 			+ Statistics.getInstance().getGroundPoundKills() 		+ " .");
+		System.out.println("laser kill " 				+ Statistics.getInstance().getLaserKills()		 		+ " .");
+		System.out.println("ambush kill " 				+ Statistics.getInstance().getAmbushKills()		 		+ " .");
+		System.out.println("original tailwhip kill" 	+ Statistics.getInstance().getOriginalTailwhipKill() 	+ " .");
+		System.out.println("bounc of tailwhip kill "	+ Statistics.getInstance().getBounceofTailwhipKill()	+ " .");
+	}
+	
 	public int getLaserActivationCounter() {
 		return laserActivationCounter;
 	}
@@ -136,6 +169,23 @@ public class Statistics {
 	public void incAmbushKills() {
 		++ambushKills;
 	}
+
+	public int getOriginalTailwhipKill() {
+		return originalTailwhipKill;
+	}
+
+	public void incOriginalTailwhipKill() {
+		++originalTailwhipKill;
+	}
+
+	public int getBounceofTailwhipKill() {
+		return bounceofTailwhipKill;
+	}
+
+	public void incBounceofTailwhipKill() {
+		++bounceofTailwhipKill;
+	}
+	
 	
 	
 }

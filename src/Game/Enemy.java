@@ -167,6 +167,11 @@ public abstract class Enemy extends GameObjectBox {
 		Statistics.getInstance().incKilledPigsCounter();
 		
 		if(dizzy){
+			if(originalHit){
+				Statistics.getInstance().incOriginalTailwhipKill();
+			} else {
+				Statistics.getInstance().incBounceofTailwhipKill();
+			}
 			Statistics.getInstance().incTailwhipKills();
 		} else if (getsGrilled){
 			Statistics.getInstance().incLaserKills();
