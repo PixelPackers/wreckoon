@@ -50,19 +50,8 @@ public class Player {
 	private int							boltCounter					= 0;
 	private int							repairTimeCounter			= 0;
 	private int							godmodeCounter				= 0; // nach spawn kurz unverwundbar
-	
-	// initialise in resetStats() to make sure we reset every counter we need
-	private int							stats_laserActivationCounter;
-	private int							stats_laserEnergyCounter;
-	private int							stats_wholeSpentBolts;
-	private int							stats_wholeCollectedBolts;
-	private int							stats_tailwhipCounter;
-	private int							stats_groundpoundCounter;
-	private int							stats_generatorsRepaired;
-	private int							stats_generatorsUsed;
 
 	private int							tmpBoltAmount				= 110;
-	private int							pigCounter					= 0;
 	private int							deathTimeCounter			= 0;
 	private int							laserTime					= 50;
 	
@@ -239,7 +228,7 @@ public class Player {
 			boltCounter -= incDec;
 			tmpBoltAmount += incDec;
 			if(incDec > 0){
-				++stats_wholeSpentBolts;
+				Statistics.getInstance().incWholeSpentBolts();
 			}
 		}
 		
@@ -249,7 +238,7 @@ public class Player {
 		
 		if (laserActive) {
 			--laserTime;
-			++stats_laserEnergyCounter;
+			Statistics.getInstance().incLaserEnergyCounter();
 		}
 		
 		if (biteShockLoading) {
@@ -290,7 +279,7 @@ public class Player {
 					this.biteCounter = 0;
 					
 //					this.body.setLinearVelocity(new Vec2(0f, 0f));
-					++stats_generatorsUsed;
+					Statistics.getInstance().incGeneratorsUsed();
 					this.currentAnimation = animations.get("bite");
 					this.currentAnimation.restart();
 					
@@ -311,7 +300,7 @@ public class Player {
 	private void repairGenerator() {
 		repairing = true;
 		repairTimeCounter = 0;
-		++stats_generatorsRepaired;
+		Statistics.getInstance().incGeneratorsRepaired();
 	}
 	
 	private void biteFinalize() {
@@ -326,7 +315,7 @@ public class Player {
 	}
 	
 	public void boltsCollected(int amount) {
-		++stats_wholeCollectedBolts;
+		Statistics.getInstance().incWholeCollectedBolts();
 		this.tmpBoltAmount += amount;
 		
 	}
@@ -339,7 +328,7 @@ public class Player {
 		
 		if (!waitingForLaserToBeKilled) {
 			this.laserActive = true;
-			++stats_laserActivationCounter;
+			Statistics.getInstance().incLaserActivationCounter();
 			
 			Sounds.getInstance().loop("laser", Functions.randomRange(0.8f, 1.2f), 1f);
 			
@@ -576,10 +565,6 @@ public class Player {
 		return laserTime;
 	}
 	
-	public int getPigCounter() {
-		return pigCounter;
-	}
-	
 	public MySensor getSensorBottomLeft() {
 		return sensorBottomLeft;
 	}
@@ -614,7 +599,7 @@ public class Player {
 	
 	private void groundpound() {
 		if (this.groundPoundCounter > GROUNDPOUND_AIRTIME) {
-			++stats_groundpoundCounter;
+			Statistics.getInstance().incGroundpoundCounter();
 			this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, groundPoundPower));
 		} else {
 			this.getBody().setLinearVelocity(new Vec2(0f, 0f));
@@ -663,10 +648,6 @@ public class Player {
 		++tailwhipDelayCounter;
 		++repairTimeCounter;
 		++godmodeCounter;
-	}
-	
-	public void increasePigCounter() {
-		++pigCounter;
 	}
 	
 	private void initAnimations() throws SlickException {
@@ -938,7 +919,7 @@ public class Player {
 		
 		this.doTailwhip = true;
 		this.fixtureTail = this.body.createFixture(this.fixtureDefTail);
-		++stats_tailwhipCounter;
+		Statistics.getInstance().incTailwhipCounter();
 	}
 	
 	private void tailwhipFinalize() {
@@ -1190,48 +1171,5 @@ public class Player {
 	
 	public boolean isRepairing() {
 		return repairing;
-	}
-	public int getStats_laserActivationCounter() {
-		return stats_laserActivationCounter;
-	}
-
-	public int getStats_laserEnergyCounter() {
-		return stats_laserEnergyCounter;
-	}
-
-	public int getStats_wholeSpentBolts() {
-		return stats_wholeSpentBolts;
-	}
-
-	public int getStats_wholeCollectedBolts() {
-		return stats_wholeCollectedBolts;
-	}
-
-	public int getStats_tailwhipCounter() {
-		return stats_tailwhipCounter;
-	}
-
-	public int getStats_groundpoundCounter() {
-		return stats_groundpoundCounter;
-	}
-
-	public int getStats_generatorsRepaired() {
-		return stats_generatorsRepaired;
-	}
-
-	public int getStats_generatorsUsed() {
-		return stats_generatorsUsed;
-	}
-
-	public void resetStats() {
-		stats_generatorsRepaired 		= 0;
-		stats_generatorsUsed 			= 0;
-		stats_groundpoundCounter 		= 0;
-		stats_laserActivationCounter 	= 0;
-		stats_laserEnergyCounter 		= 0;
-		stats_tailwhipCounter 			= 0;
-		stats_wholeCollectedBolts 		= 0;
-		stats_wholeSpentBolts 			= 0;
-		
 	}
 }

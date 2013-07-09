@@ -685,7 +685,7 @@ public class Game extends BasicGame {
 	
 	private void initDoomsday() {
 
-		player.resetStats();
+		Statistics.getInstance().resetStats();
 		DOOMSDAY = !DOOMSDAY;
 		doomsdayCounter = 0;
 		
@@ -703,15 +703,19 @@ public class Game extends BasicGame {
 		float x = ((int) (doomsdayCounter/60f*100))/100f;
 		
 		System.out.println("You survived "				+ x 										+ " Seconds.");
-		System.out.println("You killed " 				+ player.getPigCounter() 					+ " Pigs.");
-		System.out.println("You activated your Laser "	+ player.getStats_laserActivationCounter() 	+ " times.");
-		System.out.println("You repaired " 				+ player.getStats_generatorsRepaired() 		+ " broken generators.");
-		System.out.println("You used generators" 		+ player.getStats_generatorsUsed() 			+ " times.");
-		System.out.println("You attacked " 				+ player.getStats_groundpoundCounter() 		+ " times with Groundpound.");
-		System.out.println("You used " 					+ player.getStats_laserEnergyCounter() 		+ " laserenergy.");
-		System.out.println("You attacked " 				+ player.getStats_tailwhipCounter() 		+ " times with tailwhip.");
-		System.out.println("You collected " 			+ player.getStats_wholeCollectedBolts() 	+ " Bolts/Nuts.");
-		System.out.println("You used " 					+ player.getStats_wholeSpentBolts() 		+ " Bolts/Nuts.");
+		System.out.println("You killed " 				+ Statistics.getInstance().getKilledPigsCounter() 					+ " Pigs.");
+		System.out.println("You activated your Laser "	+ Statistics.getInstance().getLaserActivationCounter() 	+ " times.");
+		System.out.println("You repaired " 				+ Statistics.getInstance().getGeneratorsRepaired() 		+ " broken generators.");
+		System.out.println("You used generators" 		+ Statistics.getInstance().getGeneratorsUsed() 			+ " times.");
+		System.out.println("You attacked " 				+ Statistics.getInstance().getGroundpoundCounter() 		+ " times with Groundpound.");
+		System.out.println("You used " 					+ Statistics.getInstance().getLaserEnergyCounter() 		+ " laserenergy.");
+		System.out.println("You attacked " 				+ Statistics.getInstance().getTailwhipCounter() 		+ " times with tailwhip.");
+		System.out.println("You collected " 			+ Statistics.getInstance().getWholeCollectedBolts() 	+ " Bolts/Nuts.");
+		System.out.println("You used " 					+ Statistics.getInstance().getWholeSpentBolts() 		+ " Bolts/Nuts.");
+		System.out.println("tailwhip kill " 			+ Statistics.getInstance().getTailwhipKills() 			+ " .");
+		System.out.println("groundpound kill " 			+ Statistics.getInstance().getGroundPoundKills() 		+ " .");
+		System.out.println("laser kill " 				+ Statistics.getInstance().getLaserKills()		 		+ " .");
+		System.out.println("ambush kill " 				+ Statistics.getInstance().getAmbushKills()		 		+ " .");
 		
 	}
 
@@ -880,7 +884,7 @@ public class Game extends BasicGame {
 		// tilesDrawn, 10, 50);
 		g.drawString("time:" + doomsdayCounter/ 60f, 50, 50);
 		g.drawString("pigs alive: " + enemies.size(), 50, 100);
-		g.drawString("pigs killed: " + player.getPigCounter(), 50, 150);
+		g.drawString("pigs killed: " + Statistics.getInstance().getKilledPigsCounter(), 50, 150);
 	}
 	
 	// public static ArrayList<Shred> getShreds() {

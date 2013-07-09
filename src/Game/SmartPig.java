@@ -33,6 +33,9 @@ public class SmartPig extends Enemy {
 	@Override
 	public void die() {
 		super.die();
+		if(!aggro){
+			Statistics.getInstance().incAmbushKills();
+		}
 		currentAnimation = animations.get("die");
 	}
 	

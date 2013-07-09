@@ -156,11 +156,25 @@ public abstract class Enemy extends GameObjectBox {
 		
 		this.dead = true;
 		this.dieCounter = 0;
-		game.getPlayer().increasePigCounter();
+		
+		killStatistic();
 		
 		getBody().getFixtureList().setSensor(true);
 	}
 	
+	private void killStatistic() {
+
+		Statistics.getInstance().incKilledPigsCounter();
+		
+		if(dizzy){
+			Statistics.getInstance().incTailwhipKills();
+		} else if (getsGrilled){
+			Statistics.getInstance().incLaserKills();
+		} else {
+			Statistics.getInstance().incGroundPoundKills();
+		}
+	}
+
 	public void drawImage() {
 		// float drawWidth = (left) ? -pigSize : pigSize;
 		// // float drawHeight= (dizzy) ? -pigSize : pigSize;
