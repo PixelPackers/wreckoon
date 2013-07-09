@@ -743,7 +743,7 @@ public class Player {
 	}
 	
 	public boolean isAttacking() {
-		return doTailwhip || laserStarted || laserActive || groundPounding;
+		return doTailwhip || laserActive || groundPounding;
 	}
 	
 	public boolean isBiting() {

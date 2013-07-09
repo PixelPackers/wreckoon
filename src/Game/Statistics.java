@@ -52,42 +52,35 @@ public class Statistics {
 
 	public void printStats(){
 		
-		System.out.println("You survived "				+ getTime()			 										+ " Seconds.");
-		System.out.println("You killed " 				+ Statistics.getInstance().getKilledPigsCounter() 		+ " Pigs.");
-		System.out.println("You activated your Laser "	+ Statistics.getInstance().getLaserActivationCounter() 	+ " times.");
-		System.out.println("You repaired " 				+ Statistics.getInstance().getGeneratorsRepaired() 		+ " broken generators.");
-		System.out.println("You used generators" 		+ Statistics.getInstance().getGeneratorsUsed() 			+ " times.");
-		System.out.println("You attacked " 				+ Statistics.getInstance().getGroundpoundCounter() 		+ " times with Groundpound.");
-		System.out.println("You used " 					+ Statistics.getInstance().getLaserEnergyCounter() 		+ " laserenergy.");
-		System.out.println("You attacked " 				+ Statistics.getInstance().getTailwhipCounter() 		+ " times with tailwhip.");
-		System.out.println("You collected " 			+ Statistics.getInstance().getWholeCollectedBolts() 	+ " Bolts/Nuts.");
-		System.out.println("You used " 					+ Statistics.getInstance().getWholeSpentBolts() 		+ " Bolts/Nuts.");
-		System.out.println("tailwhip kill " 			+ Statistics.getInstance().getTailwhipKills() 			+ " .");
-		System.out.println("groundpound kill " 			+ Statistics.getInstance().getGroundPoundKills() 		+ " .");
-		System.out.println("laser kill " 				+ Statistics.getInstance().getLaserKills()		 		+ " .");
-		System.out.println("ambush kill " 				+ Statistics.getInstance().getAmbushKills()		 		+ " .");
-		System.out.println("original tailwhip kill" 	+ Statistics.getInstance().getOriginalTailwhipKill() 	+ " .");
-		System.out.println("bounc of tailwhip kill "	+ Statistics.getInstance().getBounceofTailwhipKill()	+ " .");
+		System.out.println(toString());
 	}
 	
 	public void drawStats(Graphics g) {
 
-		g.drawString("You survived "				+ getTime()			 										+ " Seconds.", 50, 20);
-		g.drawString("You killed " 				+ Statistics.getInstance().getKilledPigsCounter() 		+ " Pigs.", 50, 40);
-		g.drawString("You activated your Laser "	+ Statistics.getInstance().getLaserActivationCounter() 	+ " times.", 50, 60);
-		g.drawString("You repaired " 				+ Statistics.getInstance().getGeneratorsRepaired() 		+ " broken generators.", 50, 80);
-		g.drawString("You used generators" 		+ Statistics.getInstance().getGeneratorsUsed() 			+ " times.", 50, 320);
-		g.drawString("You attacked " 				+ Statistics.getInstance().getGroundpoundCounter() 		+ " times with Groundpound.", 50, 100);
-		g.drawString("You used " 					+ Statistics.getInstance().getLaserEnergyCounter() 		+ " laserenergy.", 50, 120);
-		g.drawString("You attacked " 				+ Statistics.getInstance().getTailwhipCounter() 		+ " times with tailwhip.", 50, 140);
-		g.drawString("You collected " 			+ Statistics.getInstance().getWholeCollectedBolts() 	+ " Bolts/Nuts.", 50, 160);
-		g.drawString("You used " 					+ Statistics.getInstance().getWholeSpentBolts() 		+ " Bolts/Nuts.", 50, 180);
-		g.drawString("tailwhip kill " 			+ Statistics.getInstance().getTailwhipKills() 			+ " .", 50, 200);
-		g.drawString("groundpound kill " 			+ Statistics.getInstance().getGroundPoundKills() 		+ " .", 50, 220);
-		g.drawString("laser kill " 				+ Statistics.getInstance().getLaserKills()		 		+ " .", 50, 240);
-		g.drawString("ambush kill " 				+ Statistics.getInstance().getAmbushKills()		 		+ " .", 50, 260);
-		g.drawString("original tailwhip kill" 	+ Statistics.getInstance().getOriginalTailwhipKill() 	+ " .", 50, 280);
-		g.drawString("bounc of tailwhip kill "	+ Statistics.getInstance().getBounceofTailwhipKill()	+ " .", 50, 300);
+		g.drawString(toString(), 50, 30);
+	}
+	
+	public String toString() {
+		return 
+		"Time: "				+ getTime()			 									+ " Seconds.\n"+
+
+		"total Pigs killed " 				+ Statistics.getInstance().getKilledPigsCounter() 		+ "\n"+
+		"\t with tailwhip: " 		+ Statistics.getInstance().getTailwhipKills() 			+ "\n"+
+		"\t\t (original): " 		+ Statistics.getInstance().getOriginalTailwhipKill() 	+ "\n"+
+		"\t\t (bounce off): "		+ Statistics.getInstance().getBounceofTailwhipKill()	+ "\n"+
+		"\t with groundpound: " 	+ Statistics.getInstance().getGroundPoundKills() 		+ "\n"+
+		"\t with laser: " 			+ Statistics.getInstance().getLaserKills()		 		+ "\n"+
+		"\t ambush kills: " 			+ Statistics.getInstance().getAmbushKills()		 		+ "\n"+
+		"Laser activated: "			+ Statistics.getInstance().getLaserActivationCounter() 	+ "\n"+
+		"Generators repaired: " 			+ Statistics.getInstance().getGeneratorsRepaired() 		+ " broken generators.\n"+
+		"You used generators" 		+ Statistics.getInstance().getGeneratorsUsed() 			+ " times.\n"+
+		"Groundpounds: " 			+ Statistics.getInstance().getGroundpoundCounter() 		+ " times with Groundpound.\n"+
+		"You used " 				+ Statistics.getInstance().getLaserEnergyCounter() 		+ " laserenergy.\n"+
+		"You attacked " 			+ Statistics.getInstance().getTailwhipCounter() 		+ " times with tailwhip.\n"+
+		"You collected " 			+ Statistics.getInstance().getWholeCollectedBolts() 	+ " Bolts/Nuts.\n"+
+		"You used " 				+ Statistics.getInstance().getWholeSpentBolts() 		+ " Bolts/Nuts.\n"+
+		"";
+		
 	}
 	
 	public 	float getTime() {

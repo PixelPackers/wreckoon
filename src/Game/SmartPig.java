@@ -129,7 +129,9 @@ public class SmartPig extends Enemy {
 				
 				float x = (playerIsLeft()) ? -speed : speed;
 				
-				if ((player.isAttacking() && insideTurnAwayRadius()) || (player.isLaserActive() || player.isLaserStarted())) {
+				if ((player.isAttacking() && insideTurnAwayRadius()) || (player.isLaserActive() 
+//						 && player.isLookingLeft() != (x<0) // nur wenn spieler zum schwein schaut
+						)) {
 					x = -x;
 				}
 				
