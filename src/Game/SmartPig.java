@@ -169,4 +169,9 @@ public class SmartPig extends Enemy {
 		
 		++switchTimeCounter;
 	}
+	@Override
+	public void laserHit() {
+		super.laserHit();
+		aggro = true;
+	}
 }
