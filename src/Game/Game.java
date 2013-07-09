@@ -33,7 +33,7 @@ import com.google.gson.Gson;
 public class Game extends BasicGame {
 	
 	private static enum Mode {
-		PLAY, PAUSE
+		PLAY, PAUSE, TEXTBOX
 	}
 	
 	private static int						screenWidth			= 1600;
@@ -47,10 +47,11 @@ public class Game extends BasicGame {
 	
 	private static boolean					DOOMSDAY			= false;
 	private static boolean					useZoomAreas		= false;
-	private static float					targetZoom			= 128f;
+	private static float					DEFAULT_ZOOM		= 128f;
+	private static float					targetZoom			= DEFAULT_ZOOM;
 	private static float					zoom				= targetZoom;
 	
-	private static int						spreadBolts 			= 0;
+	private static int						spreadBolts			= 0;
 	
 	private static final float				MANUAL_ZOOM_STEP	= 4f;
 	private static double					laserAngle;
@@ -67,7 +68,7 @@ public class Game extends BasicGame {
 	private static ArrayList<Generator>		generators			= new ArrayList<Generator>();
 	private static ArrayList<Spike>			spikes				= new ArrayList<Spike>();
 	private static ArrayList<Conveyor>		conveyors			= new ArrayList<Conveyor>();
-	private static ArrayList<Tire>		tires					= new ArrayList<Tire>();
+	private static ArrayList<Tire>			tires				= new ArrayList<Tire>();
 	// private static ArrayList<Bolt> bolts = new ArrayList<Bolt>();
 	// private static ArrayList<Nut> nuts = new ArrayList<Nut>();
 	// private static ArrayList<Shred> shreds = new ArrayList<Shred>();
@@ -105,6 +106,8 @@ public class Game extends BasicGame {
 	private static Laser					laser;
 	
 	private int								tilesDrawn;
+	
+	private String							textboxText;
 	
 	private static final double				THUMBSTICK_DEADZONE	= 0.2d;
 	private static final double				TRIGGER_DEADZONE	= 0.2d;
@@ -162,12 +165,12 @@ public class Game extends BasicGame {
 		game.start();
 	}
 	
-	private Mode	curMode			= Mode.PLAY;
+	private Mode		curMode			= Mode.PLAY;
 	
-	private Color	multiplierColor	= new Color(245, 179, 141);
-	private Color	earthColor		= new Color(164, 74, 13);
+	private Color		multiplierColor	= new Color(245, 179, 141);
+	private Color		earthColor		= new Color(164, 74, 13);
 	
-	public double	skyColorGlow	= 0;
+	public double		skyColorGlow	= 0;
 	private SpriteSheet	energy;
 	
 	public Game() {
@@ -194,8 +197,6 @@ public class Game extends BasicGame {
 		int max = 30;
 		skyColorGlow += 0.01;
 		double x = Math.sin(skyColorGlow) * max;
-		
-		
 		
 		Color skyGradientColor1 = new Color((int) (100 + x), 0, 0);
 		Color skyGradientColor2 = new Color(0, 0, 0);
@@ -231,16 +232,11 @@ public class Game extends BasicGame {
 		nut.draw(screenWidth - 130, 36);
 		drawRightAlignedDigits(boltGUIAngle, screenWidth - 150, 40);
 		
-		float energybar = ((float) player.getLaserTime() / (float)player.getMaxLaserTime()) * 325f;
-		energy.getSprite(0, 0).draw(
-				screenWidth - 360, 125,
-				screenWidth - 360 + (325 - energybar), 125 + 42,
-				0, 0, 325 - energybar, 42);
+		float energybar = ((float) player.getLaserTime() / (float) player.getMaxLaserTime()) * 325f;
+		energy.getSprite(0, 0).draw(screenWidth - 360, 125, screenWidth - 360 + (325 - energybar), 125 + 42, 0, 0, 325 - energybar, 42);
 		
-		energy.getSprite(0, 1).draw(
-				screenWidth - 360 + 325 - energybar, 125,
-				screenWidth - 360 + 325, 125 + 42,
-				325 - energybar, 0, 325, 42);
+		energy.getSprite(0, 1).draw(screenWidth - 360 + 325 - energybar, 125, screenWidth - 360 + 325, 125 + 42, 325 - energybar, 0, 325,
+				42);
 	}
 	
 	private void drawCheckpoints(Graphics g) {
@@ -366,8 +362,6 @@ public class Game extends BasicGame {
 				tires.add(new Tire(world, e.getX(), e.getY(), 0.7321f));
 			}
 		
-		tires.add(new Tire(world, 5, 15, 0.7321f));
-		
 		player = new Player(this, 5f, 3f);
 		laser = new Laser(world, 0f, 0f);
 		player.setLaser(laser);
@@ -393,36 +387,56 @@ public class Game extends BasicGame {
 	}
 	
 	private void setupXBox() {
-		//xbox = new XboxController();
-		xbox = new XboxController(is64bit()? "xboxcontroller64" : "xboxcontroller", 1, 50, 50);
+		// xbox = new XboxController();
+		xbox = new XboxController(is64bit() ? "xboxcontroller64" : "xboxcontroller", 1, 50, 50);
 		xbox.setLeftThumbDeadZone(THUMBSTICK_DEADZONE);
 		xbox.setRightThumbDeadZone(THUMBSTICK_DEADZONE);
 		xbox.setLeftTriggerDeadZone(TRIGGER_DEADZONE);
 		xbox.setRightTriggerDeadZone(TRIGGER_DEADZONE);
 		xbox.addXboxControllerListener(new XboxControllerAdapter() {
 			public void buttonA(boolean pressed) {
-				if (pressed)
-					actionJump();
-				else
-					actionCancelJump();
+				if (curMode == Mode.PLAY) {
+					if (pressed)
+						actionJump();
+					else
+						actionCancelJump();
+				}
+				if (curMode == Mode.TEXTBOX) {
+					actionTextBoxOK();
+				}
+			}
+			
+			public void rightShoulder(boolean pressed) {
+				if (curMode == Mode.PLAY) {
+					if (pressed)
+						actionJump();
+					else
+						actionCancelJump();
+				}
 			}
 			
 			public void buttonB(boolean pressed) {
-				if (pressed)
-					actionGroundpound();
+				if (curMode == Mode.PLAY) {
+					if (pressed)
+						actionGroundpound();
+				}
 			}
 			
 			public void buttonX(boolean pressed) {
-				if (pressed) {
-					actionTailwhip();
+				if (curMode == Mode.PLAY) {
+					if (pressed) {
+						actionTailwhip();
+					}
 				}
 			}
 			
 			public void buttonY(boolean pressed) {
-				if (pressed)
-					actionLaserStart();
-				else
-					actionLaserEnd();
+				if (curMode == Mode.PLAY) {
+					if (pressed)
+						actionLaserStart();
+					else
+						actionLaserEnd();
+				}
 			}
 			
 			public void start(boolean pressed) {
@@ -465,6 +479,10 @@ public class Game extends BasicGame {
 				xboxRightThumbDirection = direction;
 			}
 		});
+	}
+	
+	protected void actionTextBoxOK() {
+		curMode = Mode.PLAY;
 	}
 	
 	private void initNormalSky() {
@@ -511,6 +529,15 @@ public class Game extends BasicGame {
 	
 	public void processInput(Input input) throws SlickException {
 		
+		if (input.isKeyDown(Input.KEY_B)) {
+			textboxText = "Das ist eine Textbox";
+			curMode = Mode.TEXTBOX;
+		}
+		
+		if (input.isKeyDown(Input.KEY_U)) {
+			house.startBloodBath();
+		}
+		
 		if (input.isKeyPressed(Input.KEY_SPACE) || input.isKeyPressed(Input.KEY_W) || input.isKeyPressed(Input.KEY_UP)) {
 			actionJump();
 		}
@@ -555,7 +582,7 @@ public class Game extends BasicGame {
 		
 		if (level.getCheckpoints() != null)
 			for (Checkpoint cp : level.getCheckpoints()) {
-				if (cp.isInArea(player.getBody().getPosition().x, player.getBody().getPosition().y)) {
+				if (!player.isDead() && cp.isInArea(player.getBody().getPosition().x, player.getBody().getPosition().y)) {
 					player.setCheckpoint(cp);
 				}
 			}
@@ -563,7 +590,9 @@ public class Game extends BasicGame {
 		// TODO Kamera Smoothness muss auch angepasst werden, je nach Zoom
 		if (useZoomAreas) {
 			float biggestZoom = 0f;
-			if (level.getZoomAreas() != null)
+			if (player.isBiting() || player.isRepairing() || player.isDead()) {
+				targetZoom = 320f;
+			} else if (level.getZoomAreas() != null) {
 				for (ZoomArea za : level.getZoomAreas()) {
 					Vec2 pos = player.getBody().getPosition();
 					if (za.isInArea(pos.x, pos.y)) {
@@ -572,8 +601,11 @@ public class Game extends BasicGame {
 						}
 					}
 				}
-			if (biggestZoom > 0.001f) {
-				targetZoom = biggestZoom;
+				if (biggestZoom > 0.001f) {
+					targetZoom = biggestZoom;
+				} else {
+					targetZoom = DEFAULT_ZOOM;
+				}
 			}
 			zoom = Functions.curveValue(targetZoom, zoom, 30);
 		} else {
@@ -628,7 +660,7 @@ public class Game extends BasicGame {
 			float size = (float) Math.random() * (max_size - min_size) + min_size;
 			
 			for (int i = 0; i < 4; ++i) {
-					spreadBolts(true);
+				spreadBolts(true);
 			}
 			
 			// enemies.add(new SmartPig(this, player.getBody().getPosition().x +
@@ -656,7 +688,6 @@ public class Game extends BasicGame {
 		if (input.isKeyDown(Input.KEY_N)) {
 			shootkeyDown = true;
 		}
-
 		
 		if (input.isKeyPressed(Input.KEY_J)) {
 			actionLaserStart();
@@ -682,7 +713,7 @@ public class Game extends BasicGame {
 		player.setWaitingForLaserToBeKilled(false);
 		
 		if (player.getGenerator() != null) {
-				player.bite();
+			player.bite();
 		} else {
 			player.initializeLaser();
 		}
@@ -697,16 +728,16 @@ public class Game extends BasicGame {
 	}
 	
 	private void initDoomsday() {
-
+		
 		DOOMSDAY = !DOOMSDAY;
 		doomsdayCounter = 0;
 		
 	}
 	
-	private void endDoomsday(){
+	private void endDoomsday() {
 		DOOMSDAY = false;
 	}
-
+	
 	private void actionTailwhip() {
 		player.tailwhipInit();
 	}
@@ -798,8 +829,8 @@ public class Game extends BasicGame {
 		
 		player.draw(g, debugView);
 		
-		for (int x = getBlockX(0); x <= getBlockX(screenWidth); ++x) {
-			for (int y = getBlockY(0); y <= getBlockY(screenHeight); ++y) {
+		for (int x = getBlockX(-zoom); x <= getBlockX(screenWidth); ++x) {
+			for (int y = getBlockY(-zoom); y <= getBlockY(screenHeight); ++y) {
 				if (tiles[x][y] != null) {
 					tiles[x][y].draw(g, debugView);
 					++tilesDrawn;
@@ -839,6 +870,10 @@ public class Game extends BasicGame {
 		
 		drawInterface();
 		
+		if (curMode == Mode.TEXTBOX) {
+			g.drawString(textboxText, 500, 500);
+		}
+		
 		if (curMode == Mode.PAUSE) {
 			g.setColor(new Color(0f, 0f, 0f, 0.3f));
 			g.fillRect(0, 0, screenWidth, screenHeight);
@@ -870,7 +905,7 @@ public class Game extends BasicGame {
 		// + "\n" + "laser angle: " + laserAngle
 		// + "\nlaser target angle: " + laserTargetAngle + "\ntiles drawn: " +
 		// tilesDrawn, 10, 50);
-		g.drawString("time:" + doomsdayCounter/ 60f, 50, 50);
+		g.drawString("time:" + doomsdayCounter / 60f, 50, 50);
 		g.drawString("pigs alive: " + enemies.size(), 50, 100);
 	}
 	
@@ -898,8 +933,9 @@ public class Game extends BasicGame {
 			actionPause();
 		}
 		
-		if (curMode == Mode.PLAY) {
-			processInput(input);
+		if (curMode == Mode.PLAY || curMode == Mode.TEXTBOX) {
+			if (curMode == Mode.PLAY)
+				processInput(input);
 			
 			house.updateAnimations();
 			
@@ -931,16 +967,20 @@ public class Game extends BasicGame {
 			if (DOOMSDAY) {
 				cam.wiggle((player.isLaserActive()) ? 1f : 0.5f);
 				
-				if (doomsdayCounter%450 == 0 && enemies.size() < MAX_SPAWN_ENEMIES) {
-					enemies.add(new SmartPig(this, player.getBody().getPosition().x - 5f, player.getBody().getPosition().y - 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
-					enemies.add(new SmartPig(this, player.getBody().getPosition().x + 5f, player.getBody().getPosition().y - 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
-					enemies.add(new DumbPig(this, player.getBody().getPosition().x - 5f, player.getBody().getPosition().y - 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
-					enemies.add(new DumbPig(this, player.getBody().getPosition().x + 5f, player.getBody().getPosition().y - 5f, 0.5f, 0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+				if (doomsdayCounter % 450 == 0 && enemies.size() < MAX_SPAWN_ENEMIES) {
+					enemies.add(new SmartPig(this, player.getBody().getPosition().x - 5f, player.getBody().getPosition().y - 5f, 0.5f,
+							0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+					enemies.add(new SmartPig(this, player.getBody().getPosition().x + 5f, player.getBody().getPosition().y - 5f, 0.5f,
+							0.5f, 3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+					enemies.add(new DumbPig(this, player.getBody().getPosition().x - 5f, player.getBody().getPosition().y - 5f, 0.5f, 0.5f,
+							3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
+					enemies.add(new DumbPig(this, player.getBody().getPosition().x + 5f, player.getBody().getPosition().y - 5f, 0.5f, 0.5f,
+							3.3f, 0.3f, 0.3f, null, BodyType.DYNAMIC));
 				}
 				
 				++doomsdayCounter;
 				
-				if(player.isDead()){
+				if (player.isDead()) {
 					// TODO draw statistics
 				}
 			} else {
@@ -1019,8 +1059,8 @@ public class Game extends BasicGame {
 			
 			if (spreadBolts != 0 && player.isRepairing()) {
 				
-				for(int i=0; i<1; ++i) {
-					if(spreadBolts > 0 && spreadBolts % 10==0) {
+				for (int i = 0; i < 1; ++i) {
+					if (spreadBolts > 0 && spreadBolts % 10 == 0) {
 						spreadBolts(false);
 					} else {
 						break;
@@ -1075,7 +1115,7 @@ public class Game extends BasicGame {
 	
 	private int getBlockY(float screenY) {
 		float blockY = (screenY - screenHeight / 2) / zoom + 0.5f + cam.getY();
-		return (int) Math.max(0, Math.min(blockY - 1, level.getHeight() - 1));
+		return (int) Math.max(0, Math.min(blockY, level.getHeight() - 1));
 	}
 	
 	public boolean isTiltedDown(double direction, double magnitude) {
@@ -1093,33 +1133,39 @@ public class Game extends BasicGame {
 	public boolean isTiltedUp(double direction, double magnitude) {
 		return Math.abs(magnitude) > THUMBSTICK_DEADZONE && direction >= 315d && direction <= 45d;
 	}
-	public void spreadBolts(boolean collectable) throws SlickException{
-		if(collectable){
-			dropItems.add(new Bolt(this, world, player.getBody().getPosition().add(new Vec2(0, -1)), "images/bolt" + ((int) (Math.random() * 3) + 1) + ".png"));
-			dropItems.add(new Nut(this, world, player.getBody().getPosition().add(new Vec2(0, -1)), "images/nut" + ((int) (Math.random() * 3) + 1) + ".png"));
+	
+	public void spreadBolts(boolean collectable) throws SlickException {
+		if (collectable) {
+			dropItems.add(new Bolt(this, world, player.getBody().getPosition().add(new Vec2(0, -1)), "images/bolt"
+					+ ((int) (Math.random() * 3) + 1) + ".png"));
+			dropItems.add(new Nut(this, world, player.getBody().getPosition().add(new Vec2(0, -1)), "images/nut"
+					+ ((int) (Math.random() * 3) + 1) + ".png"));
 		} else {
-
+			
 			DropItem newDropItem;
 			
-			if(Math.random() < 0.5d){
-				newDropItem = new GeneratorBolt(this, world, player.getBody().getPosition().add(new Vec2(0, -0f)), "images/bolt" + ((int) (Math.random() * 3) + 1) + ".png");
+			if (Math.random() < 0.5d) {
+				newDropItem = new GeneratorBolt(this, world, player.getBody().getPosition().add(new Vec2(0, -0f)), "images/bolt"
+						+ ((int) (Math.random() * 3) + 1) + ".png");
 			} else {
-				newDropItem = new GeneratorNut(this, world, player.getBody().getPosition().add(new Vec2(0, -0f)), "images/nut" + ((int) (Math.random() * 3) + 1) + ".png");
+				newDropItem = new GeneratorNut(this, world, player.getBody().getPosition().add(new Vec2(0, -0f)), "images/nut"
+						+ ((int) (Math.random() * 3) + 1) + ".png");
 			}
 			
 			float factor = 7f;
-			newDropItem.getBody().setLinearVelocity( new Vec2 ((float)(Math.random()-0.5f)*factor,-factor));
+			newDropItem.getBody().setLinearVelocity(new Vec2((float) (Math.random() - 0.5f) * factor, -factor));
 			dropItems.add(newDropItem);
 		}
 	}
-	public void addSpreadBolts(int spreadBolts){
+	
+	public void addSpreadBolts(int spreadBolts) {
 		this.spreadBolts += spreadBolts;
 	}
 	
 	static boolean is64bit() {
-	  return System.getProperty("sun.arch.data.model").equals("64");
+		return System.getProperty("sun.arch.data.model").equals("64");
 	}
-
+	
 	public ArrayList<Tire> getTires() {
 		return tires;
 	}

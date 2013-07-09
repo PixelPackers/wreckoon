@@ -7,18 +7,20 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 
 public class Conveyor extends GameObjectBox {
-
-	private float		speed		= 0.3f;
+	
+	private float		speed	= 0.3f;
+	private boolean		left;
 	private float		x, y;
 	
 	private Animation	animation;
 	
-	public Conveyor(World world, float posX, float posY, float width, float height, float density, float friction, float restitution, boolean left)
-			throws SlickException {
+	public Conveyor(World world, float posX, float posY, float width, float height, float density, float friction, float restitution,
+			boolean left) throws SlickException {
 		
 		super(world, posX, posY, width, height, 0, 0.3f, 0, null, BodyType.STATIC);
 		
-		if (left) speed = -speed;
+		if (left)
+			speed = -speed;
 		
 		x = posX;
 		y = posY;
@@ -58,7 +60,7 @@ public class Conveyor extends GameObjectBox {
 	public float getY() {
 		return y;
 	}
-
+	
 	public boolean isLeft() {
 		return speed < 0f;
 	}

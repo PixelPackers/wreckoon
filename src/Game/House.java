@@ -31,10 +31,13 @@ public class House {
 	private Image				housefront;
 	private Image				washer;
 	private Image				washy;
+	private Image				bloody;
 	
 	private float				washerX;
 	
 	private float				washerY;
+
+	private float	bloodyAlpha = -1f;
 	
 	public House(World world, float x, float y) throws SlickException {
 		
@@ -46,7 +49,9 @@ public class House {
 		this.housefront = Images.getInstance().getImage("images/housefront.png");
 		this.washer = Images.getInstance().getImage("images/washer.png");
 		this.washy = Images.getInstance().getImage("images/washy.png");
+		this.bloody = Images.getInstance().getImage("images/deathwashy.png");
 		washy.setCenterOfRotation(washy.getWidth() / 2, washy.getHeight() / 2);
+		bloody.setCenterOfRotation(bloody.getWidth() / 2, bloody.getHeight() / 2);
 		
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyType.STATIC;
@@ -433,9 +438,19 @@ public class House {
 		g.translate(0.74867725f + washerX, 0.4099f + washerY);
 		washy.setRotation(waterAngle);
 		washy.draw(0.15f, 0.12f, 0.11f, 0.11f);
+		bloody.setRotation(waterAngle);
+		if (bloodyAlpha >= 0f) {
+			bloodyAlpha += 0.01f;
+			bloody.setAlpha(bloodyAlpha );
+			bloody.draw(0.15f, 0.12f, 0.11f, 0.11f);
+		}
 		washer.draw(0, 0, 0.35f, 0.33346036f);
 		g.popTransform();
 		g.popTransform();
+	}
+	
+	public void startBloodBath() {
+		bloodyAlpha = 0f;
 	}
 	
 	public void drawOutline(Graphics g) {

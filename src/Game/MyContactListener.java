@@ -137,7 +137,10 @@ public class MyContactListener implements ContactListener {
 		
 		for (Tire tire : game.getTires()) {
 			if (contact.getFixtureA() == tire.getFixture() || contact.getFixtureB() == tire.getFixture()) {
-				tire.bounce(1.2f);
+				float bouncyness = (float) Math.max(1.3f, 1f + (contact.getFixtureA().m_body.getLinearVelocity().length() + contact
+						.getFixtureB().m_body.getLinearVelocity().length()) / 23f);
+				if (bouncyness > 1.15f)
+					tire.bounce(bouncyness);
 			}
 		}
 		

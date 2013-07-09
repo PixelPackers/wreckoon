@@ -849,8 +849,8 @@ public class Player {
 	}
 	
 	private void revive() {
-		body.setTransform(lastCheckpoint.getMidPoint(), 0f);
-		wheel.getBody().setTransform(lastCheckpoint.getMidPoint(), 0f);
+		body.setTransform(lastCheckpoint.getStartingPoint(), 0f);
+		wheel.getBody().setTransform(lastCheckpoint.getStartingPoint(), 0f);
 		body.setLinearVelocity(new Vec2(0f, 0f));
 		// TODO eine resetVariables() wäre praktisch...
 		dead = false;

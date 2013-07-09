@@ -28,8 +28,8 @@ public class Checkpoint {
 		return y2 - y1;
 	}
 	
-	public Vec2 getMidPoint() {
-		return new Vec2((x1 + x2) / 2, (y1 + y2) / 2);
+	public Vec2 getStartingPoint() {
+		return new Vec2((x1 + x2) * 0.5f, y2 - 1f);
 	}
 	
 	public float getWidth() {

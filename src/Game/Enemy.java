@@ -149,7 +149,9 @@ public abstract class Enemy extends GameObjectBox {
 	}
 	
 	public void die() {
-		Sounds.getInstance().play("pigdeath", Functions.randomRange(0.8f, 1.2f), 1f);
+		float distance = getBody().getPosition().sub(game.getPlayer().getBody().getPosition()).length();
+		if (distance < 15f)
+			Sounds.getInstance().play("pigdeath", Functions.randomRange(0.8f, 1.2f), 1f - distance / 15f);
 		
 		// sprite
 		Game.getObjectsToRemove().add(this);
