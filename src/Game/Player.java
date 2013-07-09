@@ -696,7 +696,7 @@ public class Player {
 		animations.put("groundpoundImpact", animationGroundpoundImpact);
 		animations.put("death", animationDeath);
 		animations.put("deathAir", new Animation(sheetDeathAir, 150));
-		animations.put("repair", new Animation(sheetRepair, 150));
+		animations.put("repair", new Animation(sheetRepair, 90));
 		
 		// animations.put("walkJump", animationWalkJump);
 		// animations.put("walkJumpAir", new Animation(sheetWalkJumpAir, 100));
