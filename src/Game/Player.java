@@ -258,7 +258,7 @@ public class Player {
 
 			if ( generator != null) {
 
-				getBody().setLinearVelocity(new Vec2(0,0));
+//				getBody().setLinearVelocity(new Vec2(0,0));
 				
 				if(!generator.isRepaired()){
 					if(boltCounter >= REPAIR_BOLT_PRICE){
@@ -275,7 +275,7 @@ public class Player {
 					this.biting = true;
 					this.biteCounter = 0;
 					
-					this.body.setLinearVelocity(new Vec2(0f, 0f));
+//					this.body.setLinearVelocity(new Vec2(0f, 0f));
 					
 					this.currentAnimation = animations.get("bite");
 					this.currentAnimation.restart();
@@ -598,7 +598,6 @@ public class Player {
 	private void groundpound() {
 		if (this.groundPoundCounter > GROUNDPOUND_AIRTIME) {
 			this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, groundPoundPower));
-			// unlock();
 		} else {
 			this.getBody().setLinearVelocity(new Vec2(0f, 0f));
 		}
@@ -612,8 +611,6 @@ public class Player {
 		if (groundPoundCounter > GROUNDPOUND_DELAY && !groundPounding) {
 			
 			lock();
-			// FIXME wegen movement evtl doch nicht locken? spezial lock für
-			// movement?
 			
 			this.currentAnimation = animations.get("groundpound");
 			this.currentAnimation.restart();
@@ -736,7 +733,7 @@ public class Player {
 	// laser
 	public void initializeLaser() {
 		
-		if (!locked) {
+		if (!locked && laserTime > 0) {
 			lock();
 			
 			this.laserStarted = true;

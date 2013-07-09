@@ -681,11 +681,11 @@ public class Game extends BasicGame {
 	private void actionLaserStart() {
 		player.setWaitingForLaserToBeKilled(false);
 		
-		if (player.getGenerator() != null &&  !player.maxPower()) {
+//		if (player.getGenerator() != null &&  !player.maxPower()) {
 			player.bite();
-		} else {
+//		} else {
 			player.initializeLaser();
-		}
+//		}
 	}
 	
 	private void actionDebugView() {
