@@ -871,9 +871,7 @@ public class Game extends BasicGame {
 		// + "\n" + "laser angle: " + laserAngle
 		// + "\nlaser target angle: " + laserTargetAngle + "\ntiles drawn: " +
 		// tilesDrawn, 10, 50);
-		g.drawString("time:" + doomsdayCounter/ 60f, 50, 50);
-		g.drawString("pigs alive: " + enemies.size(), 50, 100);
-		g.drawString("pigs killed: " + Statistics.getInstance().getKilledPigsCounter(), 50, 150);
+		Statistics.getInstance().drawStats(g);
 	}
 	
 	// public static ArrayList<Shred> getShreds() {
@@ -895,6 +893,7 @@ public class Game extends BasicGame {
 	
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
+		Statistics.getInstance().update();
 		Input input = gc.getInput();
 		if (input.isKeyPressed(Input.KEY_ESCAPE)) {
 			actionPause();
