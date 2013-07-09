@@ -69,7 +69,7 @@ public abstract class DropItem extends GameObjectPolygon {
 		// TODO player position vektor zum objekt bestimmen und in die richtung
 		// dann thrown
 		// TODO random
-		float force = 7.5f;
+		float force = (float) (3f * Math.random() + 3.5f);
 		float x = (game.getPlayer().isLookingLeft()) ? -force : force;
 		
 		this.getBody().setLinearVelocity(new Vec2(x, -force * 0.75f));

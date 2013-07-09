@@ -33,6 +33,7 @@ public class Player {
 	private static final int			GROUNDPOUND_DELAY			= 50;
 	private static final int			REPAIR_BOLT_PRICE			= 100;
 	private static final int			REPAIR_TIME					= 100;
+	private static final int			GODMODE_DURATION			= 100;
 	
 	private final float					MAX_VELOCITY				= 5f;
 	private final float					ACC_RUNNING					= 0.4375f;
@@ -48,9 +49,9 @@ public class Player {
 	private int							floatingCounter				= 0;
 	private int							boltCounter					= 0;
 	private int							repairTimeCounter			= 0;
-	
+	private int							godmodeCounter				= 0; // nach spawn kurz unverwundbar
+
 	private int							tmpBoltAmount				= 110;
-	private int							pigCounter					= 0;
 	private int							deathTimeCounter			= 0;
 	private int							laserTime					= 50;
 	
@@ -189,7 +190,7 @@ public class Player {
 	}
 	
 	public void accelerate(float magnitude) {
-		if (!locked) {
+		if (!locked || (locked && groundPounding) ) {
 			float velocityX = this.body.getLinearVelocity().x;
 			float velocityY = this.body.getLinearVelocity().y;
 			
@@ -213,16 +214,22 @@ public class Player {
 	}
 	
 	private void accountTmpBoltAmount() {
-		
+		int amount = (tmpBoltAmount < 0) ? -tmpBoltAmount : tmpBoltAmount;
 		int max = 7;
 		// int max = (int) (tmpBoltAmount/20)+1; // "curve value" je kleiner
 		// desto weniger wird verrechnet
 		
-		int currAmount = (tmpBoltAmount >= max) ? max : tmpBoltAmount;
+		int incDec = (tmpBoltAmount < 0) ? 1 : -1;
+		
+		int currAmount = (amount >= max) ? max : amount;
 		
 		for (int i = 0; i < currAmount; ++i) {
-			increaseBoltCounter();
-			tmpBoltAmount -= 1;
+//			increaseBoltCounter();
+			boltCounter -= incDec;
+			tmpBoltAmount += incDec;
+			if(incDec > 0){
+				Statistics.getInstance().incWholeSpentBolts();
+			}
 		}
 		
 	}
@@ -231,6 +238,7 @@ public class Player {
 		
 		if (laserActive) {
 			--laserTime;
+			Statistics.getInstance().incLaserEnergyCounter();
 		}
 		
 		if (biteShockLoading) {
@@ -249,13 +257,13 @@ public class Player {
 	
 	public void bite() {
 		
-		if (!this.biting && !locked && this.isOnGround()) {
+		if (!this.biting && !locked && this.isOnGround() && !maxPower()) {
 
 			if ( generator != null) {
 
-				getBody().setLinearVelocity(new Vec2(0,0));
+//				getBody().setLinearVelocity(new Vec2(0,0));
 				
-				if(!generator.isRepaired() ){
+				if(!generator.isRepaired()){
 					if(boltCounter >= REPAIR_BOLT_PRICE){
 
 						lock();
@@ -270,8 +278,8 @@ public class Player {
 					this.biting = true;
 					this.biteCounter = 0;
 					
-					this.body.setLinearVelocity(new Vec2(0f, 0f));
-					
+//					this.body.setLinearVelocity(new Vec2(0f, 0f));
+					Statistics.getInstance().incGeneratorsUsed();
 					this.currentAnimation = animations.get("bite");
 					this.currentAnimation.restart();
 					
@@ -283,7 +291,8 @@ public class Player {
 	private void payForRepair() {
 
 		generator.repair();
-		boltCounter -= REPAIR_BOLT_PRICE;
+//		boltCounter -= REPAIR_BOLT_PRICE;
+		tmpBoltAmount -= REPAIR_BOLT_PRICE;
 		repairing = false;
 		unlock();
 	}
@@ -291,6 +300,7 @@ public class Player {
 	private void repairGenerator() {
 		repairing = true;
 		repairTimeCounter = 0;
+		Statistics.getInstance().incGeneratorsRepaired();
 	}
 	
 	private void biteFinalize() {
@@ -305,6 +315,7 @@ public class Player {
 	}
 	
 	public void boltsCollected(int amount) {
+		Statistics.getInstance().incWholeCollectedBolts();
 		this.tmpBoltAmount += amount;
 		
 	}
@@ -317,6 +328,7 @@ public class Player {
 		
 		if (!waitingForLaserToBeKilled) {
 			this.laserActive = true;
+			Statistics.getInstance().incLaserActivationCounter();
 			
 			Sounds.getInstance().loop("laser", Functions.randomRange(0.8f, 1.2f), 1f);
 			
@@ -434,7 +446,7 @@ public class Player {
 	}
 	
 	public void die(boolean throwback) {
-		if (!dead) {
+		if (!dead && godmodeCounter > GODMODE_DURATION) {
 			if (!godmode) {
 				this.currentAnimation = animations.get("deathAir");
 				this.dead = true;
@@ -553,10 +565,6 @@ public class Player {
 		return laserTime;
 	}
 	
-	public int getPigCounter() {
-		return pigCounter;
-	}
-	
 	public MySensor getSensorBottomLeft() {
 		return sensorBottomLeft;
 	}
@@ -591,8 +599,8 @@ public class Player {
 	
 	private void groundpound() {
 		if (this.groundPoundCounter > GROUNDPOUND_AIRTIME) {
+			Statistics.getInstance().incGroundpoundCounter();
 			this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, groundPoundPower));
-			// unlock();
 		} else {
 			this.getBody().setLinearVelocity(new Vec2(0f, 0f));
 		}
@@ -606,8 +614,6 @@ public class Player {
 		if (groundPoundCounter > GROUNDPOUND_DELAY && !groundPounding) {
 			
 			lock();
-			// FIXME wegen movement evtl doch nicht locken? spezial lock für
-			// movement?
 			
 			this.currentAnimation = animations.get("groundpound");
 			this.currentAnimation.restart();
@@ -641,14 +647,10 @@ public class Player {
 		if (dead) ++deathTimeCounter;
 		++tailwhipDelayCounter;
 		++repairTimeCounter;
-	}
-	
-	public void increasePigCounter() {
-		++pigCounter;
+		++godmodeCounter;
 	}
 	
 	private void initAnimations() throws SlickException {
-		// XXX evtl auch da eine hashmap verwenden?
 		SpriteSheet sheetWalk = Images.getInstance().getSpriteSheet("images/walkcycle.png", 300, 290);
 		SpriteSheet sheetRun = Images.getInstance().getSpriteSheet("images/runcycle.png", 368, 192);
 		SpriteSheet sheetWallJump = Images.getInstance().getSpriteSheet("images/walljump.png", 310, 342);
@@ -692,7 +694,7 @@ public class Player {
 		animations.put("groundpoundImpact", animationGroundpoundImpact);
 		animations.put("death", animationDeath);
 		animations.put("deathAir", new Animation(sheetDeathAir, 150));
-		animations.put("repair", new Animation(sheetRepair, 150));
+		animations.put("repair", new Animation(sheetRepair, 90));
 		
 		// animations.put("walkJump", animationWalkJump);
 		// animations.put("walkJumpAir", new Animation(sheetWalkJumpAir, 100));
@@ -729,7 +731,7 @@ public class Player {
 	// laser
 	public void initializeLaser() {
 		
-		if (!locked) {
+		if (!locked && laserTime > 0) {
 			lock();
 			
 			this.laserStarted = true;
@@ -741,7 +743,7 @@ public class Player {
 	}
 	
 	public boolean isAttacking() {
-		return doTailwhip || laserStarted || laserActive || groundPounding;
+		return doTailwhip || laserActive || groundPounding;
 	}
 	
 	public boolean isBiting() {
@@ -840,6 +842,7 @@ public class Player {
 	
 	
 	public void lock() {
+		getBody().setLinearVelocity( new Vec2(0f, 0f) );
 		locked = true;
 	}
 	
@@ -861,6 +864,7 @@ public class Player {
 		biting = false;
 		repairing = false;
 		unlock();
+		godmodeCounter = 0;
 	}
 	
 	public boolean rightWallColliding() {
@@ -885,11 +889,9 @@ public class Player {
 	}
 	
 	public void setLeft(boolean left) {
-		if (locked && !laserActive) {
-			return;
+		if ( (!locked || laserActive) || (locked && groundPounding) ) {
+			this.left = left;
 		}
-		
-		this.left = left;
 	}
 	
 	public void setMovementButtonIsDown(boolean movementButtonIsDown) {
@@ -920,6 +922,7 @@ public class Player {
 		
 		this.doTailwhip = true;
 		this.fixtureTail = this.body.createFixture(this.fixtureDefTail);
+		Statistics.getInstance().incTailwhipCounter();
 	}
 	
 	private void tailwhipFinalize() {
@@ -1017,7 +1020,6 @@ public class Player {
 				this.body.setLinearVelocity(new Vec2(0f, -0.3f));
 			}
 			
-			// XXX evtl da checken, welche hitbox ausrichtung angebracht is
 			
 			// // abwaerts bewegung an wand
 			// if( this.isOnWall() ){
@@ -1118,7 +1120,6 @@ public class Player {
 				createLaser();
 			}
 			
-			// TODO überprüfen ob das jetzt mit lauf band funkt
 			if (this.conveyorSpeed != 0) {
 				this.getBody().setLinearVelocity(new Vec2(getBody().getLinearVelocity().x + conveyorSpeed, getBody().getLinearVelocity().y));
 			}
@@ -1168,7 +1169,7 @@ public class Player {
 	}
 	
 	public boolean maxPower(){
-		return laserTime == MAX_LASER_DURATION;
+		return laserTime >= MAX_LASER_DURATION;
 	}
 	
 	public boolean isRepairing() {

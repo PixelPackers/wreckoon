@@ -351,12 +351,18 @@ public class Game extends BasicGame {
 		
 		if (level.getConveyors() != null)
 			for (Conveyor ge : level.getConveyors()) {
-				conveyors.add(new Conveyor(world, ge.getX(), ge.getY(), 1.8f, 0.4f, 0.5f, 0.5f, 0.5f, ge.isLeft()));
+				Conveyor newConveyor = new Conveyor(world, ge.getX(), ge.getY(), 1.8f, 0.4f, 0.5f, 0.5f, 0.5f, ge.getLeft());
+				conveyors.add(newConveyor);
 			}
 		
 		if (level.getTires() != null)
 			for (Tire e : level.getTires()) {
 				tires.add(new Tire(world, e.getX(), e.getY(), 0.7321f));
+			}
+		
+		if (level.getParts() != null)
+			for (Part e : level.getParts()) {
+				parts.add(new Part(world, this, e.getX(), e.getY()));
 			}
 		
 		player = new Player(this, 5f, 3f);
@@ -540,15 +546,6 @@ public class Game extends BasicGame {
 			actionJump();
 		}
 		
-		int duration = 250;
-		
-		// / XXX MAGIC NUMBERS
-		// / max gegenlenken
-		float minCounterSteerSpeed = (!player.isJumpingFromWall()) ? -5 : 5;
-		// FIXME set this to 420 to see the bug... only works in one direction
-		float slowDownForce = 5f;
-		float slowDownThreshold = 0.5f;
-		
 		if (isTiltedLeft(xboxLeftThumbDirection, xboxLeftThumbMagnitude) || input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
 			actionLeft();
 		}
@@ -711,12 +708,8 @@ public class Game extends BasicGame {
 	
 	private void actionLaserStart() {
 		player.setWaitingForLaserToBeKilled(false);
-		
-		if (player.getGenerator() != null) {
-			player.bite();
-		} else {
-			player.initializeLaser();
-		}
+		player.bite();
+		player.initializeLaser();
 	}
 	
 	private void actionDebugView() {
@@ -724,18 +717,31 @@ public class Game extends BasicGame {
 	}
 	
 	private void actionDoomsday() {
-		initDoomsday();
+		if(!DOOMSDAY){
+			initDoomsday();
+		} else {
+			endDoomsday();
+		}
 	}
 	
 	private void initDoomsday() {
-		
-		DOOMSDAY = !DOOMSDAY;
+		Statistics.getInstance().resetStats();
+		DOOMSDAY = true;
 		doomsdayCounter = 0;
 		
+//		TODO start dub step
+		
 	}
-	
-	private void endDoomsday() {
+
+	private void endDoomsday(){
+		printDoomsdayStatistics();
 		DOOMSDAY = false;
+	}
+
+	private void printDoomsdayStatistics() {
+		
+		Statistics.getInstance().printStats();
+		
 	}
 	
 	private void actionTailwhip() {
@@ -918,8 +924,7 @@ public class Game extends BasicGame {
 		// + "\n" + "laser angle: " + laserAngle
 		// + "\nlaser target angle: " + laserTargetAngle + "\ntiles drawn: " +
 		// tilesDrawn, 10, 50);
-		g.drawString("time:" + doomsdayCounter / 60f, 50, 50);
-		g.drawString("pigs alive: " + enemies.size(), 50, 100);
+		Statistics.getInstance().drawStats(g);
 	}
 	
 	// public static ArrayList<Shred> getShreds() {
@@ -941,6 +946,7 @@ public class Game extends BasicGame {
 	
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
+		Statistics.getInstance().update();
 		Input input = gc.getInput();
 		if (input.isKeyPressed(Input.KEY_ESCAPE)) {
 			actionPause();
@@ -993,8 +999,8 @@ public class Game extends BasicGame {
 				
 				++doomsdayCounter;
 				
-				if (player.isDead()) {
-					// TODO draw statistics
+				if(player.isDead()){
+					endDoomsday();
 				}
 			} else {
 				cam.wiggle((player.isLaserActive()) ? 1f : 0f);
@@ -1082,6 +1088,10 @@ public class Game extends BasicGame {
 				--spreadBolts;
 			} else {
 				spreadBolts = 0;
+			}
+			
+			for (Generator g : generators){
+				g.update();
 			}
 			
 			world.step(delta / 1000f, 18, 6);

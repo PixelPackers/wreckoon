@@ -8,7 +8,7 @@ import org.newdawn.slick.SpriteSheet;
 
 public class Conveyor extends GameObjectBox {
 	
-	private float		speed	= 0.3f;
+	private static final float		SPEED	= 0.3f;
 	private boolean		left;
 	private float		x, y;
 	
@@ -18,9 +18,8 @@ public class Conveyor extends GameObjectBox {
 			boolean left) throws SlickException {
 		
 		super(world, posX, posY, width, height, 0, 0.3f, 0, null, BodyType.STATIC);
-		
-		if (left)
-			speed = -speed;
+	
+		this.left = left;  
 		
 		x = posX;
 		y = posY;
@@ -31,11 +30,12 @@ public class Conveyor extends GameObjectBox {
 	}
 	
 	public void drawImage() {
-		animation.draw(x - width * 0.5f, y - height * 0.5f, width, height);
+		float drawWidth = (left) ? -width : width;
+		animation.draw(x - drawWidth * 0.5f, y - height * 0.5f, drawWidth, height);
 	}
 	
 	public float getSpeed() {
-		return speed;
+		return (left) ? -SPEED : SPEED;
 	}
 	
 	private void initializeSprite() {
@@ -60,8 +60,8 @@ public class Conveyor extends GameObjectBox {
 	public float getY() {
 		return y;
 	}
-	
-	public boolean isLeft() {
-		return speed < 0f;
+
+	public boolean getLeft() {
+		return left;
 	}
 }

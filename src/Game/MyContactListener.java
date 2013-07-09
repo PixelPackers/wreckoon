@@ -190,24 +190,25 @@ public class MyContactListener implements ContactListener {
 			}
 			
 			// player + dropItems
-			Iterator iterator = game.getDropItems().iterator();
-			while (iterator.hasNext()) {
-				
-				DropItem dropItem = (DropItem) iterator.next();
-				
-				if (dropItem.getFixture() == contact.getFixtureA() || dropItem.getFixture() == contact.getFixtureB()) {
+			if(!game.getPlayer().isDead()){
+				Iterator iterator = game.getDropItems().iterator();
+				while (iterator.hasNext()) {
 					
-					if (dropItem.isCollectable()) {
-						dropItem.collect();
-						iterator.remove();
-						game.getObjectsToRemove().add(dropItem);
-					} else {
-						game.getPlayer().getDropItemsToCollect().add(dropItem);
+					DropItem dropItem = (DropItem) iterator.next();
+					
+					if (dropItem.getFixture() == contact.getFixtureA() || dropItem.getFixture() == contact.getFixtureB()) {
+						
+						if (dropItem.isCollectable()) {
+							dropItem.collect();
+							iterator.remove();
+							game.getObjectsToRemove().add(dropItem);
+						} else {
+							game.getPlayer().getDropItemsToCollect().add(dropItem);
+						}
+						
 					}
-					
 				}
 			}
-			
 		}
 		
 		// enemy

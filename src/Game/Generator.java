@@ -1,6 +1,5 @@
 package Game;
 
-import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.World;
 import org.newdawn.slick.Animation;
@@ -9,8 +8,9 @@ import org.newdawn.slick.SpriteSheet;
 
 public class Generator extends GameObjectBox {
 	
-	private Vec2		position	= new Vec2();
 	private float		x, y;
+	private int 		lifetimeCounter = 0;
+	private int 		MAX_LIFETIME = 5000;
 	
 	private Animation	animation;
 	private boolean repaired = false;
@@ -31,9 +31,7 @@ public class Generator extends GameObjectBox {
 			animation.draw(x - width * 0.5f, y - height * 0.5f, width, height);
 		} else {
 			img.draw(x - width * 0.5f, y - height * 0.5f, width, height);
-		}
-		
-		
+		}		
 	}
 	
 	public Animation getAnimation() {
@@ -65,9 +63,20 @@ public class Generator extends GameObjectBox {
 	
 	public void repair() {
 		repaired = true;	
+		lifetimeCounter = 0;
 	}
 	public boolean isRepaired() {
 		return repaired;
 	}
 	
+	public void update(){
+		
+		++lifetimeCounter;
+		
+		// FIXME checken ob spieler nicht gerade auflädt
+		if(lifetimeCounter > MAX_LIFETIME){
+			repaired = false;
+		}
+		
+	}
 }

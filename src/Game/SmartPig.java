@@ -33,6 +33,9 @@ public class SmartPig extends Enemy {
 	@Override
 	public void die() {
 		super.die();
+		if(!aggro){
+			Statistics.getInstance().incAmbushKills();
+		}
 		currentAnimation = animations.get("die");
 	}
 	
@@ -126,7 +129,9 @@ public class SmartPig extends Enemy {
 				
 				float x = (playerIsLeft()) ? -speed : speed;
 				
-				if ((player.isAttacking() && insideTurnAwayRadius()) || (player.isLaserActive() || player.isLaserStarted())) {
+				if ((player.isAttacking() && insideTurnAwayRadius()) || (player.isLaserActive() 
+//						 && player.isLookingLeft() != (x<0) // nur wenn spieler zum schwein schaut
+						)) {
 					x = -x;
 				}
 				
@@ -168,5 +173,10 @@ public class SmartPig extends Enemy {
 		}
 		
 		++switchTimeCounter;
+	}
+	@Override
+	public void laserHit() {
+		super.laserHit();
+		aggro = true;
 	}
 }
