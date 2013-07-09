@@ -1020,25 +1020,6 @@ public class Player {
 				this.body.setLinearVelocity(new Vec2(0f, -0.3f));
 			}
 			
-			
-			// // abwaerts bewegung an wand
-			// if( this.isOnWall() ){
-			// if(this.body.getLinearVelocity().y < 0){
-			// if( (this.leftWallColliding() && this.body.getLinearVelocity().x
-			// < 0f ) || (this.rightWallColliding() &&
-			// this.body.getLinearVelocity().x > 0f )){
-			// this.body.setLinearVelocity(new
-			// Vec2(this.body.getLinearVelocity().x, 1f));
-			// } else {
-			// this.body.setLinearVelocity(new
-			// Vec2(this.body.getLinearVelocity().x, -2f));
-			// }
-			// }
-			// // if( !this.isOnGround()){
-			// // this.setRunning(false);
-			// // }
-			// }
-			
 			if (this.groundPounding) {
 				this.groundpound();
 			}
