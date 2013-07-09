@@ -29,7 +29,7 @@ public class Checkpoint {
 	}
 	
 	public Vec2 getStartingPoint() {
-		return new Vec2((x1 + x2) * 0.5f, y2 - 1f);
+		return new Vec2((x1 + x2) * 0.5f, y2 - 0.5f);
 	}
 	
 	public float getWidth() {

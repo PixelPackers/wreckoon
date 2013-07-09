@@ -1,5 +1,7 @@
 package Game;
 
+import org.jbox2d.common.Vec2;
+
 public class Camera {
 	
 	private final float	WIGGLE_INTENSITY	= 0.2f;
@@ -43,6 +45,11 @@ public class Camera {
 	public void wiggle(float magnitude) {
 		wiggleX = (float) Math.random() * WIGGLE_INTENSITY * magnitude;
 		wiggleY = (float) Math.random() * WIGGLE_INTENSITY * magnitude;
+	}
+
+	public void setPosition(Vec2 startingPoint) {
+		this.x = startingPoint.x;
+		this.y = startingPoint.y;
 	}
 	
 }

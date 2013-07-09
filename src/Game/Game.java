@@ -40,8 +40,6 @@ public class Game extends BasicGame {
 	private static int						screenHeight		= 900;
 	private static boolean					fullScreen			= false;
 	
-	private static boolean					DEFAULT_RUNNING		= true;
-	
 	private static int						MAX_SPAWN_ENEMIES	= 30;
 	private static boolean					debugView			= false;
 	
@@ -104,8 +102,6 @@ public class Game extends BasicGame {
 	private static SpriteSheet				digits;
 	
 	private static Laser					laser;
-	
-	private int								tilesDrawn;
 	
 	private String							textboxText;
 	
@@ -172,6 +168,7 @@ public class Game extends BasicGame {
 	
 	public double		skyColorGlow	= 0;
 	private SpriteSheet	energy;
+	private float		deathFade;
 	
 	public Game() {
 		super("The Raccooning");
@@ -209,7 +206,7 @@ public class Game extends BasicGame {
 		if (level.getBackgroundObjects() != null) {
 			for (BackgroundObject bo : level.getBackgroundObjects()) {
 				g.pushTransform();
-				g.translate(-cam.getX() * zoom * bo.getZ() + screenWidth / 2, -cam.getY() * zoom * bo.getZ() + screenHeight * 2 / 3);
+				g.translate(-cam.getX() * zoom * bo.getZ() + screenWidth / 2, -cam.getY() * zoom * bo.getZ() + screenHeight / 2);
 				g.scale(zoom * bo.getZ(), zoom * bo.getZ());
 				
 				Image tmp = trashpile[bo.getType()];
@@ -243,7 +240,7 @@ public class Game extends BasicGame {
 		if (level.getCheckpoints() != null) {
 			for (Checkpoint cp : level.getCheckpoints()) {
 				g.pushTransform();
-				g.translate(-cam.getX() * zoom + screenWidth / 2, -cam.getY() * zoom + screenHeight * 2 / 3);
+				g.translate(-cam.getX() * zoom + screenWidth / 2, -cam.getY() * zoom + screenHeight / 2);
 				g.scale(zoom, zoom);
 				g.drawRect(cp.getX1(), cp.getY1(), cp.getWidth(), cp.getHeight());
 				g.popTransform();
@@ -266,7 +263,7 @@ public class Game extends BasicGame {
 		if (level.getZoomAreas() != null) {
 			for (ZoomArea za : level.getZoomAreas()) {
 				g.pushTransform();
-				g.translate(-cam.getX() * zoom + screenWidth / 2, -cam.getY() * zoom + screenHeight * 2 / 3);
+				g.translate(-cam.getX() * zoom + screenWidth / 2, -cam.getY() * zoom + screenHeight / 2);
 				g.scale(zoom, zoom);
 				g.drawRect(za.getX1(), za.getY1(), za.getWidth(), za.getHeight());
 				g.popTransform();
@@ -316,7 +313,7 @@ public class Game extends BasicGame {
 		
 		// load the level
 		try {
-			String json = readFile("levels/level1.json");
+			String json = readFile("levels/level2.json");
 			level = new Gson().fromJson(json, Level.class);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -363,6 +360,7 @@ public class Game extends BasicGame {
 			}
 		
 		player = new Player(this, 5f, 3f);
+		smoothBoltGUIAngle = player.getBoltCounter();
 		laser = new Laser(world, 0f, 0f);
 		player.setLaser(laser);
 		
@@ -592,12 +590,14 @@ public class Game extends BasicGame {
 			float biggestZoom = 0f;
 			if (player.isBiting() || player.isRepairing() || player.isDead()) {
 				targetZoom = 320f;
-			} else if (level.getZoomAreas() != null) {
-				for (ZoomArea za : level.getZoomAreas()) {
-					Vec2 pos = player.getBody().getPosition();
-					if (za.isInArea(pos.x, pos.y)) {
-						if (za.getZoom() > biggestZoom) {
-							biggestZoom = za.getZoom();
+			} else {
+				if (level.getZoomAreas() != null) {
+					for (ZoomArea za : level.getZoomAreas()) {
+						Vec2 pos = player.getBody().getPosition();
+						if (za.isInArea(pos.x, pos.y)) {
+							if (za.getZoom() > biggestZoom) {
+								biggestZoom = za.getZoom();
+							}
 						}
 					}
 				}
@@ -786,14 +786,12 @@ public class Game extends BasicGame {
 	@Override
 	public void render(GameContainer gc, Graphics g) throws SlickException {
 		
-		tilesDrawn = 0;
-		
 		g.fill(skyRect, skyGradient);
 		
 		drawBackgroundObjects(g);
 		
 		g.pushTransform();
-		g.translate(-cam.getX() * zoom + screenWidth / 2f, -cam.getY() * zoom + screenHeight * 2f / 3f);
+		g.translate(-cam.getX() * zoom + screenWidth / 2f, -cam.getY() * zoom + screenHeight / 2f);
 		g.scale(zoom, zoom);
 		
 		g.setColor(earthColor);
@@ -830,10 +828,9 @@ public class Game extends BasicGame {
 		player.draw(g, debugView);
 		
 		for (int x = getBlockX(-zoom); x <= getBlockX(screenWidth); ++x) {
-			for (int y = getBlockY(-zoom); y <= getBlockY(screenHeight); ++y) {
+			for (int y = getBlockY(-zoom * 2); y <= getBlockY(screenHeight); ++y) {
 				if (tiles[x][y] != null) {
 					tiles[x][y].draw(g, debugView);
-					++tilesDrawn;
 				}
 			}
 		}
@@ -867,6 +864,22 @@ public class Game extends BasicGame {
 		}
 		
 		g.popTransform();
+		
+		// death fade
+		int numframes = 10;
+		if (player.getDeathTimeCounter() > player.getDeathWaitTime() - numframes
+				&& player.getDeathTimeCounter() <= player.getDeathWaitTime()) {
+			if ((deathFade += 1f / numframes) > 1f)
+				deathFade = 1f;
+			if (player.getDeathTimeCounter() == player.getDeathWaitTime())
+				zoom = DEFAULT_ZOOM;
+		} else {
+			if ((deathFade -= 1f / numframes) < 0f)
+				deathFade = 0f;
+		}
+		g.setColor(new Color(0f, 0f, 0f, deathFade));
+		g.fillRect(0, 0, screenWidth, screenHeight);
+		// death fade end
 		
 		drawInterface();
 		
@@ -1168,6 +1181,10 @@ public class Game extends BasicGame {
 	
 	public ArrayList<Tire> getTires() {
 		return tires;
+	}
+	
+	public Camera getCamera() {
+		return cam;
 	}
 	
 }

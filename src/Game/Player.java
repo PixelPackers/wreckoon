@@ -638,7 +638,7 @@ public class Player {
 		++jumpCounter;
 		++laserCounter;
 		++biteCounter;
-		++deathTimeCounter;
+		if (dead) ++deathTimeCounter;
 		++tailwhipDelayCounter;
 		++repairTimeCounter;
 	}
@@ -852,6 +852,9 @@ public class Player {
 		body.setTransform(lastCheckpoint.getStartingPoint(), 0f);
 		wheel.getBody().setTransform(lastCheckpoint.getStartingPoint(), 0f);
 		body.setLinearVelocity(new Vec2(0f, 0f));
+		
+		game.getCamera().setPosition(lastCheckpoint.getStartingPoint());
+		
 		// TODO eine resetVariables() wäre praktisch...
 		dead = false;
 		deadAndOnGround = false;
@@ -1170,5 +1173,13 @@ public class Player {
 	
 	public boolean isRepairing() {
 		return repairing;
+	}
+	
+	public int getDeathTimeCounter() {
+		return deathTimeCounter;
+	}
+	
+	public int getDeathWaitTime() {
+		return DEATH_WAIT_TIME;
 	}
 }
