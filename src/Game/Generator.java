@@ -11,6 +11,8 @@ public class Generator extends GameObjectBox {
 	
 	private Vec2		position	= new Vec2();
 	private float		x, y;
+	private int 		lifetimeCounter = 0;
+	private int 		MAX_LIFETIME = 5000;
 	
 	private Animation	animation;
 	private boolean repaired = false;
@@ -65,9 +67,20 @@ public class Generator extends GameObjectBox {
 	
 	public void repair() {
 		repaired = true;	
+		lifetimeCounter = 0;
 	}
 	public boolean isRepaired() {
 		return repaired;
 	}
 	
+	public void update(){
+		
+		++lifetimeCounter;
+		
+		// FIXME checken ob spieler nicht gerade auflädt
+		if(lifetimeCounter > MAX_LIFETIME){
+			repaired = false;
+		}
+		
+	}
 }

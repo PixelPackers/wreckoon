@@ -1032,6 +1032,10 @@ public class Game extends BasicGame {
 				spreadBolts = 0;
 			}
 			
+			for (Generator g : generators){
+				g.update();
+			}
+			
 			world.step(delta / 1000f, 18, 6);
 			
 		}

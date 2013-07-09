@@ -64,15 +64,15 @@ public class Statistics {
 		return 
 		"Time: "				+ getTime()			 									+ " Seconds.\n"+
 
-		"total Pigs killed " 				+ Statistics.getInstance().getKilledPigsCounter() 		+ "\n"+
+		"total Pigs killed " 		+ Statistics.getInstance().getKilledPigsCounter() 		+ "\n"+
 		"\t with tailwhip: " 		+ Statistics.getInstance().getTailwhipKills() 			+ "\n"+
 		"\t\t (original): " 		+ Statistics.getInstance().getOriginalTailwhipKill() 	+ "\n"+
 		"\t\t (bounce off): "		+ Statistics.getInstance().getBounceofTailwhipKill()	+ "\n"+
 		"\t with groundpound: " 	+ Statistics.getInstance().getGroundPoundKills() 		+ "\n"+
 		"\t with laser: " 			+ Statistics.getInstance().getLaserKills()		 		+ "\n"+
-		"\t ambush kills: " 			+ Statistics.getInstance().getAmbushKills()		 		+ "\n"+
+		"\t ambush kills: " 		+ Statistics.getInstance().getAmbushKills()		 		+ "\n"+
 		"Laser activated: "			+ Statistics.getInstance().getLaserActivationCounter() 	+ "\n"+
-		"Generators repaired: " 			+ Statistics.getInstance().getGeneratorsRepaired() 		+ " broken generators.\n"+
+		"Generators repaired: " 	+ Statistics.getInstance().getGeneratorsRepaired() 		+ " broken generators.\n"+
 		"You used generators" 		+ Statistics.getInstance().getGeneratorsUsed() 			+ " times.\n"+
 		"Groundpounds: " 			+ Statistics.getInstance().getGroundpoundCounter() 		+ " times with Groundpound.\n"+
 		"You used " 				+ Statistics.getInstance().getLaserEnergyCounter() 		+ " laserenergy.\n"+
