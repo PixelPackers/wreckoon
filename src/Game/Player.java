@@ -34,6 +34,7 @@ public class Player {
 	private static final int			REPAIR_BOLT_PRICE			= 100;
 	private static final int			REPAIR_TIME					= 100;
 	private static final int			GODMODE_DURATION			= 40;
+	private static final int			DEATH_PRICE					= 10;
 	
 	private final float					MAX_VELOCITY				= 5f;
 	private final float					ACC_RUNNING					= 0.4375f;
@@ -246,7 +247,6 @@ public class Player {
 				int step = (boltCounter > 2) ? 2 : boltCounter;
 				
 				laserTime += step;
-				dropElectroBolt();
 			} else  {
 				biteFinalize();
 			}
@@ -451,6 +451,13 @@ public class Player {
 				this.currentAnimation = animations.get("deathAir");
 				this.dead = true;
 				this.deadAndOnGround = false;
+				
+				if(boltCounter >= DEATH_PRICE) {
+					tmpBoltAmount -= DEATH_PRICE;
+				} else {
+					boltCounter = 0;
+				}
+
 			}
 			
 			if (throwback) {
@@ -523,10 +530,6 @@ public class Player {
 			}
 			g.draw(polygonTailwhipToDraw);
 		}
-		
-	}
-	
-	private void dropElectroBolt() {
 		
 	}
 	
