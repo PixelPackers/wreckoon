@@ -179,7 +179,7 @@ public class MyContactListener implements ContactListener {
 			for (Spike spike : game.getSpikes()) {
 				if (spike.getFixture() == contact.getFixtureA() || spike.getFixture() == contact.getFixtureB()) {
 					if (!game.getPlayer().isDead())
-						Sounds.getInstance().play("fence", 1f, 1f);	
+						Sounds.getInstance().play("fence", 1f, 0.5f);	
 					game.getPlayer().die(false);
 				}
 			}

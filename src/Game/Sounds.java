@@ -39,6 +39,7 @@ public class Sounds {
 			putSound("airtime");
 			putSound("repair");
 			putSound("fence");
+			putSound("impact");
 			putSound("bgmusic", "audio/menu.ogg");
 			putSound("bgmusic2", "audio/menumelody.ogg");
 		} catch (Exception e) {

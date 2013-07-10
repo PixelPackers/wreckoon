@@ -48,7 +48,7 @@ public class Game extends BasicGame {
 	private static boolean					debugView			= false;
 	
 	private static boolean					DOOMSDAY			= false;
-	private static boolean					useZoomAreas		= false;
+	private static boolean					useZoomAreas		= true;
 	private static float					DEFAULT_ZOOM		= 128f;
 	private static float					targetZoom			= DEFAULT_ZOOM;
 	private static float					zoom				= targetZoom;
@@ -165,16 +165,18 @@ public class Game extends BasicGame {
 		game.start();
 	}
 	
-	private Mode			curMode			= Mode.PLAY;
+	private Mode						curMode			= Mode.PLAY;
 	
-	private Color			multiplierColor	= new Color(245, 179, 141);
-	private Color			earthColor		= new Color(164, 74, 13);
+	private Color						multiplierColor	= new Color(245, 179, 141);
+	private Color						earthColor		= new Color(164, 74, 13);
 	
-	public double			skyColorGlow	= 0;
-	private SpriteSheet		energy;
-	private float			deathFade;
-	private TrueTypeFont	fontBig;
-	private TrueTypeFont	fontSmall;
+	public double						skyColorGlow	= 0;
+	private SpriteSheet					energy;
+	private float						deathFade;
+	private TrueTypeFont				fontBig;
+	private TrueTypeFont				fontSmall;
+	private ArrayList<DialogTrigger>	dialogs			= new ArrayList<DialogTrigger>();
+	private Boaris	boaris;
 	
 	public Game() {
 		super("The Raccooning");
@@ -307,7 +309,7 @@ public class Game extends BasicGame {
 		
 		loadFonts();
 		
-		// Sounds.getInstance().loopMusic("bgmusic2", 1f, 0.8f);
+		Sounds.getInstance().play("impact", 1f, 0.8f);
 		
 		setupXBox();
 		
@@ -375,7 +377,16 @@ public class Game extends BasicGame {
 				parts.add(new Part(world, this, e.getX(), e.getY()));
 			}
 		
-		player = new Player(this, 5f, 3f);
+		if (level.getDialogTriggers() != null)
+			for (DialogTrigger e : level.getDialogTriggers()) {
+				dialogs.add(new DialogTrigger(e.getX1(), e.getY1(), e.getX2(), e.getY2()));
+			}
+		
+		// player = new Player(this, 5f, 3f);
+		player = new Player(this, -16.454136f, 23.8f);
+		boaris = new Boaris(-6f, 28.6f);
+		cam.setPosition(new Vec2(-16.454136f, 23.8f));
+		deathFade = 1f;
 		smoothBoltGUIAngle = player.getBoltCounter();
 		laser = new Laser(world, 0f, 0f);
 		player.setLaser(laser);
@@ -553,10 +564,6 @@ public class Game extends BasicGame {
 			curMode = Mode.TEXTBOX;
 		}
 		
-		if (input.isKeyDown(Input.KEY_U)) {
-			house.startBloodBath();
-		}
-		
 		if (input.isKeyPressed(Input.KEY_SPACE) || input.isKeyPressed(Input.KEY_W) || input.isKeyPressed(Input.KEY_UP)) {
 			actionJump();
 		}
@@ -596,6 +603,17 @@ public class Game extends BasicGame {
 					player.setCheckpoint(cp);
 				}
 			}
+		
+		int di = 0;
+		for (DialogTrigger d : dialogs) {
+			Vec2 pos = player.getBody().getPosition();
+			if (!d.isUsed() && d.isInArea(pos.x, pos.y)) {
+				textbox.setDialog(di);
+				curMode = Mode.TEXTBOX;
+				d.setUsed(true);
+			}
+			++di;
+		}
 		
 		// TODO Kamera Smoothness muss auch angepasst werden, je nach Zoom
 		if (useZoomAreas) {
@@ -845,6 +863,8 @@ public class Game extends BasicGame {
 			}
 		}
 		
+		boaris.draw(debugView);
+		
 		player.draw(g, debugView);
 		
 		for (int x = getBlockX(-zoom); x <= getBlockX(screenWidth); ++x) {
@@ -905,14 +925,15 @@ public class Game extends BasicGame {
 		
 		if (curMode == Mode.TEXTBOX) {
 			if (textbox.getText() != null)
-				drawAlignedString(fontSmall, 4, textbox.getText(), screenWidth / 2, screenHeight - 100, Color.white);
+				drawAlignedString(fontSmall, 4, textbox.getText(), screenWidth / 2, screenHeight - 96, Color.black);
+			drawAlignedString(fontSmall, 4, textbox.getText(), screenWidth / 2, screenHeight - 100, Color.white);
 		}
 		
 		if (curMode == Mode.PAUSE) {
 			g.setColor(new Color(0f, 0f, 0f, 0.3f));
 			g.fillRect(0, 0, screenWidth, screenHeight);
 			// pauseImage.drawCentered(screenWidth * 0.5f, screenHeight * 0.4f);
-			drawAlignedString(fontBig, 4, "PAUSE", screenWidth / 2, screenHeight / 2, Color.white);
+			drawAlignedString(fontBig, 4, "PAUSE", screenWidth / 2, (int) (screenHeight * 0.3), Color.white);
 		}
 		g.setColor(Color.white);
 		
@@ -962,11 +983,14 @@ public class Game extends BasicGame {
 	
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
+		
 		Statistics.getInstance().update();
 		Input input = gc.getInput();
 		if (input.isKeyPressed(Input.KEY_ESCAPE)) {
 			actionPause();
 		}
+		
+		boaris.update();
 		
 		if (curMode == Mode.PLAY || curMode == Mode.TEXTBOX) {
 			if (curMode == Mode.PLAY)
@@ -994,6 +1018,37 @@ public class Game extends BasicGame {
 				targetCamX = (float) (player.getBody().getPosition().x + polarToX(xboxRightThumbDirection, xboxRightThumbMagnitude) * 3f);
 				targetCamY = (float) (player.getBody().getPosition().y + polarToY(xboxRightThumbDirection, xboxRightThumbMagnitude) * 3f);
 			}
+			
+			if (player.isDead()) {
+				targetCamX = (float) (player.getBody().getPosition().x);
+				targetCamY = (float) (player.getBody().getPosition().y);
+			}
+			
+			if (curMode == Mode.TEXTBOX) {
+				if (textbox.getText() == "Farewell! Hahaha...") {
+					house.startBloodBath();
+					boaris.startMoving();
+				}
+				switch (textbox.getCamFocus()) {
+					case 0:
+						targetCamX = (float) (player.getBody().getPosition().x);
+						targetCamY = (float) (player.getBody().getPosition().y);
+						break;
+					case 1:
+						targetCamX = (float) (-6f);
+						targetCamY = (float) (28.6f);
+						break;
+					case 2:
+						targetCamX = (float) (-6.268761f);
+						targetCamY = (float) (27.005844f);
+						break;
+					case 3:
+						targetCamX = (float) (-7f);
+						targetCamY = (float) (22f);
+						break;
+				}
+			}
+			
 			// if (targetCamY > level.getHeight() - screenHeight/2/zoom)
 			// targetCamY = level.getHeight() - screenHeight/2/zoom;
 			
@@ -1118,7 +1173,7 @@ public class Game extends BasicGame {
 		} else {
 			initNormalSky();
 		}
-		
+
 	}
 	
 	private double polarToY(double direction, double magnitude) {

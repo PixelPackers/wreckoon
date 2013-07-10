@@ -228,5 +228,9 @@ public class Statistics {
 	public void incSuicides() {
 		++suicides;
 	}
+
+	public int getTimeCounter() {
+		return timeCounter;
+	}
 	
 }

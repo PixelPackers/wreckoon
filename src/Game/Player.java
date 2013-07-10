@@ -147,7 +147,7 @@ public class Player {
 		
 		this.body = game.getWorld().createBody(bodyDef);
 		
-		wheel = new GameObjectCircle(game.getWorld(), 0f, 0f, width * 0.5f, 5f, FRICTION, 0f, null, BodyType.DYNAMIC);
+		wheel = new GameObjectCircle(game.getWorld(), posX, posY, width * 0.5f, 5f, FRICTION, 0f, null, BodyType.DYNAMIC);
 		wheel.getBody().setAngularDamping(100000000f);
 		
 		Filter filter = new Filter();

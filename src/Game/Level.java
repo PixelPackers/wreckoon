@@ -17,6 +17,7 @@ public class Level {
 	private ArrayList<Generator>		generators;
 	private ArrayList<Conveyor>			conveyors;
 	private ArrayList<Tire>				tires;
+	private ArrayList<DialogTrigger>	dialogs;
 	
 	public Level(int width, int height) {
 		this.blocks = new Block[width][height];
@@ -47,6 +48,13 @@ public class Level {
 			conveyors = new ArrayList<Conveyor>();
 		}
 		conveyors.add(c);
+	}
+	
+	public void addDialogTrigger(DialogTrigger d) {
+		if (dialogs == null) {
+			dialogs = new ArrayList<DialogTrigger>();
+		}
+		dialogs.add(d);
 	}
 	
 	public void addEnemy(SpawnPoint e) {
@@ -119,6 +127,10 @@ public class Level {
 		return girders;
 	}
 	
+	public ArrayList<DialogTrigger> getDialogTriggers() {
+		return dialogs;
+	}
+	
 	public int getHeight() {
 		return this.blocks[0].length;
 	}
@@ -159,7 +171,7 @@ public class Level {
 	public void setBlock(int x, int y, int brush, int angle, boolean flipped) {
 		this.blocks[x][y].set(brush, angle, flipped);
 	}
-	
+
 	public void shift(int dX, int dY) {
 		Block[][] tmp = new Block[this.getWidth()][this.getHeight()];
 		for (int x = 0; x < this.getWidth(); ++x) {
