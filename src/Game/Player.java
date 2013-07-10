@@ -35,7 +35,8 @@ public class Player {
 	private static final int			GROUNDPOUND_DELAY			= 50;
 	private static final int			REPAIR_BOLT_PRICE			= 100;
 	private static final int			REPAIR_TIME					= 100;
-	private static final int			GODMODE_DURATION			= 100;
+	private static final int			GODMODE_DURATION			= 40;
+	private static final int			DEATH_PRICE					= 10;
 	
 	private final float					MAX_VELOCITY				= 5f;
 	private final float					ACC_RUNNING					= 0.4375f;
@@ -248,7 +249,6 @@ public class Player {
 				int step = (boltCounter > 2) ? 2 : boltCounter;
 				
 				laserTime += step;
-				dropElectroBolt();
 			} else  {
 				biteFinalize();
 			}
@@ -454,6 +454,13 @@ public class Player {
 				this.currentAnimation = animations.get("deathAir");
 				this.dead = true;
 				this.deadAndOnGround = false;
+				
+				if(boltCounter >= DEATH_PRICE) {
+					tmpBoltAmount -= DEATH_PRICE;
+				} else {
+					boltCounter = 0;
+				}
+
 			}
 			
 			if (throwback) {
@@ -465,6 +472,7 @@ public class Player {
 			
 			deathTimeCounter = 0;
 			lock();
+			Statistics.getInstance().incPlayerDeaths();
 		}
 	}
 	
@@ -525,10 +533,6 @@ public class Player {
 			}
 			g.draw(polygonTailwhipToDraw);
 		}
-		
-	}
-	
-	private void dropElectroBolt() {
 		
 	}
 	
@@ -602,7 +606,6 @@ public class Player {
 	
 	private void groundpound() {
 		if (this.groundPoundCounter > GROUNDPOUND_AIRTIME) {
-			Statistics.getInstance().incGroundpoundCounter();
 			this.body.setLinearVelocity(new Vec2(this.body.getLinearVelocity().x, groundPoundPower));
 		} else {
 			this.getBody().setLinearVelocity(new Vec2(0f, 0f));
@@ -610,24 +613,24 @@ public class Player {
 	}
 	
 	public void groundpoundInit() {
-		if (locked || wasLasering) {
-			return;
-		}
-		
-		if (groundPoundCounter > GROUNDPOUND_DELAY && !groundPounding) {
+		if (!locked && !wasLasering) {		
 			
-			lock();
-			
-			this.currentAnimation = animations.get("groundpound");
-			this.currentAnimation.restart();
-			
-			this.groundPounding = true;
-			this.groundPoundCounter = 0;
-			
-			godmode = true;
-			
-			this.groundpound();
-			
+			if (groundPoundCounter > GROUNDPOUND_DELAY && !groundPounding && !isOnWall()) {
+				
+				lock();
+				
+				this.currentAnimation = animations.get("groundpound");
+				this.currentAnimation.restart();
+				
+				this.groundPounding = true;
+				this.groundPoundCounter = 0;
+				
+				godmode = true;
+	
+				Statistics.getInstance().incGroundpoundCounter();
+				this.groundpound();
+				
+			}
 		}
 		
 	}
@@ -1027,25 +1030,6 @@ public class Player {
 				// FIXME magic number
 				this.body.setLinearVelocity(new Vec2(0f, -0.3f));
 			}
-			
-			
-			// // abwaerts bewegung an wand
-			// if( this.isOnWall() ){
-			// if(this.body.getLinearVelocity().y < 0){
-			// if( (this.leftWallColliding() && this.body.getLinearVelocity().x
-			// < 0f ) || (this.rightWallColliding() &&
-			// this.body.getLinearVelocity().x > 0f )){
-			// this.body.setLinearVelocity(new
-			// Vec2(this.body.getLinearVelocity().x, 1f));
-			// } else {
-			// this.body.setLinearVelocity(new
-			// Vec2(this.body.getLinearVelocity().x, -2f));
-			// }
-			// }
-			// // if( !this.isOnGround()){
-			// // this.setRunning(false);
-			// // }
-			// }
 			
 			if (this.groundPounding) {
 				this.groundpound();
