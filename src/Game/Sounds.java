@@ -36,8 +36,11 @@ public class Sounds {
 			putSound("pigaggro");
 			putSound("tailwhip");
 			putSound("fence");
+			putSound("airtime");
+			putSound("repair");
+			putSound("fence");
 			putSound("bgmusic", "audio/menu.ogg");
-			putSound("bgmusic2", "audio/menu.ogg");
+			putSound("bgmusic2", "audio/menumelody.ogg");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

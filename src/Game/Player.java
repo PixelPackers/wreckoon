@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import javax.jws.Oneway;
+
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -269,6 +271,7 @@ public class Player {
 						lock();
 						game.addSpreadBolts(REPAIR_BOLT_PRICE);
 						
+						Sounds.getInstance().play("repair", 1f, 1f);
 						repairGenerator();
 					}
 					
@@ -804,6 +807,7 @@ public class Player {
 			float jumpSpeedY = this.jumpPower;
 			
 			Sounds.getInstance().play("jump", Functions.randomRange(0.9f, 1.1f), 1f);
+			Sounds.getInstance().play("airtime", 1f, 1f);
 			
 			if (this.isOnGround()) {
 				
@@ -944,7 +948,7 @@ public class Player {
 			return;
 		}
 		
-		if (!doTailwhip && !this.isGoingToCreateTailwhip && !this.groundPounding) {
+		if (!doTailwhip && !this.isGoingToCreateTailwhip && !this.groundPounding && !isOnWall()) {
 			
 			this.tailwhipCounter = 0;
 			
@@ -989,6 +993,10 @@ public class Player {
 	}
 	
 	public void update() {
+		if (isOnGround() || isOnWall()) {
+			Sounds.getInstance().stop("airtime");
+		}
+		
 		if (!dead) {
 			
 			adjustLaserTime();

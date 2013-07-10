@@ -1,8 +1,10 @@
 package Game;
 
+import java.awt.Font;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -22,8 +24,10 @@ import org.newdawn.slick.ShapeFill;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
 import org.newdawn.slick.SpriteSheet;
+import org.newdawn.slick.TrueTypeFont;
 import org.newdawn.slick.fills.GradientFill;
 import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.util.ResourceLoader;
 
 import ch.aplu.xboxcontroller.XboxController;
 import ch.aplu.xboxcontroller.XboxControllerAdapter;
@@ -103,8 +107,6 @@ public class Game extends BasicGame {
 	
 	private static Laser					laser;
 	
-	private String							textboxText;
-	
 	private static final double				THUMBSTICK_DEADZONE	= 0.2d;
 	private static final double				TRIGGER_DEADZONE	= 0.2d;
 	
@@ -114,6 +116,8 @@ public class Game extends BasicGame {
 	private double							xboxRightThumbMagnitude;
 	private double							xboxLeftTrigger;
 	private double							xboxRightTrigger;
+	
+	private Textbox							textbox				= new Textbox();
 	
 	public static ArrayList<Conveyor> getConveyors() {
 		return conveyors;
@@ -161,14 +165,16 @@ public class Game extends BasicGame {
 		game.start();
 	}
 	
-	private Mode		curMode			= Mode.PLAY;
+	private Mode			curMode			= Mode.PLAY;
 	
-	private Color		multiplierColor	= new Color(245, 179, 141);
-	private Color		earthColor		= new Color(164, 74, 13);
+	private Color			multiplierColor	= new Color(245, 179, 141);
+	private Color			earthColor		= new Color(164, 74, 13);
 	
-	public double		skyColorGlow	= 0;
-	private SpriteSheet	energy;
-	private float		deathFade;
+	public double			skyColorGlow	= 0;
+	private SpriteSheet		energy;
+	private float			deathFade;
+	private TrueTypeFont	fontBig;
+	private TrueTypeFont	fontSmall;
 	
 	public Game() {
 		super("The Raccooning");
@@ -299,6 +305,10 @@ public class Game extends BasicGame {
 	public void init(GameContainer gc) throws SlickException {
 		Sounds.getInstance().loadAudioFiles();
 		
+		loadFonts();
+		
+		// Sounds.getInstance().loopMusic("bgmusic2", 1f, 0.8f);
+		
 		setupXBox();
 		
 		for (int i = 0; i <= 4; ++i) {
@@ -406,7 +416,8 @@ public class Game extends BasicGame {
 						actionCancelJump();
 				}
 				if (curMode == Mode.TEXTBOX) {
-					actionTextBoxOK();
+					if (pressed)
+						actionTextBoxOK();
 				}
 			}
 			
@@ -486,7 +497,11 @@ public class Game extends BasicGame {
 	}
 	
 	protected void actionTextBoxOK() {
-		curMode = Mode.PLAY;
+		if (textbox.hasNext()) {
+			textbox.nextText();
+		} else {
+			curMode = Mode.PLAY;
+		}
 	}
 	
 	private void initNormalSky() {
@@ -534,7 +549,7 @@ public class Game extends BasicGame {
 	public void processInput(Input input) throws SlickException {
 		
 		if (input.isKeyDown(Input.KEY_B)) {
-			textboxText = "Das ist eine Textbox";
+			textbox.setDialog(0);
 			curMode = Mode.TEXTBOX;
 		}
 		
@@ -717,7 +732,7 @@ public class Game extends BasicGame {
 	}
 	
 	private void actionDoomsday() {
-		if(!DOOMSDAY){
+		if (!DOOMSDAY) {
 			initDoomsday();
 		} else {
 			endDoomsday();
@@ -729,15 +744,15 @@ public class Game extends BasicGame {
 		DOOMSDAY = true;
 		doomsdayCounter = 0;
 		
-//		TODO start dub step
+		// TODO start dub step
 		
 	}
-
-	private void endDoomsday(){
+	
+	private void endDoomsday() {
 		printDoomsdayStatistics();
 		DOOMSDAY = false;
 	}
-
+	
 	private void printDoomsdayStatistics() {
 		
 		Statistics.getInstance().printStats();
@@ -890,13 +905,15 @@ public class Game extends BasicGame {
 		drawInterface();
 		
 		if (curMode == Mode.TEXTBOX) {
-			g.drawString(textboxText, 500, 500);
+			if (textbox.getText() != null)
+				drawAlignedString(fontSmall, 4, textbox.getText(), screenWidth / 2, screenHeight - 100, Color.white);
 		}
 		
 		if (curMode == Mode.PAUSE) {
 			g.setColor(new Color(0f, 0f, 0f, 0.3f));
 			g.fillRect(0, 0, screenWidth, screenHeight);
-			pauseImage.drawCentered(screenWidth * 0.5f, screenHeight * 0.4f);
+			// pauseImage.drawCentered(screenWidth * 0.5f, screenHeight * 0.4f);
+			drawAlignedString(fontBig, 4, "PAUSE", screenWidth / 2, screenHeight / 2, Color.white);
 		}
 		g.setColor(Color.white);
 		
@@ -999,7 +1016,7 @@ public class Game extends BasicGame {
 				
 				++doomsdayCounter;
 				
-				if(player.isDead()){
+				if (player.isDead()) {
 					endDoomsday();
 				}
 			} else {
@@ -1090,7 +1107,7 @@ public class Game extends BasicGame {
 				spreadBolts = 0;
 			}
 			
-			for (Generator g : generators){
+			for (Generator g : generators) {
 				g.update();
 			}
 			
@@ -1195,6 +1212,25 @@ public class Game extends BasicGame {
 	
 	public Camera getCamera() {
 		return cam;
+	}
+	
+	// align defines the anchor point
+	// 0 1 2
+	// 3 4 5
+	// 6 7 8
+	private void drawAlignedString(TrueTypeFont font, int align, String text, int x, int y, Color color) {
+		font.drawString(x - (align % 3) * font.getWidth(text) / 2, y - (align / 3) * font.getHeight(text) / 2, text, color);
+	}
+	
+	private void loadFonts() {
+		try {
+			InputStream inputStream = ResourceLoader.getResourceAsStream("etc/Second-Chances-Solid.ttf");
+			Font awtFont = Font.createFont(Font.TRUETYPE_FONT, inputStream);
+			fontSmall = new TrueTypeFont(awtFont.deriveFont(40f), true);
+			fontBig = new TrueTypeFont(awtFont.deriveFont(60f), true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 }

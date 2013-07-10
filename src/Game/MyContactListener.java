@@ -178,6 +178,8 @@ public class MyContactListener implements ContactListener {
 			// player + spikes
 			for (Spike spike : game.getSpikes()) {
 				if (spike.getFixture() == contact.getFixtureA() || spike.getFixture() == contact.getFixtureB()) {
+					if (!game.getPlayer().isBiting())
+						Sounds.getInstance().play("fence", 1f, 1f);	
 					game.getPlayer().die(false);
 				}
 			}
@@ -190,7 +192,7 @@ public class MyContactListener implements ContactListener {
 			}
 			
 			// player + dropItems
-			if(!game.getPlayer().isDead()){
+			if (!game.getPlayer().isDead()) {
 				Iterator iterator = game.getDropItems().iterator();
 				while (iterator.hasNext()) {
 					
