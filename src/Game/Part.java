@@ -15,7 +15,7 @@ import org.newdawn.slick.SlickException;
 
 public class Part {
 	
-	private final int			BOLT_VALUE		= 500;
+	private final int			BOLT_VALUE		= 100;
 	
 	private static final float	radius			= 0.5f;
 	private World				world;

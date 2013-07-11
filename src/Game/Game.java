@@ -961,7 +961,9 @@ public class Game extends BasicGame {
 		// + "\n" + "laser angle: " + laserAngle
 		// + "\nlaser target angle: " + laserTargetAngle + "\ntiles drawn: " +
 		// tilesDrawn, 10, 50);
-		Statistics.getInstance().drawStats(g);
+		if( curMode == Mode.PAUSE ){
+			Statistics.getInstance().drawStats(g);
+		}
 	}
 	
 	// public static ArrayList<Shred> getShreds() {
@@ -983,14 +985,31 @@ public class Game extends BasicGame {
 	
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
-		
-		Statistics.getInstance().update();
+
+		if( curMode != Mode.PAUSE ){
+			Statistics.getInstance().update();
+		}
 		Input input = gc.getInput();
 		if (input.isKeyPressed(Input.KEY_ESCAPE)) {
 			actionPause();
 		}
 		
 		boaris.update();
+		
+		if (input.isKeyPressed(Input.KEY_COMMA)) {
+			Checkpoint cp = player.getCheckpoint();
+			cp = level.getCheckpoints().get((level.getCheckpoints().indexOf(cp) + 1) % level.getCheckpoints().size());
+			player.setCheckpoint(cp);
+			player.revive();
+			curMode = Mode.PLAY;
+		}
+		if (input.isKeyPressed(Input.KEY_PERIOD)) {
+			Checkpoint cp = player.getCheckpoint();
+			cp = level.getCheckpoints().get((level.getCheckpoints().indexOf(cp) + level.getCheckpoints().size() - 1) % level.getCheckpoints().size());
+			player.setCheckpoint(cp);
+			player.revive();
+			curMode = Mode.PLAY;
+		}
 		
 		if (curMode == Mode.PLAY || curMode == Mode.TEXTBOX) {
 			if (curMode == Mode.PLAY)

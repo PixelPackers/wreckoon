@@ -57,7 +57,7 @@ public class Player {
 																										// kurz
 																										// unverwundbar
 																										
-	private int							tmpBoltAmount				= 110;
+	private int							tmpBoltAmount				= 0;
 	private int							deathTimeCounter			= 0;
 	private int							laserTime					= 50;
 	
@@ -861,7 +861,7 @@ public class Player {
 		return this.left;
 	}
 	
-	private void revive() {
+	public void revive() {
 		body.setTransform(lastCheckpoint.getStartingPoint(), 0f);
 		wheel.getBody().setTransform(lastCheckpoint.getStartingPoint(), 0f);
 		body.setLinearVelocity(new Vec2(0f, 0f));
