@@ -230,6 +230,7 @@ public abstract class Enemy extends GameObjectBox {
 		g.setColor(Color.red);
 		g.fill(r);
 		g.draw(r);
+		g.setColor(Color.white);
 	}
 	
 	public Animation getCurrentAnimation() {

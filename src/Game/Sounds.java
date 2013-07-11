@@ -40,6 +40,8 @@ public class Sounds {
 			putSound("repair");
 			putSound("fence");
 			putSound("impact");
+			putSound("intro");
+			putSound("drama");
 			putSound("bgmusic", "audio/menu.ogg");
 			putSound("bgmusic2", "audio/menumelody.ogg");
 		} catch (Exception e) {

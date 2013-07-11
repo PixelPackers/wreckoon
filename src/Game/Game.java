@@ -119,6 +119,8 @@ public class Game extends BasicGame {
 	
 	private Textbox							textbox				= new Textbox();
 	
+	private Music drama, bgmusic, dubstep;
+	
 	public static ArrayList<Conveyor> getConveyors() {
 		return conveyors;
 	}
@@ -176,7 +178,7 @@ public class Game extends BasicGame {
 	private TrueTypeFont				fontBig;
 	private TrueTypeFont				fontSmall;
 	private ArrayList<DialogTrigger>	dialogs			= new ArrayList<DialogTrigger>();
-	private Boaris	boaris;
+	private Boaris						boaris;
 	
 	public Game() {
 		super("The Raccooning");
@@ -306,6 +308,10 @@ public class Game extends BasicGame {
 	@Override
 	public void init(GameContainer gc) throws SlickException {
 		Sounds.getInstance().loadAudioFiles();
+		
+		drama = new Music("audio/drama.ogg");
+		bgmusic = new Music("audio/menumelody.ogg");
+		dubstep = new Music("audio/dubstep.ogg");
 		
 		loadFonts();
 		
@@ -508,6 +514,9 @@ public class Game extends BasicGame {
 	}
 	
 	protected void actionTextBoxOK() {
+		if (textbox.getText() == "...and crush Boaris with all my wrath!!!") {
+			bgmusic.loop();
+		}
 		if (textbox.hasNext()) {
 			textbox.nextText();
 		} else {
@@ -611,44 +620,11 @@ public class Game extends BasicGame {
 				textbox.setDialog(di);
 				curMode = Mode.TEXTBOX;
 				d.setUsed(true);
+				if (di == 1) {
+					Sounds.getInstance().loopMusic("drama", 1f, 1f);
+				}
 			}
 			++di;
-		}
-		
-		// TODO Kamera Smoothness muss auch angepasst werden, je nach Zoom
-		if (useZoomAreas) {
-			float biggestZoom = 0f;
-			if (player.isBiting() || player.isRepairing() || player.isDead()) {
-				targetZoom = 320f;
-			} else {
-				if (level.getZoomAreas() != null) {
-					for (ZoomArea za : level.getZoomAreas()) {
-						Vec2 pos = player.getBody().getPosition();
-						if (za.isInArea(pos.x, pos.y)) {
-							if (za.getZoom() > biggestZoom) {
-								biggestZoom = za.getZoom();
-							}
-						}
-					}
-				}
-				if (biggestZoom > 0.001f) {
-					targetZoom = biggestZoom;
-				} else {
-					targetZoom = DEFAULT_ZOOM;
-				}
-			}
-			zoom = Functions.curveValue(targetZoom, zoom, 30);
-		} else {
-			if (input.isKeyDown(Input.KEY_E)) {
-				if (zoom < 200) {
-					zoom += MANUAL_ZOOM_STEP;
-				}
-			}
-			if (input.isKeyDown(Input.KEY_R)) {
-				if (zoom - MANUAL_ZOOM_STEP > MANUAL_ZOOM_STEP) {
-					zoom -= MANUAL_ZOOM_STEP;
-				}
-			}
 		}
 		
 		if (input.isKeyPressed(Input.KEY_X)) {
@@ -760,7 +736,7 @@ public class Game extends BasicGame {
 	private void initDoomsday() {
 		DOOMSDAY = true;
 		doomsdayCounter = 0;
-		
+		dubstep.loop();
 		// TODO start dub step
 		
 	}
@@ -768,6 +744,7 @@ public class Game extends BasicGame {
 	private void endDoomsday() {
 		printDoomsdayStatistics();
 		DOOMSDAY = false;
+		bgmusic.loop();
 	}
 	
 	private void printDoomsdayStatistics() {
@@ -834,6 +811,7 @@ public class Game extends BasicGame {
 		
 		g.setColor(earthColor);
 		g.fillRect(-21.5f, level.getHeight() - 1f, level.getWidth() + 21f, 10f);
+		g.setColor(Color.white);
 		
 		for (Tire t : tires) {
 			t.draw(g, debugView);
@@ -961,7 +939,7 @@ public class Game extends BasicGame {
 		// + "\n" + "laser angle: " + laserAngle
 		// + "\nlaser target angle: " + laserTargetAngle + "\ntiles drawn: " +
 		// tilesDrawn, 10, 50);
-		if( curMode == Mode.PAUSE ){
+		if (curMode == Mode.PAUSE) {
 			Statistics.getInstance().drawStats(g);
 		}
 	}
@@ -985,8 +963,8 @@ public class Game extends BasicGame {
 	
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
-
-		if( curMode != Mode.PAUSE ){
+		
+		if (curMode != Mode.PAUSE) {
 			Statistics.getInstance().update();
 		}
 		Input input = gc.getInput();
@@ -1005,10 +983,47 @@ public class Game extends BasicGame {
 		}
 		if (input.isKeyPressed(Input.KEY_PERIOD)) {
 			Checkpoint cp = player.getCheckpoint();
-			cp = level.getCheckpoints().get((level.getCheckpoints().indexOf(cp) + level.getCheckpoints().size() - 1) % level.getCheckpoints().size());
+			cp = level.getCheckpoints().get(
+					(level.getCheckpoints().indexOf(cp) + level.getCheckpoints().size() - 1) % level.getCheckpoints().size());
 			player.setCheckpoint(cp);
 			player.revive();
 			curMode = Mode.PLAY;
+		}
+		
+		// TODO Kamera Smoothness muss auch angepasst werden, je nach Zoom
+		if (useZoomAreas) {
+			float biggestZoom = 0f;
+			if (player.isBiting() || player.isRepairing() || player.isDead()) {
+				targetZoom = 320f;
+			} else {
+				if (level.getZoomAreas() != null) {
+					for (ZoomArea za : level.getZoomAreas()) {
+						Vec2 pos = player.getBody().getPosition();
+						if (za.isInArea(pos.x, pos.y)) {
+							if (za.getZoom() > biggestZoom) {
+								biggestZoom = za.getZoom();
+							}
+						}
+					}
+				}
+				if (biggestZoom > 0.001f) {
+					targetZoom = biggestZoom;
+				} else {
+					targetZoom = DEFAULT_ZOOM;
+				}
+			}
+			zoom = Functions.curveValue(targetZoom, zoom, 30);
+		} else {
+			if (input.isKeyDown(Input.KEY_E)) {
+				if (zoom < 200) {
+					zoom += MANUAL_ZOOM_STEP;
+				}
+			}
+			if (input.isKeyDown(Input.KEY_R)) {
+				if (zoom - MANUAL_ZOOM_STEP > MANUAL_ZOOM_STEP) {
+					zoom -= MANUAL_ZOOM_STEP;
+				}
+			}
 		}
 		
 		if (curMode == Mode.PLAY || curMode == Mode.TEXTBOX) {
@@ -1068,8 +1083,14 @@ public class Game extends BasicGame {
 				}
 			}
 			
-			// if (targetCamY > level.getHeight() - screenHeight/2/zoom)
-			// targetCamY = level.getHeight() - screenHeight/2/zoom;
+			if (targetCamY > level.getHeight() - screenHeight / 2 / zoom)
+				targetCamY = level.getHeight() - screenHeight / 2 / zoom;
+			
+			if (targetCamX > level.getWidth() - screenWidth / 2 / zoom)
+				targetCamX = level.getWidth() - screenWidth / 2 / zoom;
+			
+			if (targetCamX < -13 - screenWidth / 2 / zoom)
+				targetCamX = -13 - screenWidth / 2 / zoom;
 			
 			cam.follow(targetCamX, targetCamY, 10);
 			
@@ -1192,7 +1213,7 @@ public class Game extends BasicGame {
 		} else {
 			initNormalSky();
 		}
-
+		
 	}
 	
 	private double polarToY(double direction, double magnitude) {
